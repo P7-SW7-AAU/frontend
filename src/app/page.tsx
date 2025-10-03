@@ -40,7 +40,7 @@ const Dashboard = () => {
               Multi-Sport Fantasy
               <span className="block text-[#1B8143] animate-pulse-glow">Command Center</span>
             </h1>
-            <p className="text-xl font-medium text-[#94A4B8] max-w-2xl mx-auto">
+            <p className="text-xl font-medium text-primary-gray max-w-2xl mx-auto">
               Build teams with players from football, basketball, soccer, chess, tennis and more. Dominate across all sports!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -82,15 +82,15 @@ const Dashboard = () => {
           <Card className="hover:shadow-card transition-smooth">
             <CardHeader>
               <CardTitle className="flex items-center text-lg text-white">
-                <Users className="h-5 w-5 mr-2 text-[#16A149]" />
+                <Users className="h-5 w-5 mr-2 text-primary-green" />
                 League Standings
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-[#94A4B8] font-medium mb-4">Check your position in the league</p>
+              <p className="text-primary-gray font-medium mb-4">Check your position in the league</p>
               <Button 
-                variant="outline" 
-                className="w-full"
+                variant="gold" 
+                className="w-full font-semibold"
                 onClick={() => router.push('/leagues')}
               >
                 View Leagues
@@ -101,14 +101,14 @@ const Dashboard = () => {
           <Card className="hover:shadow-card transition-smooth">
             <CardHeader>
               <CardTitle className="flex items-center text-lg text-white">
-                <Target className="h-5 w-5 mr-2 text-[#16A149]" />
+                <Target className="h-5 w-5 mr-2 text-primary-green" />
                 Waiver Wire
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-[#94A4B8] font-medium mb-4">Find hidden gems for your roster</p>
+              <p className="text-primary-gray font-medium mb-4">Find hidden gems for your roster</p>
               <Button 
-                variant="outline" 
+                variant="gold" 
                 className="w-full"
                 onClick={() => router.push('/players')}
               >
@@ -135,7 +135,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">Your Top Performers</h2>
-            <Badge variant="secondary" className="px-3 py-1">This Week</Badge>
+            <Badge className="px-3 py-1 bg-[#152332] font-bold">This Week</Badge>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {currentTeam.players.slice(0, 3).map((player) => (
@@ -151,10 +151,10 @@ const Dashboard = () => {
         {/* Available Players */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-foreground">Trending Players</h2>
+            <h2 className="text-2xl font-bold text-white">Trending Players</h2>
             <Button 
-              variant="ghost"
               onClick={() => router.push('/players')}
+              className="text-white font-bold hover:scale-105 transition-all duration-200"
             >
               View All
               <Plus className="h-4 w-4 ml-2" />
@@ -166,7 +166,6 @@ const Dashboard = () => {
                 key={player.uniqueID}
                 player={player}
                 onAction={handlePlayerAction}
-                compact
               />
             ))}
           </div>

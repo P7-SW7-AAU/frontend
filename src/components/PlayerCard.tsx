@@ -24,8 +24,8 @@ const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team
   };
 
   const getTrendIcon = () => {
-    if (player.trend === 'up') return <TrendingUp className="h-4 w-4 text-[#16A149]" />;
-    if (player.trend === 'down') return <TrendingDown className="h-4 w-4 text-[#EF4345]" />;
+    if (player.trend === 'up') return <TrendingUp className="h-4 w-4 text-primary-green" />;
+    if (player.trend === 'down') return <TrendingDown className="h-4 w-4 text-primary-red" />;
     return null;
   };
 
@@ -48,7 +48,7 @@ const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team
           </div>
           <div className="flex items-center space-x-1">
             {getTrendIcon()}
-            <Badge variant={getStatusColor(player.status)} className="text-xs">
+            <Badge variant={getStatusColor(player.status)} className="text-xs font-bold">
               {player.status.toUpperCase()}
             </Badge>
           </div>
@@ -58,13 +58,13 @@ const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team
       <CardContent className={`pt-0 ${compact ? 'p-4 pt-0' : ''}`}>
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <div className={`text-foreground font-medium ${compact ? 'text-sm' : 'text-base'}`}>
+            <div className={`text-white font-medium ${compact ? 'text-sm' : 'text-base'}`}>
               {player.points || 0} pts
             </div>
-            <div className={`text-muted-foreground ${compact ? 'text-xs' : 'text-sm'}`}>
+            <div className={`text-primary-gray font-medium ${compact ? 'text-xs' : 'text-sm'}`}>
               Proj: {player.projectedPoints || 0}
             </div>
-            <div className={`text-muted-foreground ${compact ? 'text-xs' : 'text-sm'}`}>
+            <div className={`text-primary-gray font-medium ${compact ? 'text-xs' : 'text-sm'}`}>
               Value: ${player.value}M
             </div>
           </div>
@@ -78,12 +78,12 @@ const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team
             >
               {isOwned ? (
                 <>
-                  <Minus className="h-4 w-4 mr-1" />
+                  <Minus className="h-4 w-4 mr-1 text-white" />
                   Drop
                 </>
               ) : (
                 <>
-                  <Plus className="h-4 w-4 mr-1" />
+                  <Plus className="h-4 w-4 mr-1 text-white" />
                   Add
                 </>
               )}
