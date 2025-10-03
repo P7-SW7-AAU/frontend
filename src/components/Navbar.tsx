@@ -57,7 +57,6 @@ const Navbar = () => {
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
                 <Button
-                variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(!isOpen)}
                 >
@@ -69,7 +68,7 @@ const Navbar = () => {
             {/* Mobile Navigation */}
             {isOpen && (
             <div className="md:hidden">
-                <div className="px-2 pt-2 pb-3 space-y-1 border-t border-border">
+                <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-800">
                 {navigation.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -78,8 +77,8 @@ const Navbar = () => {
                         href={item.href}
                         className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
                         isActive(item.href)
-                            ? 'text-primary bg-primary/10'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                            ? 'text-primary-green bg-[#152624]'
+                            : 'text-[#94A4B8] hover:text-[#16A149]'
                         }`}
                         onClick={() => setIsOpen(false)}
                     >
