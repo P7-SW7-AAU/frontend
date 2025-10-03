@@ -161,3 +161,52 @@
 .bg-primary-yellow {
   background-color: #F8C631;
 }
+
+/* Stack authentication form styling */
+/* Target Stack's email and password input fields */
+[data-stack-component="auth-form"] input[type="email"],
+[data-stack-component="auth-form"] input[type="password"],
+.stack-auth-form input[type="email"],
+.stack-auth-form input[type="password"],
+.stack-sign-in input[type="email"],
+.stack-sign-in input[type="password"],
+.stack-sign-up input[type="email"],
+.stack-sign-up input[type="password"] {
+  color: white !important;
+}
+
+/* Also target Stack input fields by their common patterns */
+[data-stack] input[type="email"],
+[data-stack] input[type="password"],
+.stack input[type="email"],
+.stack input[type="password"] {
+  color: white !important;
+}
+
+/* Generic fallback for any Stack-related input fields */
+[class*="stack"] input[type="email"],
+[class*="stack"] input[type="password"],
+[id*="stack"] input[type="email"],
+[id*="stack"] input[type="password"] {
+  color: white !important;
+}
+
+/* Placeholder text styling for better visibility */
+[data-stack-component="auth-form"] input[type="email"]::placeholder,
+[data-stack-component="auth-form"] input[type="password"]::placeholder,
+.stack-auth-form input[type="email"]::placeholder,
+.stack-auth-form input[type="password"]::placeholder,
+.stack-sign-in input[type="email"]::placeholder,
+.stack-sign-in input[type="password"]::placeholder,
+.stack-sign-up input[type="email"]::placeholder,
+.stack-sign-up input[type="password"]::placeholder,
+[data-stack] input[type="email"]::placeholder,
+[data-stack] input[type="password"]::placeholder,
+.stack input[type="email"]::placeholder,
+.stack input[type="password"]::placeholder,
+[class*="stack"] input[type="email"]::placeholder,
+[class*="stack"] input[type="password"]::placeholder,
+[id*="stack"] input[type="email"]::placeholder,
+[id*="stack"] input[type="password"]::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
