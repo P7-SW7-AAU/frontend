@@ -26,7 +26,7 @@ const Navbar = () => {
             <div className="flex justify-between h-16">
             <div className="flex items-center">
                 <Link href="/" className="flex-shrink-0 flex items-center">
-                <div className="w-8 h-8 bg-[#16A149] rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-primary-green rounded-lg flex items-center justify-center">
                     <Trophy className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <span className="ml-2 text-xl font-bold text-white">FantasyPro</span>
@@ -43,7 +43,7 @@ const Navbar = () => {
                     href={item.href}
                     className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                         isActive(item.href)
-                        ? 'text-[#16A149] bg-[#152624]'
+                        ? 'text-primary-green bg-[#152624]'
                         : 'text-[#94A4B8] hover:text-[#16A149]'
                     }`}
                     >

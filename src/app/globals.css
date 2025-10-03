@@ -133,3 +133,31 @@
 .animate-float-continuous {
   animation: float-continuous 3s ease-in-out infinite;
 }
+
+.text-primary-green {
+  color: #16A149;
+}
+
+.bg-primary-green {
+  background-color: #16A149;
+}
+
+.text-primary-gray {
+  color: #94A4B8;
+}
+
+.text-primary-red {
+  color: #EF4345;
+}
+
+.bg-primary-red {
+  background-color: #EF4345;
+}
+
+.text-primary-yellow {
+  color: #F8C631;
+}
+
+.bg-primary-yellow {
+  background-color: #F8C631;
+}
