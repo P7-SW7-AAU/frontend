@@ -56,7 +56,7 @@ const TeamStats = ({
           Managed by {team.user?.name} • Team Value: ${team.valueSum}M
         </div>
         <div className="flex items-center justify-center space-x-4">
-          <Badge className="px-3 py-1 bg-[#152332] font-bold">
+          <Badge variant="secondary" className="px-3 py-1">
             {team.players.length} Sports Represented
           </Badge>
           <Badge 
