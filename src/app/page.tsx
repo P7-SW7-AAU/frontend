@@ -89,8 +89,8 @@ const Dashboard = () => {
             <CardContent>
               <p className="text-primary-gray font-medium mb-4">Check your position in the league</p>
               <Button 
-                variant="gold" 
-                className="w-full font-semibold"
+                variant="outline" 
+                className="w-full"
                 onClick={() => router.push('/leagues')}
               >
                 View Leagues
@@ -108,7 +108,7 @@ const Dashboard = () => {
             <CardContent>
               <p className="text-primary-gray font-medium mb-4">Find hidden gems for your roster</p>
               <Button 
-                variant="gold" 
+                variant="outline" 
                 className="w-full"
                 onClick={() => router.push('/players')}
               >
@@ -135,7 +135,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">Your Top Performers</h2>
-            <Badge className="px-3 py-1 bg-[#152332] font-bold">This Week</Badge>
+            <Badge variant="secondary" className="px-3 py-1">This Week</Badge>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {currentTeam.players.slice(0, 3).map((player) => (
