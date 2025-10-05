@@ -423,7 +423,7 @@ const Draft = () => {
                               </div>
 
                               <div className="flex items-center gap-2 mb-4">
-                                <Badge variant={getStatusColor(player.status)} className="text-xs">
+                                <Badge variant={getStatusColor(player.status)} className="text-xs font-bold">
                                   {player.status.toUpperCase()}
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">
