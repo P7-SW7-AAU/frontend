@@ -41,7 +41,7 @@ const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team
               <Badge variant="outline" className="text-xs">
                 {player.position}
               </Badge>
-              <span className={`text-white ${compact ? 'text-xs' : 'text-sm'}`}>
+              <span className={`text-primary-gray ${compact ? 'text-xs' : 'text-sm'}`}>
                 {player.sportsTeam.name}
               </span>
             </div>
