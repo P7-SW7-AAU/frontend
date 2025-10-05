@@ -1,4 +1,4 @@
-import DraftClient from "@/modules/draft/ui/views/DraftClient";
+import DraftClient from "@/app/draft/DraftClient";
 
 const DraftPage = () => {
     return (
