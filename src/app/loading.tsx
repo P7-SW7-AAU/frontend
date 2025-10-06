@@ -1,6 +1,9 @@
-export default function Loading() {
+import Loader from "@/components/Loader";
 
-  // Stack uses React Suspense, which will render this page while user data is being fetched.
-  // See: https://nextjs.org/docs/app/api-reference/file-conventions/loading
-  return <></>;
+const Loading = () => {
+    return (
+        <Loader />
+    );
 }
+
+export default Loading;
