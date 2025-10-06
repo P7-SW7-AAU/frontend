@@ -1,10 +1,10 @@
 "use client";
 
-import Navigation from '@/components/Navbar';
+import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, Trophy, Target, Settings, Calendar, Edit2 } from 'lucide-react';
+import { Plus, Users, Trophy, Target, Trash2, Calendar, Edit2 } from 'lucide-react';
 import { getUserTeams, getCurrentUser, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 import { useRouter } from 'next/navigation';
 
@@ -18,7 +18,7 @@ const TeamsClient = () => {
   };
 
   const handleViewTeam = (teamID: string) => {
-    router.push(`/team/${teamID}`);
+    router.push(`/teams/lineup`);
   };
 
   const getTeamStats = (team: any) => {
@@ -42,7 +42,7 @@ const TeamsClient = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
@@ -147,8 +147,8 @@ const TeamsClient = () => {
                         <Button size="sm" variant="outline">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="outline">
-                          <Settings className="h-4 w-4" />
+                        <Button size="sm" variant="trash">
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>

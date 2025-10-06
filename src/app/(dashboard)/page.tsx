@@ -1,6 +1,6 @@
 "use client"
 
-import Navigation from '@/components/Navbar';
+import Navbar from '@/components/Navbar';
 import TeamStats from '@/components/TeamStats';
 import PlayerCard from '@/components/PlayerCard';
 import { Button } from '@/components/ui/button';
@@ -19,12 +19,12 @@ const Dashboard = () => {
   const availablePlayers = getAvailablePlayers();
 
   const handlePlayerAction = (player: PlayerWithTeam, action: 'add' | 'drop') => {
-    console.log(`${action} player:`, player.name);
+    router.push('/teams/lineup');
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navbar />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -106,7 +106,7 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-primary-gray font-medium mb-4">Find hidden gems for your roster</p>
+              <p className="text-primary-gray font-medium mb-4">Find hidden gems for your team</p>
               <Button 
                 variant="outline" 
                 className="w-full"
@@ -134,7 +134,7 @@ const Dashboard = () => {
         {/* Top Performers */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white">Your Top Performers</h2>
+            <h2 className="text-2xl font-bold text-white">Top Performers</h2>
             <Badge variant="secondary" className="px-3 py-1">This Week</Badge>
           </div>
           <div className="grid md:grid-cols-3 gap-6">

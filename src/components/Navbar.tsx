@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Trophy, Users, User, BarChart3, Menu, X, UserPlus } from 'lucide-react';
+import { Trophy, Users, User, BarChart3, Menu, X, LogIn, LogOut } from 'lucide-react';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +15,7 @@ const Navbar = () => {
         { name: 'My Teams', href: '/teams', icon: Users },
         { name: 'My Leagues', href: '/leagues', icon: Trophy },
         { name: 'Players', href: '/players', icon: User },
-        { name: 'Draft', href: '/draft', icon: UserPlus },
+        { name: 'Log In', href: '/handler/sign-in', icon: LogIn }, // TODO: Dynamically change to log in and log out (text, icon)
     ];
 
     const isActive = (href: string) => pathname === href;
