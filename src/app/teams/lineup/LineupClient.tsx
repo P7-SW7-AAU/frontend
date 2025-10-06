@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import Navigation from '@/components/Navbar';
+import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,7 +16,7 @@ import { toast } from 'sonner'
 
 const TEAM_BUDGET = 200; // Budget in millions
 
-const Draft = () => {
+const LineupClient = () => {
   const userTeams = getUserTeams();
   const allPlayers = getAvailablePlayers();
   const [selectedTeamId, setSelectedTeamId] = useState(userTeams[0]?.uniqueID || '');
@@ -92,7 +92,7 @@ const Draft = () => {
       return;
     }
     
-    // Check roster slots
+    // Check team slots
     if (getRemainingSlots(selectedTeamId) <= 0) {
       toast.message("You've reached the maximum number of players");
       return;
@@ -132,14 +132,14 @@ const Draft = () => {
 
   return (
     <div className="min-h-screen bg-gradient-primary">
-      <Navigation />
+      <Navbar />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <Trophy className="h-10 w-10 text-primary-green animate-pulse" />
             <div>
-              <h1 className="text-4xl font-bold text-white">Draft Center</h1>
-              <p className="text-primary-gray font-medium">Build your championship roster</p>
+              <h1 className="text-4xl font-bold text-white">Team Manager</h1>
+              <p className="text-primary-gray font-medium mt-1">Build your dream team</p>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@ const Draft = () => {
                 <Target className="h-5 w-5 text-primary-green" />
                 Select Your Team
               </CardTitle>
-              <CardDescription className="text-primary-gray font-medium">Choose which team to add players to</CardDescription>
+              <CardDescription className="text-primary-gray font-medium">Choose which team to modify your lineup for</CardDescription>
             </CardHeader>
             <CardContent>
               <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
@@ -162,7 +162,7 @@ const Draft = () => {
                   {userTeams.map(team => (
                     <SelectItem key={team.uniqueID} value={team.uniqueID}>
                       <div className="flex items-center gap-2">
-                        <span className="text-white font-medium">{team.name}</span>
+                        <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
                         <Badge variant="secondary" className="text-xs">
                           {team.playerCount} players
                         </Badge>
@@ -179,7 +179,7 @@ const Draft = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white text-2xl font-bold">
                   <DollarSign className="h-5 w-5 text-white" />
-                  Team Budget & Roster
+                  Team Budget & Slots
                 </CardTitle>
                 <CardDescription className="text-primary-gray font-medium">Manage your resources wisely</CardDescription>
               </CardHeader>
@@ -202,7 +202,7 @@ const Draft = () => {
                 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-primary-gray">Roster Slots</span>
+                    <span className="text-sm font-semibold text-primary-gray">Team Slots</span>
                     <span className="text-2xl font-bold text-white">
                       {getRemainingSlots(selectedTeamId)} / {MAX_PLAYERS_PER_TEAM}
                     </span>
@@ -212,7 +212,7 @@ const Draft = () => {
                     className="h-3"
                   />
                   <p className="text-xs text-primary-gray font-medium mt-1">
-                    {getDraftedCount(selectedTeamId)} drafted this session
+                    {getDraftedCount(selectedTeamId)} added this session
                   </p>
                 </div>
               </CardContent>
@@ -227,7 +227,7 @@ const Draft = () => {
               Player Management
             </CardTitle>
             <CardDescription className="mt-1 text-primary-gray font-medium">
-              Draft players to build your roster
+              Manage your team and find new talent
             </CardDescription>
             
             {/* Search and Filter Controls */}
@@ -350,8 +350,8 @@ const Draft = () => {
                         <UserPlus className="h-4 w-4 mr-2" />
                         {!selectedTeamId ? 'Select Team First' : 
                          player.value > getRemainingBudget(selectedTeamId) ? 'Insufficient Budget' :
-                         getRemainingSlots(selectedTeamId) <= 0 ? 'Roster Full' :
-                         'Draft Player'}
+                         getRemainingSlots(selectedTeamId) <= 0 ? 'Team Full' :
+                         'Add Player'}
                       </Button>
                     )}
                   </CardContent>
@@ -450,10 +450,10 @@ const Draft = () => {
                   <div className="text-center py-12">
                     <Trophy className="h-16 w-16 mx-auto text-primary-gray mb-4" />
                     <p className="text-primary-gray text-lg font-medium">
-                      {selectedTeamId ? 'No players drafted yet' : 'Select a team to view players'}
+                      {selectedTeamId ? 'No players added yet' : 'Select a team to view players'}
                     </p>
                     <p className="text-sm text-primary-gray font-medium mt-2">
-                      {selectedTeamId ? 'Start drafting players from the "All Players" tab' : 'Choose a team from the dropdown above'}
+                      {selectedTeamId ? 'Start adding players from the "All Players" tab' : 'Choose a team from the dropdown above'}
                     </p>
                   </div>
                 )}
@@ -466,4 +466,4 @@ const Draft = () => {
   );
 };
 
-export default Draft;
+export default LineupClient;
