@@ -8,14 +8,17 @@ import { Plus, Users, Trophy, Target, Trash2, Calendar, Edit2 } from 'lucide-rea
 import { getUserTeams, getCurrentUser, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 import { useRouter } from 'next/navigation';
 
+import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
+import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
+import { useEditTeamModal } from "@/hooks/useEditTeamModal";
+
 const TeamsClient = () => {
   const currentUser = getCurrentUser();
   const userTeams = getUserTeams(currentUser.uniqueID);
+  const createTeamModal = useCreateTeamModal();
+  const deleteTeamModal = useDeleteTeamModal();
+  const editTeamModal = useEditTeamModal();
   const router = useRouter();
-
-  const handleCreateTeam = () => {
-    // TODO: Implement team creation logic
-  };
 
   const handleViewTeam = (teamID: string) => {
     router.push(`/teams/lineup`);
@@ -53,7 +56,7 @@ const TeamsClient = () => {
               Manage your multi-sport fantasy teams
             </p>
           </div>
-          <Button onClick={handleCreateTeam} variant="hero" size="lg">
+          <Button onClick={createTeamModal.onOpen} variant="hero" size="lg">
             <Plus className="h-5 w-5 mr-2" />
             Create New Team
           </Button>
@@ -144,10 +147,10 @@ const TeamsClient = () => {
                         </div>
                       </div>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={editTeamModal.onOpen}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="trash">
+                        <Button size="sm" variant="trash" onClick={deleteTeamModal.onOpen}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -204,7 +207,7 @@ const TeamsClient = () => {
             })}
 
             {/* Create New Team Card */}
-            <Card className="border-dashed border-2 hover:border-[#1D5D36] transition-colors cursor-pointer" onClick={handleCreateTeam}>
+            <Card className="border-dashed border-2 hover:border-[#1D5D36] transition-colors cursor-pointer" onClick={createTeamModal.onOpen}>
               <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
                 <div className="rounded-full bg-[#152624] p-6">
                   <Plus className="h-8 w-8 text-primary-green" />
