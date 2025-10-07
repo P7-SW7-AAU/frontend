@@ -35,7 +35,8 @@ const DeleteTeamModal = () => {
             isOpen={deleteTeamModal.isOpen} 
             onClose={deleteTeamModal.onClose} 
             onSubmit={onDelete} 
-            body={bodyContent} actionLabel="Confirm" 
+            body={bodyContent} 
+            actionLabel="Confirm" 
             secondaryActionLabel="Cancel" 
             secondaryAction={deleteTeamModal.onClose} 
             disabled={isLoading} 
