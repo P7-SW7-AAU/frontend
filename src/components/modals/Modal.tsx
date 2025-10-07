@@ -67,7 +67,7 @@ const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled,
                             <Button
                                 onClick={handleSecondaryAction}
                                 disabled={disabled}
-                                variant="trash"
+                                variant="outline"
                                 className="w-full"
                             >
                                 {secondaryActionLabel}

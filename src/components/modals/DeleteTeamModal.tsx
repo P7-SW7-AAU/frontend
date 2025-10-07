@@ -24,6 +24,9 @@ const DeleteTeamModal = () => {
             <span className="flex items-center justify-center text-white text-2xl font-semibold">
                 Delete Team
             </span>
+            <p className="flex items-center justify-center text-primary-gray text-medium font-medium">
+                This action cannot be undone!
+            </p>
         </div>
     );
 
