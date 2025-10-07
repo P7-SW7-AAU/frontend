@@ -45,7 +45,7 @@ const CreateTeamModal = () => {
             onClose={createTeamModal.onClose} 
             onSubmit={handleSubmit(onSubmit)} 
             body={bodyContent} 
-            actionLabel="Save" 
+            actionLabel="Create" 
             disabled={isLoading} 
         />
     );

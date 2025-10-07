@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 
@@ -42,9 +42,6 @@ const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled,
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
             <div className="modal-pop-in bg-[#131920] rounded-xl border border-gray-800 shadow-sm w-full max-w-lg mx-4 relative">
-                <div className="items-center justify-center">
-
-                </div>
                 <button
                     className="absolute top-4 right-4 text-[#94A4B8] hover:text-[#707882] focus:outline-none"
                     onClick={onClose}

@@ -15,7 +15,7 @@ const DeleteTeamModal = () => {
 
     const onDelete = useCallback(() => {
         setIsLoading(true);
-
+        // TODO: Endpoint call
         console.log("Delete team");
     }, []);
 
