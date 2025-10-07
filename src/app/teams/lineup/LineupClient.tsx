@@ -236,7 +236,7 @@ const LineupClient = () => {
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-primary-gray" />
                 <Input
                   placeholder="Search players, teams, positions..."
-                  className="pl-10 border-[#1E2938] text-white"
+                  className="pl-10 border-[#1E2938] text-white font-medium"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

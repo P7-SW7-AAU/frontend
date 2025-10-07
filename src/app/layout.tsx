@@ -3,6 +3,9 @@ import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackClientApp } from "../stack/client";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import CreateTeamModal from "@/components/modals/CreateTeamModal";
+import DeleteTeamModal from "@/components/modals/DeleteTeamModal";
+import EditTeamModal from "@/components/modals/EditTeamModal";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,10 +32,17 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      ><StackProvider app={stackClientApp}><StackTheme>
-        <Toaster />
-        {children}
-      </StackTheme></StackProvider></body>
+      >
+        <StackProvider app={stackClientApp}>
+          <StackTheme>
+            <Toaster />
+            <CreateTeamModal />
+            <DeleteTeamModal />
+            <EditTeamModal />
+            {children}
+          </StackTheme>
+        </StackProvider>
+      </body>
     </html>
   );
 }
