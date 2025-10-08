@@ -1,12 +1,15 @@
 "use client";
 
-import Navbar from '@/components/Navbar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Users, Trophy, Target, Trash2, Calendar, Edit2 } from 'lucide-react';
-import { getUserTeams, getCurrentUser, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 import { useRouter } from 'next/navigation';
+import { Plus, Users, Trophy, Target, Trash2, Calendar, Edit2 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import Navbar from '@/components/Navbar';
+
+import { getUserTeams, getCurrentUser, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 
 import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
@@ -21,7 +24,7 @@ const TeamsClient = () => {
   const router = useRouter();
 
   const handleViewTeam = (teamID: string) => {
-    router.push(`/teams/lineup`);
+    router.push(`/teams/lineup`); // TODO: Add teamID to the route
   };
 
   const getTeamStats = (team: any) => {
