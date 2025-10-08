@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { redirect } from 'next/navigation';
 import { toast } from 'sonner'
 import { UserPlus, TrendingUp, TrendingDown, Minus, DollarSign, Trophy, Zap, Target, Search, UserMinus } from 'lucide-react';
-
-import { useUser } from '@stackframe/stack';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -30,11 +27,6 @@ const LineupClient = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, string[]>>({});
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
-  const user = useUser();
-
-  if (!user) {
-      redirect('/handler/sign-in');
-  }
 
   const selectedTeam = userTeams.find(team => team.uniqueID === selectedTeamId);
   
