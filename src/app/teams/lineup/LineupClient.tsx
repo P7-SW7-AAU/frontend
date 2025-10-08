@@ -1,18 +1,24 @@
 "use client";
 
 import { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { UserPlus, TrendingUp, TrendingDown, Minus, DollarSign, Trophy, Zap, Target, Search, UserMinus } from 'lucide-react';
-import { getUserTeams, getAvailablePlayers, sports, getPlayersBySport, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
+import { redirect } from 'next/navigation';
 import { toast } from 'sonner'
+import { UserPlus, TrendingUp, TrendingDown, Minus, DollarSign, Trophy, Zap, Target, Search, UserMinus } from 'lucide-react';
+
+import { useUser } from '@stackframe/stack';
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+import Navbar from '@/components/Navbar';
+
+import { getUserTeams, getAvailablePlayers, sports, getPlayersBySport, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 
 const TEAM_BUDGET = 200; // Budget in millions
 
@@ -24,6 +30,11 @@ const LineupClient = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, string[]>>({});
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
+  const user = useUser();
+
+  if (!user) {
+      redirect('/handler/sign-in');
+  }
 
   const selectedTeam = userTeams.find(team => team.uniqueID === selectedTeamId);
   

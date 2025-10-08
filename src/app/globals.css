@@ -234,3 +234,36 @@
 [id*="stack"] input[type="password"]::placeholder {
   color: rgba(255, 255, 255, 0.7) !important;
 }
+
+/* Make Stack auth 'Forgot password' link/text white */
+[data-stack-component="auth-form"] a,
+.stack-auth-form a,
+.stack-sign-in a,
+.stack-sign-up a,
+[data-stack] a,
+.stack a,
+[class*="stack"] a,
+[id*="stack"] a {
+  color: #fff !important;
+}
+
+/* Make the "Sign in" button green */
+[data-stack-component="auth-form"] button[type="submit"],
+.stack-auth-form button[type="submit"],
+.stack-sign-in button[type="submit"],
+[class*="stack"] button[type="submit"],
+[id*="stack"] button[type="submit"] {
+  background-color: #16A149 !important; /* Tailwind's green-500 */
+  color: white !important;
+  border: none !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Optional: add hover effect */
+[data-stack-component="auth-form"] button[type="submit"]:hover,
+.stack-auth-form button[type="submit"]:hover,
+.stack-sign-in button[type="submit"]:hover,
+[class*="stack"] button[type="submit"]:hover,
+[id*="stack"] button[type="submit"]:hover {
+  background-color: #0f833a !important; /* green-600 */
+}
