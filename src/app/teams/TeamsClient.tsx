@@ -139,7 +139,7 @@ const TeamsClient = () => {
                         <CardTitle className="text-xl text-white">{team.name}</CardTitle>
                         <div className="flex items-center space-x-4">
                           <Badge 
-                            variant={team.playerCount === MAX_PLAYERS_PER_TEAM ? "default" : "secondary"}
+                            variant="secondary"
                             className="px-2 py-1"
                           >
                             {team.playerCount}/{MAX_PLAYERS_PER_TEAM} Players
