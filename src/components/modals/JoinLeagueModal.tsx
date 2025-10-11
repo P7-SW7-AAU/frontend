@@ -5,6 +5,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { useJoinLeagueModal } from "@/hooks/useJoinLeagueModal";
+import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
@@ -19,6 +20,7 @@ const JoinLeagueModal = () => {
         register,
         handleSubmit,
         setFocus,
+        reset,
         formState: { errors },
     } = useForm<FieldValues>({
         defaultValues: {
@@ -37,6 +39,8 @@ const JoinLeagueModal = () => {
             setTimeout(() => setFocus("name"), 50);
         }
     }, [joinLeagueModal.isOpen, setFocus]);
+
+    useResetOnRouteChange(reset);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
