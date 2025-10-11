@@ -19,11 +19,24 @@ interface ModalProps {
 }
 
 const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled, secondaryAction, secondaryActionLabel }: ModalProps) => {
+
     const pathname = usePathname();
-    
+
+    // Close modal on route change
     useEffect(() => {
-    if (isOpen) onClose();
+        if (isOpen) onClose();
     }, [pathname]);
+
+    // Disable background scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            const originalOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalOverflow;
+            };
+        }
+    }, [isOpen]);
 
     const handleSubmit = useCallback(() => {
         if (disabled) return;
@@ -40,7 +53,7 @@ const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled,
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.7)] backdrop-blur-sm">
             <div className="modal-pop-in bg-[#131920] rounded-xl border border-gray-800 shadow-sm w-full max-w-lg mx-4 relative">
                 <button
                     className="absolute top-4 right-4 text-[#94A4B8] hover:text-[#707882] focus:outline-none"
