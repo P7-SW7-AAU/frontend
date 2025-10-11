@@ -68,6 +68,7 @@ const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         {/* Team Overview */}
+        {/* TODO: Use CardAction instead for the cards */}
         <TeamStats
           team={currentTeam}
           totalPoints={currentStanding?.totalPoints || 0}
@@ -116,19 +117,6 @@ const Dashboard = () => {
               </Button>
             </CardContent>
           </Card>
-
-          {/* <Card className="hover:shadow-card transition-smooth">
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg text-white">
-                <Calendar className="h-5 w-5 mr-2 text-gold" />
-                Upcoming Games
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-[#94A4B8] font-medium mb-4">Plan your lineup strategy</p>
-              <Button variant="outline" className="w-full">View Schedule</Button>
-            </CardContent>
-          </Card> */}
         </div>
 
         {/* Top Performers */}

@@ -14,6 +14,8 @@ import { getUserTeams, getCurrentUser, MAX_PLAYERS_PER_TEAM } from '@/data/multi
 import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
+import CardStats from '@/components/CardStats';
+import CardAction from '@/components/CardAction';
 
 const TeamsClient = () => {
   const currentUser = getCurrentUser();
@@ -67,61 +69,41 @@ const TeamsClient = () => {
 
         {/* Team Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-primary-gray flex items-center">
-                <Users className="h-4 w-4 mr-2 text-primary-green" />
-                Total Teams
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold text-white">{userTeams.length}</div>
-              <p className="text-sm font-medium text-primary-gray">active teams</p>
-            </CardContent>
-          </Card>
+          <CardStats 
+            title="Total Teams" 
+            value={userTeams.length} 
+            valueColor="text-white" 
+            description="active teams" 
+            icon={Users} 
+            iconColor="text-primary-green" 
+          />
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-primary-gray flex items-center">
-                <Target className="h-4 w-4 mr-2 text-primary-green" />
-                Total Players
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold text-primary-green">
-                {userTeams.reduce((sum, team) => sum + team.playerCount, 0)}
-              </div>
-              <p className="text-sm font-medium text-primary-gray">across all teams</p>
-            </CardContent>
-          </Card>
+          <CardStats 
+            title="Total Players" 
+            value={userTeams.reduce((sum, team) => sum + team.playerCount, 0)} 
+            valueColor="text-primary-green" 
+            description="across all teams" 
+            icon={Target} 
+            iconColor="text-primary-green" 
+          />
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-primary-gray flex items-center">
-                <Trophy className="h-4 w-4 mr-2 text-primary-yellow" />
-                Total Value
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold text-primary-yellow">
-                ${userTeams.reduce((sum, team) => sum + team.valueSum, 0).toFixed(1)}M
-              </div>
-              <p className="text-sm font-medium text-primary-gray">combined value</p>
-            </CardContent>
-          </Card>
+          <CardStats 
+            title="Total Value" 
+            value={`$${userTeams.reduce((sum, team) => sum + team.valueSum, 0).toFixed(1)}M`} 
+            valueColor="text-primary-yellow" 
+            description="combined value" 
+            icon={Trophy} 
+            iconColor="text-primary-yellow" 
+          />
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold text-primary-gray flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-primary-gray" />
-                Sports Covered
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold text-white">5</div>
-              <p className="text-sm font-medium text-primary-gray">different sports</p>
-            </CardContent>
-          </Card>
+          <CardStats 
+            title="Sports Covered" 
+            value={5} 
+            valueColor="text-white" 
+            description="different sports" 
+            icon={Calendar} 
+            iconColor="text-primary-gray" 
+          />
         </div>
 
         {/* Teams Grid */}
@@ -210,19 +192,15 @@ const TeamsClient = () => {
             })}
 
             {/* Create New Team Card */}
-            <Card className="border-dashed border-2 hover:border-[#1D5D36] transition-colors cursor-pointer" onClick={createTeamModal.onOpen}>
-              <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
-                <div className="rounded-full bg-[#152624] p-6">
-                  <Plus className="h-8 w-8 text-primary-green" />
-                </div>
-                <div className="text-center space-y-2">
-                  <h3 className="text-lg font-semibold text-white">Create New Team</h3>
-                  <p className="text-sm font-medium text-primary-gray max-w-xs">
-                    Build another multi-sport fantasy team with players from different sports
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <CardAction 
+              title="Create New Team"
+              description="Build another multi-sport fantasy team with players from different sports"
+              onClick={createTeamModal.onOpen}
+              icon={Plus}
+              iconColor="text-primary-green"
+              iconBgColor="bg-[#152624]"
+              hoverColor="hover:border-[#1D5D36]"
+            />
           </div>
         </div>
       </div>

@@ -4,14 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { useEditTeamModal } from "@/hooks/useEditTeamModal";
+import { useJoinLeagueModal } from "@/hooks/useJoinLeagueModal";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
 
-const EditTeamModal = () => {
+const JoinLeagueModal = () => {
     const router = useRouter();
-    const editTeamModal = useEditTeamModal();
+    const joinLeagueModal = useJoinLeagueModal();
     
     const [isLoading, setIsLoading] = useState(false);
 
@@ -29,31 +29,29 @@ const EditTeamModal = () => {
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(true);
         // TODO: Endpoint call
+        // TODO: Handle errors (e.g., league not found, already in league, league full)
     }
 
     useEffect(() => {
-        if (editTeamModal.isOpen) {
+        if (joinLeagueModal.isOpen) {
             setTimeout(() => setFocus("name"), 50);
         }
-    }, [editTeamModal.isOpen, setFocus]);
+    }, [joinLeagueModal.isOpen, setFocus]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
             <span className="flex items-center justify-center text-white text-2xl font-semibold">
-                Edit Team
+                Join Existing League
             </span>
             <Input 
-                // TODO: Display current team name
-                placeholder="Change your team name" 
+                placeholder="Enter a valid code" 
                 className="text-white font-medium border-[#1E2938]" 
-                maxLength={25}
-                inputMode="text"
-                pattern="[A-Za-z0-9]+"
+                maxLength={10}
                 {...register("name", { 
-                    required: "Team name is required",
+                    required: "A valid code is required",
                     pattern: {
-                        value: /^[A-Za-z0-9 ]+$/,
-                        message: "Only letters, numbers, and spaces are allowed"
+                        value: /^[A-Za-z0-9]+$/,
+                        message: "Only letters and numbers are allowed"
                     }
                 })}
             />
@@ -65,14 +63,14 @@ const EditTeamModal = () => {
 
     return (
         <Modal 
-            isOpen={editTeamModal.isOpen} 
-            onClose={editTeamModal.onClose} 
+            isOpen={joinLeagueModal.isOpen} 
+            onClose={joinLeagueModal.onClose} 
             onSubmit={handleSubmit(onSubmit)} 
             body={bodyContent} 
-            actionLabel="Save" 
+            actionLabel="Join" 
             disabled={isLoading} 
         />
     );
 }
 
-export default EditTeamModal;
+export default JoinLeagueModal;

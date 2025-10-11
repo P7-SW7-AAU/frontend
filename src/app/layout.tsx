@@ -6,6 +6,11 @@ import { Toaster } from "@/components/ui/sonner";
 import CreateTeamModal from "@/components/modals/CreateTeamModal";
 import DeleteTeamModal from "@/components/modals/DeleteTeamModal";
 import EditTeamModal from "@/components/modals/EditTeamModal";
+import CreateLeagueModal from "@/components/modals/CreateLeagueModal";
+import DeleteLeagueModal from "@/components/modals/DeleteLeagueModal";
+import EditLeagueModal from "@/components/modals/EditLeagueModal";
+import JoinLeagueModal from "@/components/modals/JoinLeagueModal";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,6 +44,10 @@ export default function RootLayout({
             <CreateTeamModal />
             <DeleteTeamModal />
             <EditTeamModal />
+            <CreateLeagueModal />
+            <DeleteLeagueModal />
+            <EditLeagueModal />
+            <JoinLeagueModal />
             {children}
           </StackTheme>
         </StackProvider>
