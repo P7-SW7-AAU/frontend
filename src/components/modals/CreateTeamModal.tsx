@@ -5,6 +5,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { useCreateTeamModal } from "@/hooks/useCreateTeamModal";
+import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
@@ -19,6 +20,7 @@ const CreateTeamModal = () => {
         register,
         handleSubmit,
         setFocus,
+        reset,
         formState: { errors },
     } = useForm<FieldValues>({
         defaultValues: {
@@ -36,6 +38,8 @@ const CreateTeamModal = () => {
             setTimeout(() => setFocus("name"), 50);
         }
     }, [createTeamModal.isOpen, setFocus]);
+
+    useResetOnRouteChange(reset);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">

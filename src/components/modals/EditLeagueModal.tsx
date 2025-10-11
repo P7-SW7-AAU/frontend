@@ -6,6 +6,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { useEditLeagueModal } from "@/hooks/useEditLeagueModal";
+import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
@@ -20,10 +21,11 @@ const EditLeagueModal = () => {
         register,
         handleSubmit,
         setFocus,
+        reset,
         formState: { errors },
     } = useForm<FieldValues>({
         defaultValues: {
-            name: "",
+            name: "", // TODO: Display current league name and size
         }
     });
 
@@ -37,6 +39,8 @@ const EditLeagueModal = () => {
             setTimeout(() => setFocus("name"), 50);
         }
     }, [editLeagueModal.isOpen, setFocus]);
+
+    useResetOnRouteChange(reset);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
@@ -61,7 +65,6 @@ const EditLeagueModal = () => {
 
             <Input
                 // TODO: Make sure you can't set team size to a smaller number than current team size
-                // TODO: Display current team name and size
                 type="number"
                 inputMode="numeric"
                 pattern="\d*"
