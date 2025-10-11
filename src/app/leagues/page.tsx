@@ -1,6 +1,15 @@
-import LeaguesClient from "./LeaguesClient";
+import { redirect } from "next/navigation";
+import { stackServerApp } from "@/stack/server";
 
-const LeaguesPage = () => {
+import LeaguesClient from "@/app/leagues/LeaguesClient";
+
+const LeaguesPage = async () => {
+    const user = await stackServerApp.getUser();
+    
+    if (!user) {
+        redirect('/handler/sign-in');
+    }
+
     return (
         <LeaguesClient />
     );
