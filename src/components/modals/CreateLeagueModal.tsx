@@ -33,10 +33,10 @@ const CreateLeagueModal = () => {
     }
 
     useEffect(() => {
-    if (createLeagueModal.isOpen) {
-      setTimeout(() => setFocus("name"), 50);
-    }
-  }, [createLeagueModal.isOpen, setFocus]);
+        if (createLeagueModal.isOpen) {
+            setTimeout(() => setFocus("name"), 50);
+        }
+    }, [createLeagueModal.isOpen, setFocus]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
@@ -50,8 +50,8 @@ const CreateLeagueModal = () => {
                 {...register("name", { 
                     required: "League name is required",
                     pattern: {
-                        value: /^[A-Za-z0-9]+$/,
-                        message: "Only letters and numbers are allowed"
+                        value: /^[A-Za-z0-9 ]+$/,
+                        message: "Only letters, numbers, and spaces are allowed"
                     }
                 })}
             />

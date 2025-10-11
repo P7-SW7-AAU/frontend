@@ -49,8 +49,8 @@ const CreateTeamModal = () => {
                 {...register("name", { 
                     required: "Team name is required",
                     pattern: {
-                        value: /^[A-Za-z0-9]+$/,
-                        message: "Only letters and numbers are allowed"
+                        value: /^[A-Za-z0-9 ]+$/,
+                        message: "Only letters, numbers, and spaces are allowed"
                     }
                 })}
             />
