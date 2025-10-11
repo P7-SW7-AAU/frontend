@@ -52,8 +52,17 @@ const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled,
 
     if (!isOpen) return null;
 
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    }
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.7)] backdrop-blur-sm">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.7)] backdrop-blur-sm"
+            onClick={handleBackdropClick}
+        >
             <div className="modal-pop-in bg-[#131920] rounded-xl border border-gray-800 shadow-sm w-full max-w-lg mx-4 relative">
                 <button
                     className="absolute top-4 right-4 text-[#94A4B8] hover:text-[#707882] focus:outline-none"
