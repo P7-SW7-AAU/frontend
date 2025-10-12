@@ -8,9 +8,9 @@ import { useSelectTeamModal } from "@/hooks/useSelectTeam";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import Modal from "./Modal";
-import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Badge } from "../ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+
 import { getUserTeams } from "@/data/multiSportMockData";
 
 const SelectTeamModal = () => {
