@@ -22,7 +22,7 @@ const TEAM_BUDGET = 200; // Budget in millions
 const LineupClient = () => {
   const userTeams = getUserTeams();
   const allPlayers = getAvailablePlayers();
-  const [selectedTeamId, setSelectedTeamId] = useState(userTeams[0]?.uniqueID || '');
+  const [selectedTeamId, setSelectedTeamId] = useState('');
   const [selectedSport, setSelectedSport] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, string[]>>({});
