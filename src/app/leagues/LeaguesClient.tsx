@@ -23,6 +23,7 @@ import { useCreateLeagueModal } from "@/hooks/useCreateLeagueModal";
 import { useDeleteLeagueModal } from '@/hooks/useDeleteLeagueModal';
 import { useEditLeagueModal } from "@/hooks/useEditLeagueModal";
 import { useJoinLeagueModal } from "@/hooks/useJoinLeagueModal";
+import { useSelectTeamModal } from "@/hooks/useSelectTeam";
 
 const LeaguesClient = () => {
   const currentUser = getCurrentUser();
@@ -33,6 +34,7 @@ const LeaguesClient = () => {
   const deleteLeagueModal = useDeleteLeagueModal();
   const editLeagueModal = useEditLeagueModal();
   const joinLeagueModal = useJoinLeagueModal();
+  const selectTeamModal = useSelectTeamModal();
 
   // Get all leagues the user participates in
   const getUserLeagues = () => {
@@ -246,9 +248,9 @@ const LeaguesClient = () => {
                       <Trophy className="h-4 w-4 mr-2" />
                       View League
                     </Button>
-                    <Button variant="outline" className="flex-1">
+                    <Button variant="outline" className="flex-1" onClick={selectTeamModal.onOpen}>
                       <Users className="h-4 w-4 mr-2" />
-                      Change Teams
+                      Select Team
                       {/* TODO: Implement change teams functionality and modal */}
                     </Button>
                   </div>

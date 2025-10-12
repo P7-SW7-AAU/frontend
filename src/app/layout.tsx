@@ -10,6 +10,7 @@ import CreateLeagueModal from "@/components/modals/CreateLeagueModal";
 import DeleteLeagueModal from "@/components/modals/DeleteLeagueModal";
 import EditLeagueModal from "@/components/modals/EditLeagueModal";
 import JoinLeagueModal from "@/components/modals/JoinLeagueModal";
+import SelectTeamModal from "@/components/modals/SelectTeamModal";
 
 import "./globals.css";
 
@@ -48,6 +49,7 @@ export default function RootLayout({
             <DeleteLeagueModal />
             <EditLeagueModal />
             <JoinLeagueModal />
+            <SelectTeamModal />
             {children}
           </StackTheme>
         </StackProvider>
