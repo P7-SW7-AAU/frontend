@@ -2,18 +2,18 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner'
-import { UserPlus, TrendingUp, TrendingDown, Minus, DollarSign, Trophy, Zap, Target, Search, UserMinus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, DollarSign, Trophy, Zap, Target, Search } from 'lucide-react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import Navbar from '@/components/Navbar';
+import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 
 import { getUserTeams, getAvailablePlayers, sports, getPlayersBySport, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 
@@ -22,7 +22,7 @@ const TEAM_BUDGET = 200; // Budget in millions
 const LineupClient = () => {
   const userTeams = getUserTeams();
   const allPlayers = getAvailablePlayers();
-  const [selectedTeamId, setSelectedTeamId] = useState(userTeams[0]?.uniqueID || '');
+  const [selectedTeamId, setSelectedTeamId] = useState('');
   const [selectedSport, setSelectedSport] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, string[]>>({});
@@ -278,6 +278,7 @@ const LineupClient = () => {
               </TabsList>
             </Tabs>
           </CardHeader>
+          
           <CardContent>
             {viewMode === 'all' ? (
               <>
@@ -286,80 +287,21 @@ const LineupClient = () => {
                 </p>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredPlayers.map((player) => (
-                <Card key={player.uniqueID} className="hover:shadow-elegant hover:border-[#16A149] transition-all hover:-translate-y-1 group">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12 group-hover:scale-110 transition-transform">
-                          <AvatarFallback className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold">
-                            {player.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-semibold text-white">{player.name}</h3>
-                          <p className="text-sm text-primary-gray font-medium">{player.position}</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        {getTrendIcon(player.trend)}
-                        <Badge variant="secondary" className="text-xs font-bold">
-                          ${player.value}M
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 mb-4 bg-[#131C25] rounded-lg p-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-primary-gray font-medium">Team</span>
-                        <span className="font-bold text-white text-xs">{player.sportsTeam.name}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-primary-gray font-medium">Points</span>
-                        <span className="font-bold text-primary-green">{player.points}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-primary-gray font-medium">Projected</span>
-                        <span className="font-bold text-white">{player.projectedPoints}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge variant={getStatusColor(player.status)} className="text-xs font-bold">
-                        {player.status.toUpperCase()}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {player.popularity}% owned
-                      </Badge>
-                    </div>
-
-                    {isPlayerOnTeam(player.uniqueID) ? (
-                      <Button
-                        className="w-full group-hover:scale-105 transition-transform"
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleUndraftPlayer(player.uniqueID, player.name)}
-                      >
-                        <UserMinus className="h-4 w-4 mr-2" />
-                        Remove from Team
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full group-hover:scale-105 transition-transform"
-                        size="sm"
-                        variant="hero"
-                        onClick={() => handleDraftPlayer(player.uniqueID, player.name)}
-                        disabled={!selectedTeamId || player.value > getRemainingBudget(selectedTeamId) || getRemainingSlots(selectedTeamId) <= 0}
-                      >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        {!selectedTeamId ? 'Select Team First' : 
-                         player.value > getRemainingBudget(selectedTeamId) ? 'Insufficient Budget' :
-                         getRemainingSlots(selectedTeamId) <= 0 ? 'Team Full' :
-                         'Add Player'}
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                    <PlayerCardDetailed
+                      key={player.uniqueID}
+                      player={player}
+                      isOwned={isPlayerOnTeam(player.uniqueID)}
+                      onAdd={() => handleDraftPlayer(player.uniqueID, player.name)}
+                      onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
+                      getTrendIcon={getTrendIcon}
+                      getStatusColor={getStatusColor}
+                      disabled={
+                        !selectedTeamId ||
+                        player.value > getRemainingBudget(selectedTeamId) ||
+                        getRemainingSlots(selectedTeamId) <= 0
+                      }
+                    />
+                  ))}
                 </div>
 
                 {filteredPlayers.length === 0 && (
@@ -384,67 +326,15 @@ const LineupClient = () => {
                         const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
                         if (!player) return null;
                         return (
-                          <Card
+                          <PlayerCardDetailed
                             key={player.uniqueID}
-                            className="hover:shadow-elegant hover:border-[#16A149] transition-all hover:-translate-y-1 group"
-                            style={{ animationDelay: `${index * 50}ms` }}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="h-12 w-12 ring-2 ring-success/50 group-hover:scale-110 transition-transform">
-                                    <AvatarFallback className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold">
-                                      {player.name.split(' ').map(n => n[0]).join('')}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <h3 className="font-semibold text-white">{player.name}</h3>
-                                    <p className="text-sm text-primary-gray font-medium">{player.position}</p>
-                                  </div>
-                                </div>
-                                <div className="flex flex-col items-end gap-1">
-                                  {getTrendIcon(player.trend)}
-                                  <Badge variant="secondary" className="text-xs font-bold">
-                                    ${player.value}M
-                                  </Badge>
-                                </div>
-                              </div>
-
-                              <div className="space-y-2 mb-4 bg-[#131C25] rounded-lg p-3">
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-primary-gray font-medium">Team</span>
-                                  <span className="font-bold text-white text-xs">{player.sportsTeam.name}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-primary-gray font-medium">Points</span>
-                                  <span className="font-bold text-primary-green">{player.points}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-primary-gray font-medium">Projected</span>
-                                  <span className="font-bold text-white">{player.projectedPoints}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2 mb-4">
-                                <Badge variant={getStatusColor(player.status)} className="text-xs font-bold">
-                                  {player.status.toUpperCase()}
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  {player.popularity}% owned
-                                </Badge>
-                              </div>
-
-                              <Button
-                                className="w-full group-hover:scale-105 transition-transform"
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleUndraftPlayer(player.uniqueID, player.name)}
-                              >
-                                <UserMinus className="h-4 w-4 mr-2" />
-                                Remove from Team
-                              </Button>
-                            </CardContent>
-                          </Card>
+                            player={player}
+                            isOwned={true}
+                            onAdd={() => {}}
+                            onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
+                            getTrendIcon={getTrendIcon}
+                            getStatusColor={getStatusColor}
+                          />
                         );
                       })}
                     </div>
