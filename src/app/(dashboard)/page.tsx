@@ -67,16 +67,14 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* Team Overview */}
-        {/* TODO: Use CardAction instead for the cards */}
-        <TeamStats
+        {/* <TeamStats
           team={currentTeam}
           totalPoints={currentStanding?.totalPoints || 0}
           weeklyPoints={currentStanding?.weeklyPoints || 0}
           ranking={currentStanding?.ranking || 1}
           totalTeams={standings.length}
           projectedPoints={currentStanding?.weeklyPoints || 0}
-        />
+        /> */}
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6">

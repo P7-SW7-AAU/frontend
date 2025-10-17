@@ -181,7 +181,7 @@ const TeamsClient = () => {
                         <Users className="h-4 w-4 mr-2" />
                         Manage Team
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button variant="outline" className="flex-1" onClick={() => router.push('/leagues')}>
                         <Trophy className="h-4 w-4 mr-2" />
                         View Leagues
                       </Button>

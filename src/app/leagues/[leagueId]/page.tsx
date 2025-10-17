@@ -6,10 +6,11 @@ interface Props {
 
 const LeaguePage = async ({ params }: Props) => {
     const { leagueId } = await params;
+    // Use leagueId to fetch league-specific data and send it to LeagueClient
 
     return (
         <div className="min-h-screen bg-background">
-            <LeagueClient leagueId={leagueId} />
+            <LeagueClient />
         </div>
     );
 }
