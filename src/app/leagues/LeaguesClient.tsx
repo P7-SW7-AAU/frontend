@@ -166,13 +166,7 @@ const LeaguesClient = () => {
                         )}
                       </div>
                       <div className="flex items-center space-x-4">
-                        <Badge 
-                          variant="secondary"
-                          className="px-2 py-1"
-                        >
-                          {league.type}
-                        </Badge>
-                        <Badge variant="outline" className="px-2 py-1">
+                        <Badge variant="secondary" className="px-2 py-1">
                           {league.totalTeams}/{league.maxTeams} Teams
                         </Badge>
                         <Badge variant="outline" className="px-2 py-1 capitalize">
