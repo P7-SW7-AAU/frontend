@@ -1,7 +1,7 @@
 // TODO: Add eye icon and leave buttons
 "use client";
 
-import { Trophy, TrendingUp, TrendingDown, Crown, Eye, DoorOpen, Target } from 'lucide-react';
+import { Trophy, Eye, DoorOpen, Target } from 'lucide-react';
 
 import CardStats from '@/components/CardStats';
 import Navbar from '@/components/Navbar';
@@ -16,25 +16,6 @@ import { getLeagueStandings, leagueWithTeams } from '@/data/mockData';
 const LeagueClient = () => {
   const standings = getLeagueStandings();
   const leaveLeagueModal = useLeaveLeagueModal();
-
-  const getRankBadge = (rank: number) => {
-    if (rank === 1) return <Crown className="h-4 w-4 text-gold" />;
-    if (rank <= 3) return <Trophy className="h-4 w-4 text-bronze" />;
-    return null;
-  };
-
-  const getTrendIcon = (trend: string) => {
-    if (trend === 'up') return <TrendingUp className="h-4 w-4 text-field-green" />;
-    if (trend === 'down') return <TrendingDown className="h-4 w-4 text-destructive" />;
-    return null;
-  };
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
-
-  const topTeam = standings[0];
-  const averageScore = standings.reduce((sum, t) => sum + t.totalPoints, 0) / standings.length;
 
   return (
     <div className="min-h-screen bg-background">

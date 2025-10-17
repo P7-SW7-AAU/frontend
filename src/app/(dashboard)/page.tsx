@@ -15,7 +15,6 @@ const Dashboard = () => {
   const router = useRouter();
   const currentTeam = getCurrentUserTeam();
   const standings = getLeagueStandings();
-  const currentStanding = standings.find(s => s.uniqueID === currentTeam.uniqueID);
   const availablePlayers = getAvailablePlayers();
 
   const handlePlayerAction = (player: PlayerWithTeam, action: 'add' | 'drop') => {
@@ -26,7 +25,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Banner Section */}
       <div className="relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
