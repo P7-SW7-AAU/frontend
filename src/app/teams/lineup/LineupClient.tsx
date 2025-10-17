@@ -269,10 +269,10 @@ const LineupClient = () => {
 
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'all' | 'my')} className="w-full">
               <TabsList className="grid w-full h-11 grid-cols-2 bg-[#152332]">
-                <TabsTrigger value="all" className="text-white font-bold">
+                <TabsTrigger value="all" className="text-white font-bold cursor-pointer">
                   All Players ({filteredPlayers.length})
                 </TabsTrigger>
-                <TabsTrigger value="my" className="text-white font-bold">
+                <TabsTrigger value="my" className="text-white font-bold cursor-pointer">
                   My Players ({selectedTeamId ? (draftedPlayers[selectedTeamId]?.length || 0) : 0})
                 </TabsTrigger>
               </TabsList>
