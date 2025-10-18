@@ -51,7 +51,7 @@ const LeagueClient = () => {
                 />
 
                 <CardStats 
-                    title="Total Score" 
+                    title="Total Points" 
                     value={standings[0].totalPoints} 
                     valueColor="text-primary-green" 
                     description="in this league" 
@@ -60,7 +60,7 @@ const LeagueClient = () => {
                 />
 
                 <CardStats 
-                    title="Weekly Score" 
+                    title="Weekly Points" 
                     value={standings[0].weeklyPoints} 
                     valueColor="text-white" 
                     description="in this league" 
