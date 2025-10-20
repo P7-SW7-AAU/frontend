@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Navbar from '@/components/Navbar';
 import TeamStats from '@/components/TeamStats';
@@ -6,16 +6,32 @@ import PlayerCard from '@/components/PlayerCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, Trophy, Target, Calendar } from 'lucide-react';
-import { useRouter } from "next/navigation";
+import { Plus, Users, Target } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { getCurrentUserTeam, getAvailablePlayers, getLeagueStandings } from '@/data/multiSportMockData';
 import { PlayerWithTeam } from '@/types/database';
+import { useUser, useStackApp } from '@stackframe/stack';
 
 const Dashboard = () => {
   const router = useRouter();
   const currentTeam = getCurrentUserTeam();
   const standings = getLeagueStandings();
   const availablePlayers = getAvailablePlayers();
+
+  // 🔐 Neon Auth / Stack setup
+  const user = useUser();
+  const stackApp = useStackApp(); // better naming to avoid confusion
+  const [token, setToken] = useState<string>('');
+
+  useEffect(() => {
+    (async () => {
+      if (!user) return;
+      const { accessToken } = await user.getAuthJson(); // ← correct API
+      setToken(accessToken ?? '');
+      console.log('Access token:', accessToken);
+    })();
+  }, [user]);
 
   const handlePlayerAction = (player: PlayerWithTeam, action: 'add' | 'drop') => {
     router.push('/teams/lineup');
@@ -24,10 +40,18 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
+      {/* Quick token display */}
+      {token && (
+        <div className="text-center py-4 text-xs text-primary-gray">
+          <p>Your access token:</p>
+          <pre className="break-all max-w-full overflow-x-auto px-4">{token}</pre>
+        </div>
+      )}
+
       {/* Banner Section */}
       <div className="relative overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(/fantasy-hero.jpg)` }}
         >
@@ -43,17 +67,17 @@ const Dashboard = () => {
               Build teams with players from football, basketball, soccer, chess, tennis and more. Dominate across all sports!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                variant="hero" 
-                size="lg" 
+              <Button
+                variant="hero"
+                size="lg"
                 className="animate-float-continuous"
                 onClick={() => router.push('/teams')}
               >
                 <Users className="h-5 w-5 mr-2" />
                 Manage Teams
               </Button>
-              <Button 
-                variant="gold" 
+              <Button
+                variant="gold"
                 size="lg"
                 onClick={() => router.push('/players')}
               >
@@ -66,15 +90,6 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* <TeamStats
-          team={currentTeam}
-          totalPoints={currentStanding?.totalPoints || 0}
-          weeklyPoints={currentStanding?.weeklyPoints || 0}
-          ranking={currentStanding?.ranking || 1}
-          totalTeams={standings.length}
-          projectedPoints={currentStanding?.weeklyPoints || 0}
-        /> */}
-
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6">
           <Card className="hover:shadow-card transition-smooth">
@@ -86,8 +101,8 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-primary-gray font-medium mb-4">Check your position in the league</p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 onClick={() => router.push('/leagues')}
               >
@@ -105,8 +120,8 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-primary-gray font-medium mb-4">Find hidden gems for your team</p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 onClick={() => router.push('/players')}
               >
@@ -124,11 +139,7 @@ const Dashboard = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {currentTeam.players.slice(0, 3).map((player) => (
-              <PlayerCard
-                key={player.uniqueID}
-                player={player}
-                onAction={handlePlayerAction}
-              />
+              <PlayerCard key={player.uniqueID} player={player} onAction={handlePlayerAction} />
             ))}
           </div>
         </div>
@@ -137,7 +148,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">Trending Players</h2>
-            <Button 
+            <Button
               onClick={() => router.push('/players')}
               className="text-white font-bold hover:scale-105 transition-all duration-200"
             >
@@ -147,11 +158,7 @@ const Dashboard = () => {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availablePlayers.slice(0, 3).map((player) => (
-              <PlayerCard
-                key={player.uniqueID}
-                player={player}
-                onAction={handlePlayerAction}
-              />
+              <PlayerCard key={player.uniqueID} player={player} onAction={handlePlayerAction} />
             ))}
           </div>
         </div>
