@@ -17,7 +17,7 @@ const TeamsPage = async () => {
     }
 
     return (
-        <TeamsClient token={accessToken} />
+        <TeamsClient />
     );
 }
 

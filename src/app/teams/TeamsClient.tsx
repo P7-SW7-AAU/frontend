@@ -17,13 +17,10 @@ import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
 import CardStats from '@/components/CardStats';
 import CardAction from '@/components/CardAction';
+import { useApi } from '@/hooks/useApi';
 
-interface TeamsClientProps {
-    token: string;
-}
-
-const TeamsClient = ({ token: initialToken }: TeamsClientProps) => {
-  const [token, setToken] = useState(initialToken);
+const TeamsClient = () => {
+  const api = useApi();
   const currentUser = getCurrentUser();
   const userTeams = getUserTeams(currentUser.uniqueID);
   const createTeamModal = useCreateTeamModal();
