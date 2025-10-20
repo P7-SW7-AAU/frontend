@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
+import { useState, useCallback } from 'react';
 import { Plus, Users, Trophy, Target, Trash2, Calendar, Edit2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,12 @@ import { useEditTeamModal } from "@/hooks/useEditTeamModal";
 import CardStats from '@/components/CardStats';
 import CardAction from '@/components/CardAction';
 
-const TeamsClient = () => {
+interface TeamsClientProps {
+    token: string;
+}
+
+const TeamsClient = ({ token: initialToken }: TeamsClientProps) => {
+  const [token, setToken] = useState(initialToken);
   const currentUser = getCurrentUser();
   const userTeams = getUserTeams(currentUser.uniqueID);
   const createTeamModal = useCreateTeamModal();
@@ -26,7 +32,7 @@ const TeamsClient = () => {
   const router = useRouter();
 
   const handleViewTeam = (teamID: string) => {
-    router.push(`/teams/lineup`); // TODO: Add teamID to the route
+    router.push(`/teams/lineup`);
   };
 
   const getTeamStats = (team: any) => {

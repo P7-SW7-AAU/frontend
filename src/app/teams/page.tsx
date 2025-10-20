@@ -10,8 +10,14 @@ const TeamsPage = async () => {
         redirect('/handler/sign-in');
     }
 
+    const { accessToken } = await user?.getAuthJson();
+
+    if (!accessToken) {
+        redirect('/handler/sign-in');
+    }
+
     return (
-        <TeamsClient />
+        <TeamsClient token={accessToken} />
     );
 }
 

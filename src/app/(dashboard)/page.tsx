@@ -31,7 +31,7 @@ const Dashboard = () => {
       setToken(accessToken ?? '');
       console.log('Access token:', accessToken);
     })();
-  }, [user]);
+  }, [user]); // React's useEffect with [user] as a dependency only triggers when the reference to the user object changes, not when a property value inside the same object changes. The access token is updated inside the existing user object, but the object reference stays the same, so the effect will not re-run.
 
   const handlePlayerAction = (player: PlayerWithTeam, action: 'add' | 'drop') => {
     router.push('/teams/lineup');
