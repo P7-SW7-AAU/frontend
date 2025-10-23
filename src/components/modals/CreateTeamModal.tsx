@@ -1,15 +1,11 @@
 "use client";
 
-import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { useCreateTeamModal } from "@/hooks/useCreateTeamModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
-import { useApi } from "@/hooks/useApi";
-
-import { createTeam } from "@/services/teamsService";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
@@ -17,9 +13,6 @@ import { Input } from "../ui/input";
 const CreateTeamModal = () => {
     const router = useRouter();
     const createTeamModal = useCreateTeamModal();
-    const { api } = useApi();
-    
-    const [isLoading, setIsLoading] = useState(false);
 
     const {
         register,
@@ -32,24 +25,6 @@ const CreateTeamModal = () => {
             name: "",
         }
     });
-
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        setIsLoading(true);
-
-        createTeam(data, api)
-            .then(() => {
-                toast.success("Team created successfully!");
-                router.refresh();
-                reset();
-                createTeamModal.onClose();
-            })
-            .catch((error) => {
-                toast.error("Error creating team: " + error.message);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
-    }
 
     useEffect(() => {
         if (createTeamModal.isOpen) {
@@ -86,10 +61,9 @@ const CreateTeamModal = () => {
         <Modal 
             isOpen={createTeamModal.isOpen} 
             onClose={createTeamModal.onClose} 
-            onSubmit={handleSubmit(onSubmit)} 
+            onSubmit={handleSubmit((data) => router.push(`/teams/${data.name}`))}
             body={bodyContent} 
-            actionLabel="Create" 
-            disabled={isLoading} 
+            actionLabel="Add Players" 
         />
     );
 }

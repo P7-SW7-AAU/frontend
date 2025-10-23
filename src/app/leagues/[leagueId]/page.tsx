@@ -9,7 +9,7 @@ const LeaguePage = async ({ params }: Props) => {
     // Use leagueId to fetch league-specific data and send it to LeagueClient
 
     return (
-        <div className="min-h-screen bg-background">
+        <div>
             <LeagueClient />
         </div>
     );
