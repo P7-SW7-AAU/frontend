@@ -1,17 +1,16 @@
 "use client";
 
 import Navbar from '@/components/Navbar';
-import TeamStats from '@/components/TeamStats';
 import PlayerCard from '@/components/PlayerCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Users, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { getCurrentUserTeam, getAvailablePlayers, getLeagueStandings } from '@/data/multiSportMockData';
 import { PlayerWithTeam } from '@/types/database';
-import { useUser, useStackApp } from '@stackframe/stack';
+import { useUser } from '@stackframe/stack';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -19,19 +18,16 @@ const Dashboard = () => {
   const standings = getLeagueStandings();
   const availablePlayers = getAvailablePlayers();
 
-  // 🔐 Neon Auth / Stack setup
+  // -- ONLY FOR GETTING TOKEN FOR TESTING ENDPOINTS! REMOVE LATER AS WE USE A BETTER APPROACH GETTING TOKEN --
   const user = useUser();
-  const stackApp = useStackApp(); // better naming to avoid confusion
-  const [token, setToken] = useState<string>('');
-
   useEffect(() => {
     (async () => {
       if (!user) return;
       const { accessToken } = await user.getAuthJson(); // ← correct API
-      setToken(accessToken ?? '');
       console.log('Access token:', accessToken);
     })();
-  }, [user]); // React's useEffect with [user] as a dependency only triggers when the reference to the user object changes, not when a property value inside the same object changes. The access token is updated inside the existing user object, but the object reference stays the same, so the effect will not re-run.
+  }, [user]);
+  // -- REMOVE ABOVE --
 
   const handlePlayerAction = (player: PlayerWithTeam, action: 'add' | 'drop') => {
     router.push('/teams/lineup');
@@ -40,15 +36,6 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
-      {/* Quick token display */}
-      {token && (
-        <div className="text-center py-4 text-xs text-primary-gray">
-          <p>Your access token:</p>
-          <pre className="break-all max-w-full overflow-x-auto px-4">{token}</pre>
-        </div>
-      )}
-
       {/* Banner Section */}
       <div className="relative overflow-hidden">
         <div

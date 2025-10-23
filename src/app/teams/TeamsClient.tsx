@@ -20,7 +20,8 @@ import CardAction from '@/components/CardAction';
 import { useApi } from '@/hooks/useApi';
 
 const TeamsClient = () => {
-  const api = useApi();
+  const { api } = useApi();
+  console.log('API instance in TeamsClient:', api);
   const currentUser = getCurrentUser();
   const userTeams = getUserTeams(currentUser.uniqueID);
   const createTeamModal = useCreateTeamModal();

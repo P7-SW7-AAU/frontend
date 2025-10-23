@@ -1,11 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { useCreateTeamModal } from "@/hooks/useCreateTeamModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
+import { useApi } from "@/hooks/useApi";
+
+import { createTeam } from "@/services/teamsService";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
@@ -13,6 +17,7 @@ import { Input } from "../ui/input";
 const CreateTeamModal = () => {
     const router = useRouter();
     const createTeamModal = useCreateTeamModal();
+    const { api } = useApi();
     
     const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +35,20 @@ const CreateTeamModal = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(true);
-        // TODO: Endpoint call
+
+        createTeam(data, api)
+            .then(() => {
+                toast.success("Team created successfully!");
+                router.refresh();
+                reset();
+                createTeamModal.onClose();
+            })
+            .catch((error) => {
+                toast.error("Error creating team: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     useEffect(() => {
