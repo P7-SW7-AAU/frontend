@@ -17,11 +17,8 @@ import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
 import CardStats from '@/components/CardStats';
 import CardAction from '@/components/CardAction';
-import { useApi } from '@/hooks/useApi';
 
 const TeamsClient = () => {
-  const { api } = useApi();
-  console.log('API instance in TeamsClient:', api);
   const currentUser = getCurrentUser();
   const userTeams = getUserTeams(currentUser.uniqueID);
   const createTeamModal = useCreateTeamModal();
