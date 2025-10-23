@@ -4,14 +4,12 @@ import { useState } from 'react';
 import { toast } from 'sonner'
 import { TrendingUp, TrendingDown, Minus, DollarSign, Trophy, Zap, Target, Search, Plus } from 'lucide-react';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import Navbar from '@/components/Navbar';
@@ -19,132 +17,148 @@ import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 
 import { getUserTeams, getAvailablePlayers, sports, getPlayersBySport, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
 
+import { useApi } from "@/hooks/useApi";
+
+import { createTeam } from "@/services/teamsService";
+
+interface EditTeamClientProps {
+    tempTeamId: string;
+}
+
 const TEAM_BUDGET = 200; // Budget in millions
 
-const LineupClient = () => {
-  const router = useRouter();
-  const userTeams = getUserTeams();
-  const allPlayers = getAvailablePlayers();
-  const searchParams = useSearchParams();
-  const initialTeamId = searchParams.get('team') || '';
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedTeamId, setSelectedTeamId] = useState(initialTeamId);
-  const [selectedSport, setSelectedSport] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, string[]>>({});
-  const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
+const EditTeamClient = ({ tempTeamId }: EditTeamClientProps) => {
+    const { api } = useApi();
+    const router = useRouter();
+    const userTeams = getUserTeams();
+    const allPlayers = getAvailablePlayers();
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedTeamId, setSelectedTeamId] = useState(tempTeamId);
+    const [selectedSport, setSelectedSport] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [draftedPlayers, setDraftedPlayers] = useState<Record<string, string[]>>({});
+    const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
 
-  const selectedTeam = userTeams.find(team => team.uniqueID === selectedTeamId);
-  
-  // Calculate budget spent
-  const getBudgetSpent = (teamId: string) => {
-    const drafted = draftedPlayers[teamId] || [];
-    return drafted.reduce((sum, playerId) => {
-      const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
-      return sum + (player?.value || 0);
-    }, 0);
-  };
-  
-  const getRemainingBudget = (teamId: string) => {
-    return TEAM_BUDGET - getBudgetSpent(teamId);
-  };
-  
-  const getDraftedCount = (teamId: string) => {
-    return (draftedPlayers[teamId] || []).length;
-  };
-  
-  const getRemainingSlots = (teamId: string) => {
-    const currentPlayers = selectedTeam?.playerCount || 0;
-    const draftedCount = getDraftedCount(teamId);
-    return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
-  };
-  
-  // Check if player is on selected team
-  const isPlayerOnTeam = (playerId: string) => {
-    return draftedPlayers[selectedTeamId]?.includes(playerId) || false;
-  };
-  
-  // Filter players by sport and search query
-  const filteredPlayers = allPlayers.filter(player => {
-    // Sport filter
-    if (selectedSport !== 'all') {
-      const sportPlayers = getPlayersBySport(selectedSport);
-      if (!sportPlayers.some(sp => sp.uniqueID === player.uniqueID)) {
-        return false;
-      }
+    const selectedTeam = userTeams.find(team => team.uniqueID === selectedTeamId);
+
+    const onSubmit = (data: any) => {
+        setIsLoading(true);
+
+        createTeam(data, api)
+            .then(() => {
+                toast.success("Team created successfully!");
+                router.push('/teams');
+            })
+            .catch((error) => {
+                toast.error("Error creating team: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
     
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const matchesName = player.name.toLowerCase().includes(query);
-      const matchesTeam = player.sportsTeam.name.toLowerCase().includes(query);
-      const matchesPosition = player.position.toLowerCase().includes(query);
-      return matchesName || matchesTeam || matchesPosition;
-    }
+    // Calculate budget spent
+    const getBudgetSpent = (teamId: string) => {
+        const drafted = draftedPlayers[teamId] || [];
+        return drafted.reduce((sum, playerId) => {
+        const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
+        return sum + (player?.value || 0);
+        }, 0);
+    };
     
-    return true;
-  });
-
-  const handleDraftPlayer = (playerId: string, playerName: string) => {
-    if (!selectedTeamId) {
-      toast.message("No team selected");
-      return;
-    }
+    const getRemainingBudget = (teamId: string) => {
+        return TEAM_BUDGET - getBudgetSpent(teamId);
+    };
     
-    const player = allPlayers.find(p => p.uniqueID === playerId);
-    if (!player) return;
+    const getDraftedCount = (teamId: string) => {
+        return (draftedPlayers[teamId] || []).length;
+    };
     
-    // Check budget
-    if (player.value > getRemainingBudget(selectedTeamId)) {
-      toast.message("Insufficient budget");
-      return;
-    }
+    const getRemainingSlots = (teamId: string) => {
+        const currentPlayers = selectedTeam?.playerCount || 0;
+        const draftedCount = getDraftedCount(teamId);
+        return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
+    };
     
-    // Check team slots
-    if (getRemainingSlots(selectedTeamId) <= 0) {
-      toast.message("You've reached the maximum number of players");
-      return;
-    }
+    // Check if player is on selected team
+    const isPlayerOnTeam = (playerId: string) => {
+        return draftedPlayers[selectedTeamId]?.includes(playerId) || false;
+    };
+    
+    // Filter players by sport and search query
+    const filteredPlayers = allPlayers.filter(player => {
+        // Sport filter
+        if (selectedSport !== 'all') {
+        const sportPlayers = getPlayersBySport(selectedSport);
+        if (!sportPlayers.some(sp => sp.uniqueID === player.uniqueID)) {
+            return false;
+        }
+        }
+        
+        // Search filter
+        if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesName = player.name.toLowerCase().includes(query);
+        const matchesTeam = player.sportsTeam.name.toLowerCase().includes(query);
+        const matchesPosition = player.position.toLowerCase().includes(query);
+        return matchesName || matchesTeam || matchesPosition;
+        }
+        
+        return true;
+    });
 
-    setDraftedPlayers(prev => ({
-      ...prev,
-      [selectedTeamId]: [...(prev[selectedTeamId] || []), playerId]
-    }));
+    const handleDraftPlayer = (playerId: string, playerName: string) => {
+        if (!selectedTeamId) {
+        toast.message("No team selected");
+        return;
+        }
+        
+        const player = allPlayers.find(p => p.uniqueID === playerId);
+        if (!player) return;
+        
+        // Check budget
+        if (player.value > getRemainingBudget(selectedTeamId)) {
+        toast.message("Insufficient budget");
+        return;
+        }
+        
+        // Check team slots
+        if (getRemainingSlots(selectedTeamId) <= 0) {
+        toast.message("You've reached the maximum number of players");
+        return;
+        }
 
-    toast.message(`${playerName} joined for $${player.value}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
-  };
+        setDraftedPlayers(prev => ({
+        ...prev,
+        [selectedTeamId]: [...(prev[selectedTeamId] || []), playerId]
+        }));
 
-  const handleUndraftPlayer = (playerId: string, playerName: string) => {
-    setDraftedPlayers(prev => ({
-      ...prev,
-      [selectedTeamId]: (prev[selectedTeamId] || []).filter(id => id !== playerId)
-    }));
+        toast.message(`${playerName} joined for $${player.value}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+    };
 
-    toast.message(`${playerName} has been removed from ${selectedTeam?.name}.`);
-  };
+    const handleUndraftPlayer = (playerId: string, playerName: string) => {
+        setDraftedPlayers(prev => ({
+        ...prev,
+        [selectedTeamId]: (prev[selectedTeamId] || []).filter(id => id !== playerId)
+        }));
 
-  const getTrendIcon = (trend?: string) => {
-    if (trend === 'up') return <TrendingUp className="h-3 w-3 text-primary-green" />;
-    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
-    return <Minus className="h-3 w-3 text-muted-foreground" />;
-  };
+        toast.message(`${playerName} has been removed from ${tempTeamId}.`);
+    };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'default';
-      case 'injured': return 'destructive';
-      case 'bye': return 'secondary';
-      default: return 'outline';
-    }
-  };
+    const getTrendIcon = (trend?: string) => {
+        if (trend === 'up') return <TrendingUp className="h-3 w-3 text-primary-green" />;
+        if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
+        return <Minus className="h-3 w-3 text-muted-foreground" />;
+    };
 
-  const handleTeamChange = (teamId: string) => {
-    setSelectedTeamId(teamId);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('team', teamId);
-    router.replace(`?${params.toString()}`, { scroll: false });
-  };
+    const getStatusColor = (status: string) => {
+        switch (status) {
+        case 'active': return 'default';
+        case 'injured': return 'destructive';
+        case 'bye': return 'secondary';
+        default: return 'outline';
+        }
+    };
 
   return (
     <div className="min-h-screen bg-gradient-primary">
@@ -166,36 +180,7 @@ const LineupClient = () => {
           </div>
         </div>
 
-        <div className="grid gap-6 mb-6 md:grid-cols-2">
-          <Card className="hover:shadow-card transition-smooth">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl text-white font-bold">
-                <Target className="h-5 w-5 text-primary-green" />
-                Select Your Team
-              </CardTitle>
-              <CardDescription className="text-primary-gray font-medium">Choose which team to modify your lineup for</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedTeamId} onValueChange={handleTeamChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a team" />
-                </SelectTrigger>
-                <SelectContent>
-                  {userTeams.map(team => (
-                    <SelectItem key={team.uniqueID} value={team.uniqueID}>
-                      <div className="flex items-center gap-2">
-                        <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {team.playerCount} players
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
-          
+        <div className="grid gap-6 mb-6 md:grid-cols-2">  
           {selectedTeamId && (
             <Card className="hover:shadow-card transition-smooth border-[#16A149] bg-[#152323]">
               <CardHeader>
@@ -378,4 +363,4 @@ const LineupClient = () => {
   );
 };
 
-export default LineupClient;
+export default EditTeamClient;
