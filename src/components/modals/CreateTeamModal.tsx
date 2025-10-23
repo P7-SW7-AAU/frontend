@@ -61,7 +61,7 @@ const CreateTeamModal = () => {
         <Modal 
             isOpen={createTeamModal.isOpen} 
             onClose={createTeamModal.onClose} 
-            onSubmit={handleSubmit((data) => router.push(`/teams/${data.name}`))}
+            onSubmit={handleSubmit((data) => router.push(`/teams/${encodeURIComponent(data.name)}`))}
             body={bodyContent} 
             actionLabel="Add Players" 
         />
