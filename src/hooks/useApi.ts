@@ -24,19 +24,19 @@ export function useApi() {
 
     const api = useMemo(() => {
         const instance = axios.create({
-            baseURL: "/api", // your API base URL
+            baseURL: process.env.NEXT_PUBLIC_API_URL,
         });
 
         instance.interceptors.request.use(async (config) => {
-        const user = await stackApp.getUser();
-        if (user) {
-            const { accessToken } = await user.getAuthJson();
-            config.headers = new AxiosHeaders({
-            ...(config.headers || {}),
-            Authorization: `Bearer ${accessToken}`,
-            });
-        }
-        return config;
+            const user = await stackApp.getUser();
+            if (user) {
+                const { accessToken } = await user.getAuthJson();
+                config.headers = new AxiosHeaders({
+                    ...(config.headers || {}),
+                    "x-stack-access-token": accessToken,
+                });
+            }
+            return config;
         });
 
         return instance;
