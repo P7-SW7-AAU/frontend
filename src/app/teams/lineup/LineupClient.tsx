@@ -14,7 +14,8 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import Navbar from '@/components/Navbar';
+import Header from '@/components/Header';
+import Container from '@/components/Container';
 import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 
 import { getUserTeams, getAvailablePlayers, sports, getPlayersBySport, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
@@ -147,234 +148,225 @@ const LineupClient = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-primary">
-      <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex items-center gap-3 mb-4">
-                <Trophy className="h-10 w-10 text-primary-green animate-pulse" />
-                <div>
-                    <h1 className="text-3xl font-bold text-white">Team Manager</h1>
-                    <p className="text-primary-gray font-medium mt-1">Build your dream team</p>
-                </div>
-            </div>
-            <Button onClick={() => {}} variant="hero" size="lg" disabled={isLoading}>
-                <Plus className="h-5 w-5 mr-2" />
-                Save Changes
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid gap-6 mb-6 md:grid-cols-2">
-          <Card className="hover:shadow-card transition-smooth">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl text-white font-bold">
-                <Target className="h-5 w-5 text-primary-green" />
-                Select Your Team
-              </CardTitle>
-              <CardDescription className="text-primary-gray font-medium">Choose which team to modify your lineup for</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedTeamId} onValueChange={handleTeamChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a team" />
-                </SelectTrigger>
-                <SelectContent>
-                  {userTeams.map(team => (
-                    <SelectItem key={team.uniqueID} value={team.uniqueID}>
-                      <div className="flex items-center gap-2">
-                        <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {team.playerCount} players
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
-          
-          {selectedTeamId && (
-            <Card className="hover:shadow-card transition-smooth border-[#16A149] bg-[#152323]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white text-2xl font-bold">
-                  <DollarSign className="h-5 w-5 text-white" />
-                  Team Budget & Slots
-                </CardTitle>
-                <CardDescription className="text-primary-gray font-medium">Manage your resources wisely</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-primary-gray">Budget Remaining</span>
-                    <span className="text-2xl font-bold text-white">
-                      ${getRemainingBudget(selectedTeamId).toFixed(1)}M
-                    </span>
-                  </div>
-                  <Progress 
-                    value={(getRemainingBudget(selectedTeamId) / TEAM_BUDGET) * 100} 
-                    className="h-3"
-                  />
-                  <p className="text-xs text-primary-gray font-medium mt-1">
-                    ${getBudgetSpent(selectedTeamId).toFixed(1)}M / ${TEAM_BUDGET}M spent
-                  </p>
-                </div>
-                
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-primary-gray">Team Slots</span>
-                    <span className="text-2xl font-bold text-white">
-                      {getRemainingSlots(selectedTeamId)} / {MAX_PLAYERS_PER_TEAM}
-                    </span>
-                  </div>
-                  <Progress 
-                    value={(getRemainingSlots(selectedTeamId) / MAX_PLAYERS_PER_TEAM) * 100} 
-                    className="h-3"
-                  />
-                  <p className="text-xs text-primary-gray font-medium mt-1">
-                    {getDraftedCount(selectedTeamId)} added this session
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
+    <Container>
+      <Header 
+        title="Team Manager" 
+        description="Build your dream team" 
+        icon={Trophy} 
+        buttonText="Save Changes" 
+        buttonIcon={Plus} 
+        buttonIconSize="5" 
+        onClick={() => {}} 
+        isLoading={isLoading} 
+      />
+      <div className="grid gap-6 mb-6 md:grid-cols-2">
         <Card className="hover:shadow-card transition-smooth">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white text-2xl font-bold">
-              <Zap className="h-6 w-6 text-primary-green" />
-              Player Management
+            <CardTitle className="flex items-center gap-2 text-2xl text-white font-bold">
+              <Target className="h-5 w-5 text-primary-green" />
+              Select Your Team
             </CardTitle>
-            <CardDescription className="mt-1 text-primary-gray font-medium">
-              Manage your team and find new talent
-            </CardDescription>
-            
-            {/* Search and Filter Controls */}
-            <div className="flex flex-col lg:flex-row gap-4 mb-6 mt-6">
-              <div className="relative flex-1 bg-[#0F141B]">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-primary-gray" />
-                <Input
-                  placeholder="Search players, teams, positions..."
-                  className="pl-10 border-[#1E2938] text-white font-medium"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
-              {/* Sport Filter */}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedSport === 'all' ? 'hero' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedSport('all')}
-                >
-                  All Sports
-                </Button>
-                {sports.map((sport) => (
-                  <Button
-                    key={sport.uniqueID}
-                    variant={selectedSport === sport.uniqueID ? 'hero' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedSport(sport.uniqueID)}
-                  >
-                    {sport.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'all' | 'my')} className="w-full">
-              <TabsList className="grid w-full h-11 grid-cols-2 bg-[#152332]">
-                <TabsTrigger value="all" className="text-white font-bold cursor-pointer">
-                  All Players ({filteredPlayers.length})
-                </TabsTrigger>
-                <TabsTrigger value="my" className="text-white font-bold cursor-pointer">
-                  My Players ({selectedTeamId ? (draftedPlayers[selectedTeamId]?.length || 0) : 0})
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <CardDescription className="text-primary-gray font-medium">Choose which team to modify your lineup for</CardDescription>
           </CardHeader>
-          
           <CardContent>
-            {viewMode === 'all' ? (
-              <>
-                <p className="text-sm text-primary-gray font-medium mb-4">
-                  {filteredPlayers.length} players found
-                </p>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredPlayers.map((player) => (
-                    <PlayerCardDetailed
-                      key={player.uniqueID}
-                      player={player}
-                      isOwned={isPlayerOnTeam(player.uniqueID)}
-                      onAdd={() => handleDraftPlayer(player.uniqueID, player.name)}
-                      onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
-                      getTrendIcon={getTrendIcon}
-                      getStatusColor={getStatusColor}
-                      disabled={
-                        !selectedTeamId ||
-                        player.value > getRemainingBudget(selectedTeamId) ||
-                        getRemainingSlots(selectedTeamId) <= 0
-                      }
-                    />
-                  ))}
-                </div>
-
-                {filteredPlayers.length === 0 && (
-                  <div className="text-center py-12 col-span-full">
-                    <Search className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-                    <p className="text-muted-foreground text-lg">No players found</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Try adjusting your search or filters
-                    </p>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                {selectedTeamId && draftedPlayers[selectedTeamId]?.length > 0 ? (
-                  <>
-                    <p className="text-sm text-primary-gray mb-4">
-                      {draftedPlayers[selectedTeamId].length} players in {selectedTeam?.name}
-                    </p>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                      {draftedPlayers[selectedTeamId].map((playerId, index) => {
-                        const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
-                        if (!player) return null;
-                        return (
-                          <PlayerCardDetailed
-                            key={player.uniqueID}
-                            player={player}
-                            isOwned={true}
-                            onAdd={() => {}}
-                            onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
-                            getTrendIcon={getTrendIcon}
-                            getStatusColor={getStatusColor}
-                          />
-                        );
-                      })}
+            <Select value={selectedTeamId} onValueChange={handleTeamChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a team" />
+              </SelectTrigger>
+              <SelectContent>
+                {userTeams.map(team => (
+                  <SelectItem key={team.uniqueID} value={team.uniqueID}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
+                      <Badge variant="secondary" className="text-xs">
+                        {team.playerCount} players
+                      </Badge>
                     </div>
-                  </>
-                ) : (
-                  <div className="text-center py-12">
-                    <Trophy className="h-16 w-16 mx-auto text-primary-gray mb-4" />
-                    <p className="text-primary-gray text-lg font-medium">
-                      {selectedTeamId ? 'No players added yet' : 'Select a team to view players'}
-                    </p>
-                    <p className="text-sm text-primary-gray font-medium mt-2">
-                      {selectedTeamId ? 'Start adding players from the "All Players" tab' : 'Choose a team from the dropdown above'}
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </CardContent>
         </Card>
+        
+        {selectedTeamId && (
+          <Card className="hover:shadow-card transition-smooth border-[#16A149] bg-[#152323]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-white text-2xl font-bold">
+                <DollarSign className="h-5 w-5 text-white" />
+                Team Budget & Slots
+              </CardTitle>
+              <CardDescription className="text-primary-gray font-medium">Manage your resources wisely</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-primary-gray">Budget Remaining</span>
+                  <span className="text-2xl font-bold text-white">
+                    ${getRemainingBudget(selectedTeamId).toFixed(1)}M
+                  </span>
+                </div>
+                <Progress 
+                  value={(getRemainingBudget(selectedTeamId) / TEAM_BUDGET) * 100} 
+                  className="h-3"
+                />
+                <p className="text-xs text-primary-gray font-medium mt-1">
+                  ${getBudgetSpent(selectedTeamId).toFixed(1)}M / ${TEAM_BUDGET}M spent
+                </p>
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-primary-gray">Team Slots</span>
+                  <span className="text-2xl font-bold text-white">
+                    {getRemainingSlots(selectedTeamId)} / {MAX_PLAYERS_PER_TEAM}
+                  </span>
+                </div>
+                <Progress 
+                  value={(getRemainingSlots(selectedTeamId) / MAX_PLAYERS_PER_TEAM) * 100} 
+                  className="h-3"
+                />
+                <p className="text-xs text-primary-gray font-medium mt-1">
+                  {getDraftedCount(selectedTeamId)} added this session
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
-    </div>
+
+      <Card className="hover:shadow-card transition-smooth">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-white text-2xl font-bold">
+            <Zap className="h-6 w-6 text-primary-green" />
+            Player Management
+          </CardTitle>
+          <CardDescription className="mt-1 text-primary-gray font-medium">
+            Manage your team and find new talent
+          </CardDescription>
+          
+          {/* Search and Filter Controls */}
+          <div className="flex flex-col lg:flex-row gap-4 mb-6 mt-6">
+            <div className="relative flex-1 bg-[#0F141B]">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-primary-gray" />
+              <Input
+                placeholder="Search players, teams, positions..."
+                className="pl-10 border-[#1E2938] text-white font-medium"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            {/* Sport Filter */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedSport === 'all' ? 'hero' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedSport('all')}
+              >
+                All Sports
+              </Button>
+              {sports.map((sport) => (
+                <Button
+                  key={sport.uniqueID}
+                  variant={selectedSport === sport.uniqueID ? 'hero' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedSport(sport.uniqueID)}
+                >
+                  {sport.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'all' | 'my')} className="w-full">
+            <TabsList className="grid w-full h-11 grid-cols-2 bg-[#152332]">
+              <TabsTrigger value="all" className="text-white font-bold cursor-pointer">
+                All Players ({filteredPlayers.length})
+              </TabsTrigger>
+              <TabsTrigger value="my" className="text-white font-bold cursor-pointer">
+                My Players ({selectedTeamId ? (draftedPlayers[selectedTeamId]?.length || 0) : 0})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </CardHeader>
+        
+        <CardContent>
+          {viewMode === 'all' ? (
+            <>
+              <p className="text-sm text-primary-gray font-medium mb-4">
+                {filteredPlayers.length} players found
+              </p>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredPlayers.map((player) => (
+                  <PlayerCardDetailed
+                    key={player.uniqueID}
+                    player={player}
+                    isOwned={isPlayerOnTeam(player.uniqueID)}
+                    onAdd={() => handleDraftPlayer(player.uniqueID, player.name)}
+                    onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
+                    getTrendIcon={getTrendIcon}
+                    getStatusColor={getStatusColor}
+                    disabled={
+                      !selectedTeamId ||
+                      player.value > getRemainingBudget(selectedTeamId) ||
+                      getRemainingSlots(selectedTeamId) <= 0
+                    }
+                  />
+                ))}
+              </div>
+
+              {filteredPlayers.length === 0 && (
+                <div className="text-center py-12 col-span-full">
+                  <Search className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+                  <p className="text-muted-foreground text-lg">No players found</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Try adjusting your search or filters
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {selectedTeamId && draftedPlayers[selectedTeamId]?.length > 0 ? (
+                <>
+                  <p className="text-sm text-primary-gray mb-4">
+                    {draftedPlayers[selectedTeamId].length} players in {selectedTeam?.name}
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {draftedPlayers[selectedTeamId].map((playerId, index) => {
+                      const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
+                      if (!player) return null;
+                      return (
+                        <PlayerCardDetailed
+                          key={player.uniqueID}
+                          player={player}
+                          isOwned={true}
+                          onAdd={() => {}}
+                          onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
+                          getTrendIcon={getTrendIcon}
+                          getStatusColor={getStatusColor}
+                        />
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <Trophy className="h-16 w-16 mx-auto text-primary-gray mb-4" />
+                  <p className="text-primary-gray text-lg font-medium">
+                    {selectedTeamId ? 'No players added yet' : 'Select a team to view players'}
+                  </p>
+                  <p className="text-sm text-primary-gray font-medium mt-2">
+                    {selectedTeamId ? 'Start adding players from the "All Players" tab' : 'Choose a team from the dropdown above'}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 
