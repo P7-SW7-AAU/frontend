@@ -4,41 +4,32 @@
 import { Trophy, Eye, DoorOpen, Target } from 'lucide-react';
 
 import CardStats from '@/components/CardStats';
-import Navbar from '@/components/Navbar';
+import Container from '@/components/Container';
+import Header from '@/components/Header';
 import CardLeaderboard from '@/components/leaderboard/CardLeaderboard';
-
-import { Button } from '@/components/ui/button';
 
 import { useLeaveLeagueModal } from '@/hooks/useLeaveLeagueModal';
 
 import { getLeagueStandings, leagueWithTeams } from '@/data/mockData';
 
 const LeagueClient = () => {
-  const standings = getLeagueStandings();
-  const leaveLeagueModal = useLeaveLeagueModal();
+    const standings = getLeagueStandings();
+    const leaveLeagueModal = useLeaveLeagueModal();
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                <div>
-                    <h1 className="text-3xl font-bold text-white">{leagueWithTeams.name}</h1>
-                    <p className="text-primary-gray font-medium mt-1">
-                        Track the performance of all teams in the league
-                    </p>
-                </div>
-                <div className="flex space-x-3">
-                    <Button variant="outline" size="lg" onClick={() => {}}>
-                        <Eye className="h-4 w-4" />
-                        View Code
-                    </Button>
-                    <Button variant="hero" size="lg" onClick={leaveLeagueModal.onOpen}>
-                        <DoorOpen className="h-4 w-4" />
-                        Leave League
-                    </Button>
-                </div>
-            </div>
+    return (
+        <Container>
+            <Header
+                title={leagueWithTeams.name}
+                description="Track the performance of all teams in the league"
+                buttonText="Leave League"
+                buttonIcon={DoorOpen}
+                buttonIconSize="4"
+                onClick={leaveLeagueModal.onOpen}
+                secondaryButtonText="View Code"
+                secondaryButtonIcon={Eye}
+                secondaryButtonIconSize="4"
+                secondaryOnClick={() => {}}
+            />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <CardStats 
@@ -85,9 +76,8 @@ const LeagueClient = () => {
                 </h2>
                 <CardLeaderboard standings={standings} />
             </div>
-        </div>
-    </div>
-  );
+        </Container>
+    );
 }
 
 export default LeagueClient;
