@@ -1,21 +1,19 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { Plus, Users, Trophy, Target, Trash2, Calendar, Edit2 } from 'lucide-react';
+import { Plus, Users, Trophy, Target, Calendar } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-import { getUserTeams, getCurrentUser, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
+import { getUserTeams, getCurrentUser } from '@/data/multiSportMockData';
 
 import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
+
 import CardStats from '@/components/CardStats';
 import CardAction from '@/components/CardAction';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
+import TeamCard from '@/components/teams/TeamCard';
 
 const TeamsClient = () => {
   const currentUser = getCurrentUser();
@@ -24,29 +22,6 @@ const TeamsClient = () => {
   const deleteTeamModal = useDeleteTeamModal();
   const editTeamModal = useEditTeamModal();
   const router = useRouter();
-
-  const handleViewTeam = (teamID: string) => {
-    router.push(`/teams/lineup?team=${teamID}`);
-  };
-
-  const getTeamStats = (team: any) => {
-    const totalPoints = team.players.reduce((sum: number, player: any) => sum + (player.points || 0), 0);
-    const projectedPoints = team.players.reduce((sum: number, player: any) => sum + (player.projectedPoints || 0), 0);
-    
-    // Group players by sport
-    const sportGroups = team.players.reduce((groups: any, player: any) => {
-      const sportName = player.sportsTeam?.sports_League_ID?.includes('nfl') ? 'Football' :
-                        player.sportsTeam?.sports_League_ID?.includes('nba') ? 'Basketball' :
-                        player.sportsTeam?.sports_League_ID?.includes('epl') ? 'Soccer' :
-                        player.sportsTeam?.sports_League_ID?.includes('chess') ? 'Chess' : 'Tennis';
-      
-      if (!groups[sportName]) groups[sportName] = 0;
-      groups[sportName]++;
-      return groups;
-    }, {});
-
-    return { totalPoints, projectedPoints, sportGroups };
-  };
 
   return (
     <Container>
@@ -97,90 +72,18 @@ const TeamsClient = () => {
         />
       </div>
 
-      {/* Teams Grid */}
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-white">Your Teams</h2>
-        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {userTeams.map((team) => {
-            const stats = getTeamStats(team);
-            return (
-              <Card key={team.uniqueID} className="hover:shadow-card transition-smooth">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <CardTitle className="text-xl text-white">{team.name}</CardTitle>
-                      <div className="flex items-center space-x-4">
-                        <Badge 
-                          variant="secondary"
-                          className="px-2 py-1"
-                        >
-                          {team.playerCount}/{MAX_PLAYERS_PER_TEAM} Players
-                        </Badge>
-                        <Badge variant="outline" className="px-2 py-1">
-                          ${team.valueSum}M Value
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={editTeamModal.onOpen}>
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="trash" onClick={deleteTeamModal.onOpen}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  {/* Sports Breakdown */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-primary-gray">Sports Breakdown</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(stats.sportGroups).map(([sport, count]) => (
-                        <Badge key={sport} variant="secondary">
-                          {sport}: {count as number}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Performance Stats */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-primary-gray">Total Points</div>
-                      <div className="text-lg font-semibold text-white">
-                        {stats.totalPoints.toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-primary-gray">Projected</div>
-                      <div className="text-lg font-semibold text-primary-green">
-                        {stats.projectedPoints.toFixed(1)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex space-x-3 pt-2">
-                    <Button 
-                      variant="hero" 
-                      className="flex-1"
-                      onClick={() => handleViewTeam(team.uniqueID)}
-                    >
-                      <Users className="h-4 w-4 mr-2" />
-                      Manage Team
-                    </Button>
-                    <Button variant="outline" className="flex-1" onClick={() => router.push('/leagues')}>
-                      <Trophy className="h-4 w-4 mr-2" />
-                      View Leagues
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {userTeams.map((team) => (
+            <TeamCard
+              key={team.uniqueID}
+              team={team}
+              onEdit={editTeamModal.onOpen}
+              onDelete={deleteTeamModal.onOpen}
+              onManage={(teamId) => router.push(`/teams/lineup?team=${teamId}`)}
+            />
+          ))}
 
           <CardAction 
             title="Create Team"
@@ -195,6 +98,6 @@ const TeamsClient = () => {
       </div>
     </Container>
   );
-};
+}
 
 export default TeamsClient;
