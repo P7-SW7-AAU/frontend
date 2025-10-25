@@ -1,4 +1,3 @@
-// TODO: Add eye icon and leave buttons
 "use client";
 
 import { Trophy, Eye, DoorOpen, Target } from 'lucide-react';

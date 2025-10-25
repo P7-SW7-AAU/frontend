@@ -1,15 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Plus, Users, Trophy, Target, Crown, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Users, Trophy, Target, Crown } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ActionCard from '@/components/ActionCard';
 import StatsCard from '@/components/StatsCard';
 import Container from '@/components/Container';
 import Header from "@/components/Header";
+import LeagueCard from '@/components/leagues/LeagueCard';
 
 import { 
   getCurrentUser, 
@@ -37,7 +35,6 @@ const LeaguesClient = () => {
   const joinLeagueModal = useJoinLeagueModal();
   const selectTeamModal = useSelectTeamModal();
 
-  // Get all leagues the user participates in
   const getUserLeagues = () => {
     const userTeamIds = userTeams.map(team => team.uniqueID);
     const userLeagueIds = teamLeagues
@@ -63,9 +60,9 @@ const LeaguesClient = () => {
           userTeamsInLeague,
           totalTeams: leagueData?.teams.length || 0,
           isAdmin: league.admin_ID === currentUser.uniqueID
-        };
+        }
       });
-  };
+  }
 
   const userLeagues = getUserLeagues();
 
@@ -83,7 +80,7 @@ const LeaguesClient = () => {
     ));
 
     return { totalLeagues, adminCount, totalTeamsInLeagues, bestRanking };
-  };
+  }
 
   const stats = getLeagueStats();
 
@@ -140,106 +137,18 @@ const LeaguesClient = () => {
         />
       </div>
 
-      {/* Leagues Grid */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white">Your Leagues</h2>
-        
+        <h2 className="text-2xl font-bold text-white">Your Leagues</h2>        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {userLeagues.map((league) => (
-            <Card key={league.uniqueID} className="hover:shadow-card transition-smooth">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <CardTitle className="text-xl text-white">{league.name}</CardTitle>
-                      {league.isAdmin && (
-                        <Crown className="h-5 w-5 text-primary-yellow" />
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <Badge variant="secondary" className="px-2 py-1">
-                        {league.totalTeams}/{league.maxTeams} Teams
-                      </Badge>
-                      <Badge variant="outline" className="px-2 py-1 capitalize">
-                        {league.sportType}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    {league.isAdmin && (
-                      <Button size="sm" variant="outline" onClick={editLeagueModal.onOpen}>
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {league.isAdmin && (
-                      <Button size="sm" variant="trash" onClick={deleteLeagueModal.onOpen}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Your Teams in This League */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-primary-gray">Your Teams</h4>
-                  <div className="space-y-2">
-                    {league.userTeamsInLeague.map((team) => {
-                      const standing = league.standings.find(s => s.uniqueID === team.uniqueID);
-                      return (
-                        <div key={team.uniqueID} className="flex items-center justify-between p-2 bg-primary-yellow rounded-md">
-                          <div className="flex items-center space-x-3">
-                            <Badge 
-                              variant="secondary"
-                              className="px-2 py-1"
-                            >
-                              #{standing?.ranking || 'N/A'}
-                            </Badge>
-                            <span className="font-semibold text-black">{team.name}</span>
-                          </div>
-                          <div className="text-sm font-semibold text-black">
-                            {standing?.totalPoints.toLocaleString() || 0} pts
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* League Info */}
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#1E2938]">
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium text-primary-gray">Created</div>
-                    <div className="text-sm font-medium text-white">
-                      {league.createdAt.toLocaleDateString()}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium text-primary-gray">Sports</div>
-                    <div className="text-sm font-medium text-white">
-                      {league.allowedSports?.length || 0} allowed
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex space-x-3 pt-2">
-                  <Button 
-                    variant="hero" 
-                    className="flex-1"
-                    onClick={() => router.push(`/leagues/${league.uniqueID}`)} // TODO: Change to ${leagueId}
-                  >
-                    <Trophy className="h-4 w-4 mr-2" />
-                    View League
-                  </Button>
-                  <Button variant="outline" className="flex-1" onClick={selectTeamModal.onOpen}>
-                    <Users className="h-4 w-4 mr-2" />
-                    Select Team
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <LeagueCard
+              key={league.uniqueID}
+              league={league}
+              onEdit={editLeagueModal.onOpen}
+              onDelete={deleteLeagueModal.onOpen}
+              onViewLeague={(id: string) => router.push(`/leagues/${id}`)}
+              onSelectTeam={selectTeamModal.onOpen}
+            />
           ))}
 
           <ActionCard 

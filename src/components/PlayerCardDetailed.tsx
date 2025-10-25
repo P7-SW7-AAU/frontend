@@ -1,4 +1,3 @@
-// TODO: Use this component instead of hardcode in LineUpClient
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
