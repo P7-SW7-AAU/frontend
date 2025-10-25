@@ -15,7 +15,7 @@ type TeamProps = {
     onEdit: () => void;
     onDelete: () => void;
     onManage: (teamID: string) => void;
-};
+}
 
 const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const router = useRouter();
