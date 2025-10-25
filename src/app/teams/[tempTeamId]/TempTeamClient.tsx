@@ -22,13 +22,13 @@ import { useApi } from "@/hooks/useApi";
 
 import { createTeam } from "@/services/teamsService";
 
-interface EditTeamClientProps {
+interface TempTeamClientProps {
   tempTeamId: string;
 }
 
 const TEAM_BUDGET = 200; // Budget in millions
 
-const EditTeamClient = ({ tempTeamId }: EditTeamClientProps) => {
+const TempTeamClient = ({ tempTeamId }: TempTeamClientProps) => {
   const { api } = useApi();
   const router = useRouter();
   const userTeams = getUserTeams();
@@ -356,4 +356,4 @@ const EditTeamClient = ({ tempTeamId }: EditTeamClientProps) => {
   );
 }
 
-export default EditTeamClient;
+export default TempTeamClient;

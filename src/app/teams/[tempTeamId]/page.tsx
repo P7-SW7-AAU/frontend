@@ -1,4 +1,4 @@
-import EditTeamClient from "./EditTeamClient";
+import TempTeamClient from "./TempTeamClient";
 
 interface Props {
     params: Promise<{ tempTeamId: string }>
@@ -9,7 +9,7 @@ const EditTeamPage = async ({ params }: Props) => {
 
     return (
         <div>
-            <EditTeamClient tempTeamId={tempTeamId} />
+            <TempTeamClient tempTeamId={tempTeamId} />
         </div>
     );
 }
