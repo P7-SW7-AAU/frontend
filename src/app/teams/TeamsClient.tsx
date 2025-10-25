@@ -9,8 +9,8 @@ import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
 
-import CardStats from '@/components/CardStats';
-import CardAction from '@/components/CardAction';
+import ActionCard from '@/components/ActionCard';
+import StatsCard from '@/components/StatsCard';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
 import TeamCard from '@/components/teams/TeamCard';
@@ -35,7 +35,7 @@ const TeamsClient = () => {
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <CardStats 
+        <StatsCard 
           title="Total Teams" 
           value={userTeams.length} 
           valueColor="text-white" 
@@ -44,7 +44,7 @@ const TeamsClient = () => {
           iconColor="text-primary-green" 
         />
 
-        <CardStats 
+        <StatsCard 
           title="Total Players" 
           value={userTeams.reduce((sum, team) => sum + team.playerCount, 0)} 
           valueColor="text-primary-green" 
@@ -53,7 +53,7 @@ const TeamsClient = () => {
           iconColor="text-primary-green" 
         />
 
-        <CardStats 
+        <StatsCard 
           title="Total Value" 
           value={`$${userTeams.reduce((sum, team) => sum + team.valueSum, 0).toFixed(1)}M`} 
           valueColor="text-primary-yellow" 
@@ -62,7 +62,7 @@ const TeamsClient = () => {
           iconColor="text-primary-yellow" 
         />
 
-        <CardStats 
+        <StatsCard 
           title="Sports Covered" 
           value={5} 
           valueColor="text-white" 
@@ -85,7 +85,7 @@ const TeamsClient = () => {
             />
           ))}
 
-          <CardAction 
+          <ActionCard 
             title="Create Team"
             description="Build another multi-sport fantasy team with players from different sports"
             onClick={createTeamModal.onOpen}

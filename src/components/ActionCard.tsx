@@ -1,6 +1,6 @@
 import { Card, CardContent } from "./ui/card";
 
-interface CardActionProps {
+interface ActionCardProps {
     title: string;
     description: string;
     onClick: () => void;
@@ -10,7 +10,7 @@ interface CardActionProps {
     hoverColor: string;
 }
 
-const CardAction = ({ title, description, onClick, icon: Icon, iconColor, iconBgColor, hoverColor }: CardActionProps) => {
+const ActionCard = ({ title, description, onClick, icon: Icon, iconColor, iconBgColor, hoverColor }: ActionCardProps) => {
     return (
         <Card className={`border-dashed border-2 transition-colors cursor-pointer ${hoverColor}`} onClick={onClick}>
             <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
@@ -30,4 +30,4 @@ const CardAction = ({ title, description, onClick, icon: Icon, iconColor, iconBg
     );
 }
 
-export default CardAction;
+export default ActionCard;

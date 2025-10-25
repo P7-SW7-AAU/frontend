@@ -3,10 +3,10 @@
 
 import { Trophy, Eye, DoorOpen, Target } from 'lucide-react';
 
-import CardStats from '@/components/CardStats';
+import StatsCard from '@/components/StatsCard';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
-import CardLeaderboard from '@/components/leaderboard/CardLeaderboard';
+import CardLeaderboard from '@/components/leagues/LeaderboardCard';
 
 import { useLeaveLeagueModal } from '@/hooks/useLeaveLeagueModal';
 
@@ -32,7 +32,7 @@ const LeagueClient = () => {
             />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <CardStats 
+                <StatsCard 
                     title="Week" 
                     value={5} 
                     valueColor="text-white" 
@@ -41,7 +41,7 @@ const LeagueClient = () => {
                     iconColor="text-primary-green" 
                 />
 
-                <CardStats 
+                <StatsCard 
                     title="Total Points" 
                     value={standings[0].totalPoints} 
                     valueColor="text-primary-green" 
@@ -50,7 +50,7 @@ const LeagueClient = () => {
                     iconColor="text-primary-green" 
                 />
 
-                <CardStats 
+                <StatsCard 
                     title="Weekly Points" 
                     value={standings[0].weeklyPoints} 
                     valueColor="text-white" 
@@ -59,7 +59,7 @@ const LeagueClient = () => {
                     iconColor="text-primary-gray" 
                 />
 
-                <CardStats 
+                <StatsCard 
                     title="Best Rank" 
                     value={`#${standings[0].ranking}`} 
                     valueColor="text-primary-yellow" 
@@ -74,7 +74,15 @@ const LeagueClient = () => {
                     <Trophy className="h-6 w-6 mr-2 text-primary-yellow" />
                     Leaderboard
                 </h2>
-                <CardLeaderboard standings={standings} />
+                <div className="space-y-6">
+                    {standings.map((team, index) => (
+                        <CardLeaderboard 
+                            key={team.uniqueID}
+                            team={team}
+                            index={index}
+                        />
+                    ))}
+                </div>
             </div>
         </Container>
     );
