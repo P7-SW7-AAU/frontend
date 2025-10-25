@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 
-interface CardStatsProps {
+interface StatsCardProps {
     title: string;
     value: string | number;
     valueColor: string;
@@ -9,7 +9,7 @@ interface CardStatsProps {
     iconColor: string;
 }
 
-const CardStats = ({ title, value, valueColor, description, icon: Icon, iconColor }: CardStatsProps) => {
+const StatsCard = ({ title, value, valueColor, description, icon: Icon, iconColor }: StatsCardProps) => {
     return (
         <Card>
             <CardHeader>
@@ -26,4 +26,4 @@ const CardStats = ({ title, value, valueColor, description, icon: Icon, iconColo
     );
 }
 
-export default CardStats;
+export default StatsCard;

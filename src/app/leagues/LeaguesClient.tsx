@@ -6,8 +6,8 @@ import { Plus, Users, Trophy, Target, Crown, Edit2, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import CardAction from '@/components/CardAction';
-import CardStats from '@/components/CardStats';
+import ActionCard from '@/components/ActionCard';
+import StatsCard from '@/components/StatsCard';
 import Container from '@/components/Container';
 import Header from "@/components/Header";
 
@@ -103,7 +103,7 @@ const LeaguesClient = () => {
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <CardStats 
+        <StatsCard 
           title="Total Leagues" 
           value={stats.totalLeagues} 
           valueColor="text-white" 
@@ -112,7 +112,7 @@ const LeaguesClient = () => {
           iconColor="text-primary-green" 
         />
 
-        <CardStats 
+        <StatsCard 
           title="Admin of" 
           value={stats.adminCount} 
           valueColor="text-primary-yellow" 
@@ -121,7 +121,7 @@ const LeaguesClient = () => {
           iconColor="text-primary-yellow" 
         />
 
-        <CardStats 
+        <StatsCard 
           title="Teams Active" 
           value={stats.totalTeamsInLeagues} 
           valueColor="text-primary-green" 
@@ -130,7 +130,7 @@ const LeaguesClient = () => {
           iconColor="text-primary-green" 
         />
 
-        <CardStats 
+        <StatsCard 
           title="Best Rank" 
           value={stats.bestRanking === 999 ? 'N/A' : `#${stats.bestRanking}`} 
           valueColor="text-white" 
@@ -242,7 +242,7 @@ const LeaguesClient = () => {
             </Card>
           ))}
 
-          <CardAction 
+          <ActionCard 
             title="Join League"
             description="Enter a league code to join an existing league with your teams"
             onClick={joinLeagueModal.onOpen}
@@ -252,7 +252,7 @@ const LeaguesClient = () => {
             hoverColor="hover:border-[#846F2F]"
           />
 
-          <CardAction 
+          <ActionCard 
             title="Create League"
             description="Start your own multi-sport fantasy league and invite friends"
             onClick={createLeagueModal.onOpen}

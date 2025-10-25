@@ -10,14 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type Team = any;
 
-type Props = {
+type TeamProps = {
     team: Team;
     onEdit: () => void;
     onDelete: () => void;
     onManage: (teamID: string) => void;
 };
 
-const TeamCard: React.FC<Props> = ({ team, onEdit, onDelete, onManage }) => {
+const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const router = useRouter();
 
     const getTeamStats = (team: any) => {
