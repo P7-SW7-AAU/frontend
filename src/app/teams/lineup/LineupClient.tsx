@@ -8,11 +8,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import Header from '@/components/Header';
 import Container from '@/components/Container';
+import BudgetCard from '@/components/lineup/BudgetCard';
 import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
+import TeamSelectorCard from '@/components/lineup/TeamSelectorCard';
 
 import { getUserTeams, getAvailablePlayers, sports, getPlayersBySport, MAX_PLAYERS_PER_TEAM } from '@/data/multiSportMockData';
-import BudgetCard from '@/components/lineup/BudgetCard';
-import TeamSelectorCard from '@/components/lineup/TeamSelectorCard';
 
 const TEAM_BUDGET = 200; // Budget in millions
 

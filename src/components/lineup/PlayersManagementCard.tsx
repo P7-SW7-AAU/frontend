@@ -23,7 +23,7 @@ interface Props {
   getRemainingSlots: (teamId: string) => number;
 }
 
-export default function PlayersManagementCard({
+const PlayersManagementCard = ({
   allPlayers,
   draftedPlayers,
   selectedTeamId,
@@ -34,7 +34,7 @@ export default function PlayersManagementCard({
   handleUndraftPlayer,
   getRemainingBudget,
   getRemainingSlots,
-}: Props) {
+}: Props) => {
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
   const [selectedSport, setSelectedSport] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -207,3 +207,5 @@ export default function PlayersManagementCard({
     </Card>
   );
 }
+
+export default PlayersManagementCard;
