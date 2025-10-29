@@ -53,8 +53,8 @@ const TempTeamClient = ({ tempTeamId }: TempTeamClientProps) => {
   const getBudgetSpent = (teamId: string) => {
     const drafted = draftedPlayers[teamId] || [];
     return drafted.reduce((sum, playerId) => {
-    const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
-    return sum + (player?.value || 0);
+      const player = getAvailablePlayers().find(p => p.uniqueID === playerId);
+      return sum + (player?.value || 0);
     }, 0);
   }
   
@@ -74,26 +74,26 @@ const TempTeamClient = ({ tempTeamId }: TempTeamClientProps) => {
 
   const handleDraftPlayer = (playerId: string, playerName: string) => {
     if (!selectedTeamId) {
-    toast.message("No team selected");
-    return;
+      toast.message("No team selected");
+      return;
     }
     
     const player = allPlayers.find(p => p.uniqueID === playerId);
     if (!player) return;
     
     if (player.value > getRemainingBudget(selectedTeamId)) {
-    toast.message("Insufficient budget");
-    return;
+      toast.message("Insufficient budget");
+      return;
     }
     
     if (getRemainingSlots(selectedTeamId) <= 0) {
-    toast.message("You've reached the maximum number of players");
-    return;
+      toast.message("You've reached the maximum number of players");
+      return;
     }
 
     setDraftedPlayers(prev => ({
-    ...prev,
-    [selectedTeamId]: [...(prev[selectedTeamId] || []), playerId]
+      ...prev,
+      [selectedTeamId]: [...(prev[selectedTeamId] || []), playerId]
     }));
 
     toast.message(`${playerName} joined for $${player.value}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
@@ -101,8 +101,8 @@ const TempTeamClient = ({ tempTeamId }: TempTeamClientProps) => {
 
   const handleUndraftPlayer = (playerId: string, playerName: string) => {
     setDraftedPlayers(prev => ({
-    ...prev,
-    [selectedTeamId]: (prev[selectedTeamId] || []).filter(id => id !== playerId)
+      ...prev,
+      [selectedTeamId]: (prev[selectedTeamId] || []).filter(id => id !== playerId)
     }));
 
     toast.message(`${playerName} has been removed from ${tempTeamId}.`);
