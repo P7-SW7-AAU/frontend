@@ -97,7 +97,7 @@ const TempTeamClient = ({ tempTeamId }: TempTeamClientProps) => {
     }));
 
     toast.message(`${playerName} joined for $${player.value}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
-  };
+  }
 
   const handleUndraftPlayer = (playerId: string, playerName: string) => {
     setDraftedPlayers(prev => ({
@@ -106,7 +106,7 @@ const TempTeamClient = ({ tempTeamId }: TempTeamClientProps) => {
     }));
 
     toast.message(`${playerName} has been removed from ${tempTeamId}.`);
-  };
+  }
 
   return (
     <Container>
