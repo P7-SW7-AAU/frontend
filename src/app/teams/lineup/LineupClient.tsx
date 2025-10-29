@@ -98,7 +98,7 @@ const LineupClient = () => {
     <Container>
       <Header 
         title="Team Manager" 
-        description="Build your dream team" 
+        description="Build your fantasy team" 
         icon={Trophy} 
         buttonText="Save Changes" 
         buttonIcon={Plus} 
