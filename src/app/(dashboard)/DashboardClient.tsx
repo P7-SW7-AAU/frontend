@@ -1,37 +1,51 @@
 "use client";
 
 import Navbar from '@/components/Navbar';
-import PlayerCard from '@/components/PlayerCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, Target, Trophy } from 'lucide-react';
+import { Plus, Users, Target, Trophy, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { getCurrentUserTeam, getAvailablePlayers } from '@/data/multiSportMockData';
-import { PlayerWithTeam } from '@/types/database';
+import { getAvailablePlayers } from '@/data/multiSportMockData';
 import { useUser } from '@stackframe/stack';
 import Banner from '@/components/dashboard/Banner';
 import ShortcutCard from '@/components/dashboard/ShortcutCard';
+import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 
 const DashboardClient = () => {
-  const router = useRouter();
-  const currentTeam = getCurrentUserTeam();
-  const availablePlayers = getAvailablePlayers();
+    const router = useRouter();
+    const availablePlayers = getAvailablePlayers();
 
-  // -- ONLY FOR GETTING TOKEN FOR TESTING ENDPOINTS! REMOVE LATER AS WE USE A BETTER APPROACH GETTING TOKEN --
-  const user = useUser();
-  useEffect(() => {
-    (async () => {
-      if (!user) return;
-      const { accessToken } = await user.getAuthJson(); // ← correct API
-      console.log('Access token:', accessToken);
-    })();
-  }, [user]);
-  // -- REMOVE ABOVE --
+    // -- ONLY FOR GETTING TOKEN FOR TESTING ENDPOINTS! REMOVE LATER AS WE USE A BETTER APPROACH GETTING TOKEN --
+    const user = useUser();
+    useEffect(() => {
+        (async () => {
+            if (!user) return;
+            const { accessToken } = await user.getAuthJson(); // ← correct API
+            console.log('Access token:', accessToken);
+        })();
+    }, [user]);
+    // -- REMOVE ABOVE --
 
-    const handlePlayerAction = (player: PlayerWithTeam, action: 'add' | 'drop') => {
+    const getTrendIcon = (trend?: string) => {
+        if (trend === 'up') return <TrendingUp className="h-3 w-3 text-primary-green" />;
+        if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
+        return <Minus className="h-3 w-3 text-muted-foreground" />;
+    }
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'active': return 'default';
+            case 'injured': return 'destructive';
+            case 'bye': return 'secondary';
+            default: return 'outline';
+        }
+    }
+
+    const handlePlayerAction = () => {
+        // TODO: If user has no teams, redirect to create team page
         router.push('/teams/lineup');
-    };
+    }
 
     return (
         <div className="min-h-screen bg-background">
@@ -77,8 +91,16 @@ const DashboardClient = () => {
                     <Badge variant="secondary" className="px-3 py-1">This Week</Badge>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {currentTeam.players.slice(0, 3).map((player) => (
-                        <PlayerCard key={player.uniqueID} player={player} onAction={handlePlayerAction} />
+                    {availablePlayers.slice(0, 3).map((player) => (
+                        <PlayerCardDetailed 
+                            key={player.uniqueID}
+                            player={player}
+                            isOwned={false}
+                            onAdd={handlePlayerAction}
+                            onRemove={() => {}}
+                            getTrendIcon={getTrendIcon}
+                            getStatusColor={getStatusColor}
+                        />
                     ))}
                 </div>
             </div>
@@ -96,7 +118,15 @@ const DashboardClient = () => {
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {availablePlayers.slice(0, 3).map((player) => (
-                        <PlayerCard key={player.uniqueID} player={player} onAction={handlePlayerAction} />
+                        <PlayerCardDetailed 
+                            key={player.uniqueID}
+                            player={player}
+                            isOwned={false}
+                            onAdd={handlePlayerAction}
+                            onRemove={() => {}}
+                            getTrendIcon={getTrendIcon}
+                            getStatusColor={getStatusColor}
+                        />
                     ))}
                 </div>
             </div>
