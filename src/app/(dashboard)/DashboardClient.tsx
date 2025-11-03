@@ -12,7 +12,13 @@ import Banner from '@/components/dashboard/Banner';
 import ShortcutCard from '@/components/dashboard/ShortcutCard';
 import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 
-const DashboardClient = () => {
+import { Player } from '@/types';
+
+interface DashboardClientProps {
+    players: Player[];
+}
+
+const DashboardClient = ({ players }: DashboardClientProps) => {
     const router = useRouter();
     const availablePlayers = getAvailablePlayers();
 
@@ -91,9 +97,9 @@ const DashboardClient = () => {
                     <Badge variant="secondary" className="px-3 py-1">This Week</Badge>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {availablePlayers.slice(0, 3).map((player) => (
+                    {players.slice(0, 3).map((player) => (
                         <PlayerCardDetailed 
-                            key={player.uniqueID}
+                            key={player.id}
                             player={player}
                             isOwned={false}
                             onAdd={handlePlayerAction}
@@ -117,9 +123,9 @@ const DashboardClient = () => {
                     </Button>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {availablePlayers.slice(0, 3).map((player) => (
+                    {players.slice(3, 6).map((player) => (
                         <PlayerCardDetailed 
-                            key={player.uniqueID}
+                            key={player.id}
                             player={player}
                             isOwned={false}
                             onAdd={handlePlayerAction}

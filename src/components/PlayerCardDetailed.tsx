@@ -2,10 +2,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserPlus, UserMinus } from 'lucide-react';
-import { PlayerWithTeam } from '@/types/database';
+import { Player } from '@/types';
 
 interface PlayerCardDetailedProps {
-  player: PlayerWithTeam;
+  player: Player;
   isOwned: boolean;
   onAdd: () => void;
   onRemove: () => void;
@@ -34,13 +34,13 @@ const PlayerCardDetailed = ({
           </Avatar>
           <div>
             <h3 className="font-semibold text-white">{player.name}</h3>
-            <p className="text-sm text-primary-gray font-medium">{player.position}</p>
+            <p className="text-sm text-primary-gray font-medium">{player.sport.charAt(0).toUpperCase() + player.sport.slice(1).toLowerCase()}</p>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          {getTrendIcon(player.trend)}
+          {getTrendIcon(player.trend) || "up"}
           <Badge variant="secondary" className="text-xs font-bold">
-            ${player.value}M
+            ${player.value || 100}M
           </Badge>
         </div>
       </div>
@@ -48,24 +48,27 @@ const PlayerCardDetailed = ({
       <div className="space-y-2 mb-4 bg-[#131C25] rounded-lg p-3">
         <div className="flex items-center justify-between text-sm">
           <span className="text-primary-gray font-medium">Team</span>
-          <span className="font-bold text-white text-xs">{player.sportsTeam.name}</span>
+          <span className="font-bold text-white text-xs">{player.sportsTeam || "unknown"}</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-primary-gray font-medium">Points</span>
-          <span className="font-bold text-primary-green">{player.points}</span>
+          <span className="font-bold text-primary-green">{player.points || "50"}</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-primary-gray font-medium">Projected</span>
-          <span className="font-bold text-white">{player.projectedPoints}</span>
+          <span className="font-bold text-white">{player.projectedPoints || "60"}</span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 mb-4">
-        <Badge variant={getStatusColor(player.status) as "default" | "destructive" | "outline" | "secondary" | undefined} className="text-xs font-bold">
-          {player.status.toUpperCase()}
-        </Badge>
+          <Badge
+            variant={player.status ? (getStatusColor(player.status) as "default" | "destructive" | "outline" | "secondary" | undefined) : "default"}
+            className="text-xs font-bold"
+          >
+            {player.status ? player.status.toUpperCase() : "ACTIVE"}
+          </Badge>
         <Badge variant="outline" className="text-xs">
-          {player.popularity}% owned
+          {player.popularity || 0}% owned
         </Badge>
       </div>
 
