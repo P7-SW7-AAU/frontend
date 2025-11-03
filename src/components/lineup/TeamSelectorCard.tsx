@@ -3,13 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Badge } from "../ui/badge";
 
+import { Team } from "@/types";
+
 interface TeamSelectorCardProps {
     selectedTeamId: string;
     handleTeamChange: (teamId: string) => void;
-    userTeams: any[];
+    teams: Team[];
 }
 
-const TeamSelectorCard = ({ selectedTeamId, handleTeamChange, userTeams }: TeamSelectorCardProps) => {
+const TeamSelectorCard = ({ selectedTeamId, handleTeamChange, teams }: TeamSelectorCardProps) => {
     return (
         <Card>
             <CardHeader>
@@ -25,12 +27,12 @@ const TeamSelectorCard = ({ selectedTeamId, handleTeamChange, userTeams }: TeamS
                         <SelectValue placeholder="Select a team" />
                     </SelectTrigger>
                     <SelectContent>
-                        {userTeams.map(team => (
-                            <SelectItem key={team.uniqueID} value={team.uniqueID}>
+                        {teams.map(team => (
+                            <SelectItem key={team.id} value={team.id}>
                                 <div className="flex items-center gap-2">
                                     <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
                                     <Badge variant="secondary" className="text-xs">
-                                        {team.playerCount} players
+                                        {team.players.length} players
                                     </Badge>
                                 </div>
                             </SelectItem>

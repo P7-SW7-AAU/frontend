@@ -12,26 +12,71 @@ import BudgetCard from '@/components/lineup/BudgetCard';
 import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
 import TeamSelectorCard from '@/components/lineup/TeamSelectorCard';
 
-import { getUserTeams } from '@/data/multiSportMockData';
-import { Player } from '@/types';
+import { useApi } from "@/hooks/useApi";
+
+import { updateTeam } from "@/services/teamsService";
+
+import { Player, Team } from '@/types';
 
 interface LineupClientProps {
   players: Player[];
+  teams: Team[];
 }
 
 const TEAM_BUDGET = 200; // Budget in millions
 const MAX_PLAYERS_PER_TEAM = 10;
 
-const LineupClient = ({ players }: LineupClientProps) => {
+const LineupClient = ({ players, teams }: LineupClientProps) => {
+  const { api } = useApi();
   const router = useRouter();
-  const userTeams = getUserTeams();
   const searchParams = useSearchParams();
   const initialTeamId = searchParams.get('team') || '';
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState(initialTeamId);
-  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>({});
+  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
+    const initialDrafts: Record<string, number[]> = {};
+    teams.forEach((team) => {
+      initialDrafts[team.id] = team.players?.map((p: any) => p.externalId) || [];
+    });
 
-  const selectedTeam = userTeams.find(team => team.uniqueID === selectedTeamId);
+    return initialDrafts;
+  });
+
+  const onSubmit = () => {
+    const draftedCount = getDraftedCount(selectedTeamId);
+    if (draftedCount !== MAX_PLAYERS_PER_TEAM) {
+      toast.message(`You must draft exactly ${MAX_PLAYERS_PER_TEAM} players before submitting. Currently drafted: ${draftedCount}.`);
+      return;
+    }
+    setIsLoading(true);
+
+    // Transform draftedPlayers to [{ sport, externalId }]
+    const draftedPlayerObjects =
+      (draftedPlayers[selectedTeamId] || []).map((playerId) => {
+        const player = players.find((p) => p.id === playerId);
+        return player
+          ? { sport: player.sport, externalId: player.id }
+          : null;
+      }).filter(Boolean);
+
+    updateTeam(
+      selectedTeamId,
+      { players: draftedPlayerObjects },
+      api
+    )
+      .then(() => {
+        toast.success("Team updated successfully!");
+        router.push('/teams');
+      })
+      .catch((error) => {
+        toast.error("Error updating team: " + error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  const selectedTeam = teams.find(team => team.id === selectedTeamId);
   
   const getBudgetSpent = (teamId: string) => {
     const drafted = draftedPlayers[teamId] || [];
@@ -113,13 +158,13 @@ const LineupClient = ({ players }: LineupClientProps) => {
         buttonText="Save Changes" 
         buttonIcon={Plus} 
         buttonIconSize="5" 
-        onClick={() => {}} 
+        onClick={onSubmit} 
         isLoading={isLoading} 
       />
 
       <div className="grid gap-6 mb-6 md:grid-cols-2">
         <TeamSelectorCard 
-          userTeams={userTeams} 
+          teams={teams} 
           selectedTeamId={selectedTeamId} 
           handleTeamChange={handleTeamChange}
         />
