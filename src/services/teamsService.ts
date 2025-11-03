@@ -31,3 +31,13 @@ export const updateTeam = async (teamId: string, data: any, api: any) => {
         throw error;
     }
 }
+
+export const deleteTeam = async (teamId: string, api: any) => {
+    try {
+        const response = await api.delete(`/teams/${teamId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting team:", error);
+        throw error;
+    }
+}

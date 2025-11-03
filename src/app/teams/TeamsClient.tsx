@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Users, Trophy, Target, Calendar } from 'lucide-react';
 
@@ -14,6 +15,7 @@ import Header from '@/components/Header';
 import TeamCard from '@/components/teams/TeamCard';
 
 import { Team } from '@/types';
+import DeleteTeamModal from '@/components/modals/DeleteTeamModal';
 
 interface TeamsClientProps {
   teams: Team[];
@@ -24,9 +26,17 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
   const deleteTeamModal = useDeleteTeamModal();
   const editTeamModal = useEditTeamModal();
   const router = useRouter();
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+
+  const handleDelete = (teamId: string) => {
+    setSelectedTeamId(teamId);
+    deleteTeamModal.onOpen();
+  }
 
   return (
     <Container>
+      <DeleteTeamModal teamId={selectedTeamId} />
+      
       <Header 
         title="My Teams"
         description="Manage your multi-sport fantasy teams"
@@ -82,7 +92,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
               key={team.id}
               team={team}
               onEdit={editTeamModal.onOpen}
-              onDelete={deleteTeamModal.onOpen}
+              onDelete={() => handleDelete(team.id)}
               onManage={(teamId) => router.push(`/teams/lineup?team=${teamId}`)}
             />
           ))}

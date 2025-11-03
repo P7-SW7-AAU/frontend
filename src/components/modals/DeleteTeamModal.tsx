@@ -1,23 +1,45 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 
+import { deleteTeam } from "@/services/teamsService";
+
 import Modal from "./Modal";
 
-const DeleteTeamModal = () => {
+import { useApi } from "@/hooks/useApi";
+
+const DeleteTeamModal = ({ teamId }: { teamId: string | null }) => {
+    const { api } = useApi();
     const router = useRouter();
     const deleteTeamModal = useDeleteTeamModal();
     
     const [isLoading, setIsLoading] = useState(false);
 
     const onDelete = useCallback(() => {
+        if (!teamId) {
+            toast.error("No team selected for deletion.");
+            return;
+        }
+
         setIsLoading(true);
-        // TODO: Endpoint call
-        console.log("Delete team");
-    }, []);
+
+        deleteTeam(teamId, api)
+            .then(() => {
+                toast.success("Team deleted successfully!");
+                deleteTeamModal.onClose();
+                router.refresh();
+            })
+            .catch((error) => {
+                toast.error("Failed to delete team: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            })
+    }, [teamId]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
