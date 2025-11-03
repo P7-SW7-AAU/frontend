@@ -1,8 +1,11 @@
-import DashboardClient from "./DashboardClient"
+import { getPlayers } from "@/services/playersService";
+import DashboardClient from "./DashboardClient";
+
+const players = await getPlayers();
 
 const DashboardPage = () => {
   return (
-    <DashboardClient />
+    <DashboardClient players={players} />
   );
 }
 

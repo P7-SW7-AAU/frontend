@@ -9,27 +9,24 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import PlayerCardDetailed from '@/components/PlayerCardDetailed';
+import { Player } from '@/types';
 
 interface Props {
-  allPlayers: any[];
-  draftedPlayers: Record<string, string[]>;
+  players: Player[];
+  draftedPlayers: Record<string, number[]>;
   selectedTeamId: string;
   selectedTeam?: any;
-  sports: any[];
-  getPlayersBySport: (sportId: string) => any[];
-  handleDraftPlayer: (id: string, name: string) => void;
-  handleUndraftPlayer: (id: string, name: string) => void;
+  handleDraftPlayer: (id: number, name: string) => void;
+  handleUndraftPlayer: (id: number, name: string) => void;
   getRemainingBudget: (teamId: string) => number;
   getRemainingSlots: (teamId: string) => number;
 }
 
 const PlayersManagementCard = ({
-  allPlayers,
+  players,
   draftedPlayers,
   selectedTeamId,
   selectedTeam,
-  sports,
-  getPlayersBySport,
   handleDraftPlayer,
   handleUndraftPlayer,
   getRemainingBudget,
@@ -39,6 +36,11 @@ const PlayersManagementCard = ({
   const [selectedSport, setSelectedSport] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const sports = [
+    { id: 'FOOTBALL', name: 'Football' },
+    { id: 'F1', name: 'F1' },
+    { id: 'NBA', name: 'NBA' },
+  ]
   const getTrendIcon = (trend?: string) => {
     if (trend === 'up') return <TrendingUp className="h-3 w-3 text-primary-green" />;
     if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
@@ -54,28 +56,28 @@ const PlayersManagementCard = ({
     }
   }
 
-  const isPlayerOnTeam = (playerId: string) => {
+  const isPlayerOnTeam = (playerId: number) => {
     return draftedPlayers[selectedTeamId]?.includes(playerId) || false;
   }
 
   const filteredPlayers = useMemo(() => {
-    return allPlayers.filter((player) => {
+    return players.filter((player) => {
       if (selectedSport !== 'all') {
-        const sportPlayers = getPlayersBySport(selectedSport);
-        if (!sportPlayers.some((sp) => sp.uniqueID === player.uniqueID)) return false;
+        const sportPlayers = players.filter((p) => p.sport === selectedSport);
+        if (!sportPlayers.some((sp) => sp.id === player.id)) return false;
       }
 
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = player.name.toLowerCase().includes(query);
-        const matchesTeam = player.sportsTeam.name.toLowerCase().includes(query);
-        const matchesPosition = player.position.toLowerCase().includes(query);
-        return matchesName || matchesTeam || matchesPosition;
+        // const matchesTeam = player.sportsTeam.name.toLowerCase().includes(query);
+        // const matchesPosition = player.position.toLowerCase().includes(query);
+        return matchesName;
       }
 
       return true;
     });
-  }, [allPlayers, selectedSport, searchQuery]);
+  }, [players, selectedSport, searchQuery]);
 
   return (
     <Card>
@@ -109,10 +111,10 @@ const PlayersManagementCard = ({
             </Button>
             {sports.map((sport) => (
               <Button
-                key={sport.uniqueID}
-                variant={selectedSport === sport.uniqueID ? 'hero' : 'outline'}
+                key={sport.id}
+                variant={selectedSport === sport.id ? 'hero' : 'outline'}
                 size="sm"
-                onClick={() => setSelectedSport(sport.uniqueID)}
+                onClick={() => setSelectedSport(sport.id)}
               >
                 {sport.name}
               </Button>
@@ -141,11 +143,11 @@ const PlayersManagementCard = ({
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredPlayers.map((player: any) => (
                 <PlayerCardDetailed
-                  key={player.uniqueID}
+                  key={player.id}
                   player={player}
-                  isOwned={isPlayerOnTeam(player.uniqueID)}
-                  onAdd={() => handleDraftPlayer(player.uniqueID, player.name)}
-                  onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
+                  isOwned={isPlayerOnTeam(player.id)}
+                  onAdd={() => handleDraftPlayer(player.id, player.name)}
+                  onRemove={() => handleUndraftPlayer(player.id, player.name)}
                   getTrendIcon={getTrendIcon}
                   getStatusColor={getStatusColor}
                   disabled={
@@ -170,19 +172,19 @@ const PlayersManagementCard = ({
             {selectedTeamId && draftedPlayers[selectedTeamId]?.length > 0 ? (
               <>
                 <p className="text-sm text-primary-gray mb-4">
-                  {draftedPlayers[selectedTeamId].length} players in {selectedTeam?.name}
+                  {draftedPlayers[selectedTeamId].length} players in {selectedTeam?.name || selectedTeamId}
                 </p>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {draftedPlayers[selectedTeamId].map((playerId: string) => {
-                    const player = allPlayers.find((p: any) => p.uniqueID === playerId);
+                  {draftedPlayers[selectedTeamId].map((playerId: number) => {
+                    const player = players.find((p: any) => p.id === playerId);
                     if (!player) return null;
                     return (
                       <PlayerCardDetailed
-                        key={player.uniqueID}
+                        key={player.id}
                         player={player}
                         isOwned={true}
                         onAdd={() => {}}
-                        onRemove={() => handleUndraftPlayer(player.uniqueID, player.name)}
+                        onRemove={() => handleUndraftPlayer(player.id, player.name)}
                         getTrendIcon={getTrendIcon}
                         getStatusColor={getStatusColor}
                       />
