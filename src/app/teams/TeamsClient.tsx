@@ -16,6 +16,7 @@ import TeamCard from '@/components/teams/TeamCard';
 
 import { Team } from '@/types';
 import DeleteTeamModal from '@/components/modals/DeleteTeamModal';
+import EditTeamModal from '@/components/modals/EditTeamModal';
 
 interface TeamsClientProps {
   teams: Team[];
@@ -33,10 +34,18 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
     deleteTeamModal.onOpen();
   }
 
+  const handleEdit = (teamId: string) => {
+    setSelectedTeamId(teamId);
+    editTeamModal.onOpen();
+  }
+
+  const selectedTeam = teams.find((team) => team.id === selectedTeamId);
+
   return (
     <Container>
       <DeleteTeamModal teamId={selectedTeamId} />
-      
+      <EditTeamModal teamId={selectedTeamId} teamName={selectedTeam?.name} />
+
       <Header 
         title="My Teams"
         description="Manage your multi-sport fantasy teams"
@@ -91,7 +100,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
             <TeamCard
               key={team.id}
               team={team}
-              onEdit={editTeamModal.onOpen}
+              onEdit={() => handleEdit(team.id)}
               onDelete={() => handleDelete(team.id)}
               onManage={(teamId) => router.push(`/teams/lineup?team=${teamId}`)}
             />

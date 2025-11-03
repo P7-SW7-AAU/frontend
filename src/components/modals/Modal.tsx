@@ -30,13 +30,16 @@ const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled,
     // Disable background scroll when modal is open
     useEffect(() => {
         if (isOpen) {
-            const originalOverflow = document.body.style.overflow;
             document.body.style.overflow = 'hidden';
-            return () => {
-                document.body.style.overflow = originalOverflow;
-            };
+        } else {
+            document.body.style.overflow = '';
         }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
     }, [isOpen]);
+
 
     const handleSubmit = useCallback(() => {
         if (disabled) return;
