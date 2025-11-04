@@ -7,10 +7,20 @@ import { useRouter } from "next/navigation";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
+import { updateTeam } from "@/services/teamsService";
+import { useApi } from "@/hooks/useApi";
+
 import Modal from "./Modal";
 import { Input } from "../ui/input";
+import { toast } from "sonner";
 
-const EditTeamModal = () => {
+interface EditTeamModalProps {
+    teamId: string | null;
+    teamName?: string;
+}
+
+const EditTeamModal = ({ teamId, teamName }: EditTeamModalProps) => {
+    const { api } = useApi();
     const router = useRouter();
     const editTeamModal = useEditTeamModal();
     
@@ -24,20 +34,38 @@ const EditTeamModal = () => {
         formState: { errors },
     } = useForm<FieldValues>({
         defaultValues: {
-            name: "", // TODO: Display current team name
+            name: "",
         }
     });
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        if (!teamId) {
+            toast.error("No team ID provided for editing.");
+            return;
+        }
+
         setIsLoading(true);
-        // TODO: Endpoint call
+
+        updateTeam(teamId, data, api)
+            .then(() => {
+                toast.success("Team updated successfully!");
+                editTeamModal.onClose();
+                router.refresh();
+            })
+            .catch((error) => {
+                toast.error("Failed to update team: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     useEffect(() => {
         if (editTeamModal.isOpen) {
+            reset({ name: teamName });
             setTimeout(() => setFocus("name"), 50);
         }
-    }, [editTeamModal.isOpen, setFocus]);
+    }, [editTeamModal.isOpen, setFocus, teamName, reset]);
 
     useResetOnRouteChange(reset);
 

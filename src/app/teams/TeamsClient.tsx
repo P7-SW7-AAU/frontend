@@ -1,9 +1,8 @@
 "use client";
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Users, Trophy, Target, Calendar } from 'lucide-react';
-
-import { getUserTeams, getCurrentUser } from '@/data/multiSportMockData';
 
 import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
@@ -15,16 +14,38 @@ import Container from '@/components/Container';
 import Header from '@/components/Header';
 import TeamCard from '@/components/teams/TeamCard';
 
-const TeamsClient = () => {
-  const currentUser = getCurrentUser();
-  const userTeams = getUserTeams(currentUser.uniqueID);
+import { Team } from '@/types';
+import DeleteTeamModal from '@/components/modals/DeleteTeamModal';
+import EditTeamModal from '@/components/modals/EditTeamModal';
+
+interface TeamsClientProps {
+  teams: Team[];
+}
+
+const TeamsClient = ({ teams }: TeamsClientProps) => {
   const createTeamModal = useCreateTeamModal();
   const deleteTeamModal = useDeleteTeamModal();
   const editTeamModal = useEditTeamModal();
   const router = useRouter();
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+
+  const handleDelete = (teamId: string) => {
+    setSelectedTeamId(teamId);
+    deleteTeamModal.onOpen();
+  }
+
+  const handleEdit = (teamId: string) => {
+    setSelectedTeamId(teamId);
+    editTeamModal.onOpen();
+  }
+
+  const selectedTeam = teams.find((team) => team.id === selectedTeamId);
 
   return (
     <Container>
+      <DeleteTeamModal teamId={selectedTeamId} />
+      <EditTeamModal teamId={selectedTeamId} teamName={selectedTeam?.name} />
+
       <Header 
         title="My Teams"
         description="Manage your multi-sport fantasy teams"
@@ -37,7 +58,7 @@ const TeamsClient = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <StatsCard 
           title="Total Teams" 
-          value={userTeams.length} 
+          value={teams.length} 
           valueColor="text-white" 
           description="active teams" 
           icon={Users} 
@@ -46,7 +67,7 @@ const TeamsClient = () => {
 
         <StatsCard 
           title="Total Players" 
-          value={userTeams.reduce((sum, team) => sum + team.playerCount, 0)} 
+          value={teams.reduce((sum, team) => sum + team.players.length, 0)} 
           valueColor="text-primary-green" 
           description="across all teams" 
           icon={Target} 
@@ -55,7 +76,7 @@ const TeamsClient = () => {
 
         <StatsCard 
           title="Total Value" 
-          value={`$${userTeams.reduce((sum, team) => sum + team.valueSum, 0).toFixed(1)}M`} 
+          value={`$${teams.reduce((sum, team) => sum + team.players.reduce((playerSum, player) => playerSum + player.value, 0), 0).toFixed(1)}M`} 
           valueColor="text-primary-yellow" 
           description="combined value" 
           icon={Trophy} 
@@ -75,12 +96,12 @@ const TeamsClient = () => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-white">Your Teams</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {userTeams.map((team) => (
+          {teams.map((team) => (
             <TeamCard
-              key={team.uniqueID}
+              key={team.id}
               team={team}
-              onEdit={editTeamModal.onOpen}
-              onDelete={deleteTeamModal.onOpen}
+              onEdit={() => handleEdit(team.id)}
+              onDelete={() => handleDelete(team.id)}
               onManage={(teamId) => router.push(`/teams/lineup?team=${teamId}`)}
             />
           ))}

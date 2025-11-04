@@ -7,8 +7,7 @@ import { Users, Trophy, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-type Team = any;
+import { Team } from '@/types';
 
 type TeamProps = {
     team: Team;
@@ -20,16 +19,15 @@ type TeamProps = {
 const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const router = useRouter();
 
-    const getTeamStats = (team: any) => {
+    const getTeamStats = (team: Team) => {
         const totalPoints = team.players.reduce((sum: number, player: any) => sum + (player.points || 0), 0);
         const projectedPoints = team.players.reduce((sum: number, player: any) => sum + (player.projectedPoints || 0), 0);
 
         // Group players by sport
         const sportGroups = team.players.reduce((groups: any, player: any) => {
-            const sportName = player.sportsTeam?.sports_League_ID?.includes('nfl') ? 'Football' :
-                                player.sportsTeam?.sports_League_ID?.includes('nba') ? 'Basketball' :
-                                player.sportsTeam?.sports_League_ID?.includes('epl') ? 'Soccer' :
-                                player.sportsTeam?.sports_League_ID?.includes('chess') ? 'Chess' : 'Tennis';
+            const sportName = player.sport?.includes('FOOTBALL') ? 'Football' :
+                                player.sport?.includes('F1') ? 'Formula 1' :
+                                player.sport?.includes('NBA') ? 'NBA' : 'Other';
 
             if (!groups[sportName]) groups[sportName] = 0;
             groups[sportName]++;
@@ -44,7 +42,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const stats = getTeamStats(team);
 
     return (
-        <Card className="hover:shadow-card transition-smooth">
+        <Card>
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div className="space-y-2">
@@ -54,10 +52,10 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                                 variant="secondary"
                                 className="px-2 py-1"
                             >
-                                {team.playerCount}/10 Players
+                                10/10 Players
                             </Badge>
                             <Badge variant="outline" className="px-2 py-1">
-                                ${team.valueSum}M Value
+                                ${team.players.map(player => player.value).reduce((acc, val) => acc + val, 0)}M Value
                             </Badge>
                         </div>
                     </div>
@@ -103,7 +101,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                     <Button
                         variant="hero"
                         className="flex-1"
-                        onClick={() => onManage(team.uniqueID)}
+                        onClick={() => onManage(team.id)}
                     >
                         <Users className="h-4 w-4 mr-2" />
                         Manage Team

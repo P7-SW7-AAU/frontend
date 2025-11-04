@@ -15,3 +15,9 @@ export type Player = {
     teamId?: string;
     sportsTeam?: string;
 }
+
+export type Team = {
+    id: string;
+    name: string;
+    players: Player[];
+}
