@@ -9,9 +9,11 @@ const EditTeamPage = async ({ params }: Props) => {
     const { tempTeamId } = await params;
     const players = await getPlayers();
 
+    const decodedTempTeamId = decodeURIComponent(tempTeamId);
+
     return (
         <div>
-            <TempTeamClient tempTeamId={tempTeamId} players={players} />
+            <TempTeamClient tempTeamId={decodedTempTeamId} players={players} />
         </div>
     );
 }
