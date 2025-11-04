@@ -50,7 +50,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
     }
     setIsLoading(true);
 
-    // Transform draftedPlayers to [{ sport, externalId }]
+    // Backend currently receives the entire player array in payload instead of updating the swapped players only. Minimal performance impact for 10 players though. Adjust to fit future backend changes if needed.
     const draftedPlayerObjects =
       (draftedPlayers[selectedTeamId] || []).map((playerId) => {
         const player = players.find((p) => p.id === playerId);
