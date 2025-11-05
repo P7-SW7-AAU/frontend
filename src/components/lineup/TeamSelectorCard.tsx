@@ -19,7 +19,9 @@ const TeamSelectorCard = ({ selectedTeamId, handleTeamChange, teams }: TeamSelec
                     <Target className="h-5 w-5 text-primary-green" />
                     Select Your Team
                 </CardTitle>
-                <CardDescription className="text-primary-gray font-medium">Choose which team to modify your lineup for</CardDescription>
+                <CardDescription className="text-primary-gray font-medium">
+                    Choose which team to modify your lineup for
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <Select value={selectedTeamId} onValueChange={handleTeamChange}>
@@ -30,10 +32,12 @@ const TeamSelectorCard = ({ selectedTeamId, handleTeamChange, teams }: TeamSelec
                         {teams.map(team => (
                             <SelectItem key={team.id} value={team.id}>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
-                                    <Badge variant="secondary" className="text-xs">
+                                    <span className="text-white group-hover:text-black group-focus:text-black font-semibold">
+                                        {team.name}
+                                    </span>
+                                    {/* <Badge variant="secondary" className="text-xs">
                                         {team.players.length} players
-                                    </Badge>
+                                    </Badge> */}
                                 </div>
                             </SelectItem>
                         ))}

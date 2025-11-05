@@ -65,10 +65,12 @@ const SelectTeamModal = () => {
                             {userTeams.map(team => (
                                 <SelectItem key={team.uniqueID} value={team.uniqueID}>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-white group-hover:text-black group-focus:text-black font-semibold">{team.name}</span>
-                                        <Badge variant="secondary" className="text-xs">
+                                        <span className="text-white group-hover:text-black group-focus:text-black font-semibold">
+                                            {team.name}
+                                        </span>
+                                        {/* <Badge variant="secondary" className="text-xs">
                                             {team.playerCount} players
-                                        </Badge>
+                                        </Badge> */}
                                     </div>
                                 </SelectItem>
                             ))}
