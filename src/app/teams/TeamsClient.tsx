@@ -96,14 +96,17 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-white">Your Teams</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {teams.map((team) => (
-            <TeamCard
-              key={team.id}
-              team={team}
-              onEdit={() => handleEdit(team.id)}
-              onDelete={() => handleDelete(team.id)}
-              onManage={(teamId) => router.push(`/teams/lineup?team=${teamId}`)}
-            />
+          {teams
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((team) => (
+              <TeamCard
+                key={team.id}
+                team={team}
+                onEdit={() => handleEdit(team.id)}
+                onDelete={() => handleDelete(team.id)}
+                onManage={(teamId) => router.push(`/teams/lineup?team=${teamId}`)}
+              />
           ))}
 
           <ActionCard 

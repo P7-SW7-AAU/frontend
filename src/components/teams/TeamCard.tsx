@@ -54,9 +54,9 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                             >
                                 10/10 Players
                             </Badge>
-                            <Badge variant="outline" className="px-2 py-1">
+                            {/* <Badge variant="outline" className="px-2 py-1">
                                 ${team.players.map(player => player.value).reduce((acc, val) => acc + val, 0)}M Value
-                            </Badge>
+                            </Badge> */}
                         </div>
                     </div>
                     <div className="flex space-x-2">
@@ -84,15 +84,15 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <div className="text-sm font-medium text-primary-gray">Total Points</div>
+                        <div className="text-sm font-medium text-primary-gray">Total Value</div>
                         <div className="text-lg font-semibold text-white">
-                            {stats.totalPoints.toLocaleString()}
+                            ${team.players.map(player => player.value).reduce((acc, val) => acc + val, 0)}M
                         </div>
                     </div>
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">Projected</div>
                         <div className="text-lg font-semibold text-primary-green">
-                            {stats.projectedPoints.toFixed(1)}
+                            $0.0M
                         </div>
                     </div>
                 </div>
