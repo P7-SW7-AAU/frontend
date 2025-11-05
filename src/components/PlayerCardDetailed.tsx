@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { UserPlus, UserMinus } from 'lucide-react';
+import { Lock, UserPlus, UserMinus } from 'lucide-react';
 import { Player } from '@/types';
 
 interface PlayerCardDetailedProps {
@@ -12,6 +12,7 @@ interface PlayerCardDetailedProps {
   getTrendIcon: (trend?: string) => React.ReactNode;
   getStatusColor: (status: string) => string;
   disabled?: boolean;
+  isLocked?: boolean;
 }
 
 const PlayerCardDetailed = ({
@@ -22,6 +23,7 @@ const PlayerCardDetailed = ({
   getTrendIcon,
   getStatusColor,
   disabled,
+  isLocked,
 }: PlayerCardDetailedProps) => (
   <div className="hover:shadow-elegant border border-[#1E2938] hover:border-[#16A149] transition-all hover:-translate-y-1 group rounded-xl bg-card">
     <div className="p-4">
@@ -37,6 +39,14 @@ const PlayerCardDetailed = ({
             <p className="text-sm text-primary-gray font-medium">{player.sport.charAt(0).toUpperCase() + player.sport.slice(1).toLowerCase()}</p>
           </div>
         </div>
+
+        {isLocked && (
+          <div className="flex items-center gap-1 text-xs text-primary-gray ml-2">
+            <Lock className="h-4 w-4 text-primary-yellow" />
+            <span className="font-semibold text-primary-yellow">Locked</span>
+          </div>
+        )}
+
         <div className="flex flex-col items-end gap-1">
           {getTrendIcon(player.trend) || "up"}
           <Badge variant="secondary" className="text-xs font-bold">
@@ -78,6 +88,7 @@ const PlayerCardDetailed = ({
           size="sm"
           variant="destructive"
           onClick={onRemove}
+          disabled={isLocked}
         >
           <UserMinus className="h-4 w-4 mr-2" />
           Remove from Team
@@ -88,7 +99,7 @@ const PlayerCardDetailed = ({
           size="sm"
           variant="hero"
           onClick={onAdd}
-          disabled={disabled}
+          disabled={disabled || isLocked}
         >
           <UserPlus className="h-4 w-4 mr-2" />
           {disabled ? 'Unavailable' : 'Add Player'}

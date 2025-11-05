@@ -20,6 +20,7 @@ interface Props {
   handleUndraftPlayer: (id: number, name: string) => void;
   getRemainingBudget: (teamId: string) => number;
   getRemainingSlots: (teamId: string) => number;
+  lockToken?: string;
 }
 
 const PlayersManagementCard = ({
@@ -31,6 +32,7 @@ const PlayersManagementCard = ({
   handleUndraftPlayer,
   getRemainingBudget,
   getRemainingSlots,
+  lockToken,
 }: Props) => {
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
   const [selectedSport, setSelectedSport] = useState<string>('all');
@@ -76,7 +78,8 @@ const PlayersManagementCard = ({
       }
 
       return true;
-    });
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
   }, [players, selectedSport, searchQuery]);
 
   return (
@@ -141,7 +144,9 @@ const PlayersManagementCard = ({
               {filteredPlayers.length} players found
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPlayers.map((player: any) => (
+              {filteredPlayers.map((player: Player) => {
+                const isLocked = lockToken === player?.tradeLockedWeek;
+                return (
                 <PlayerCardDetailed
                   key={player.id}
                   player={player}
@@ -150,13 +155,15 @@ const PlayersManagementCard = ({
                   onRemove={() => handleUndraftPlayer(player.id, player.name)}
                   getTrendIcon={getTrendIcon}
                   getStatusColor={getStatusColor}
+                  isLocked={isLocked}
                   disabled={
                     !selectedTeamId ||
                     player.value > getRemainingBudget(selectedTeamId) ||
                     getRemainingSlots(selectedTeamId) <= 0
                   }
                 />
-              ))}
+              );
+            })}
             </div>
 
             {filteredPlayers.length === 0 && (
@@ -176,7 +183,8 @@ const PlayersManagementCard = ({
                 </p>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {draftedPlayers[selectedTeamId].map((playerId: number) => {
-                    const player = players.find((p: any) => p.id === playerId);
+                    const player = players.find((p: Player) => p.id === playerId);
+                    const isLocked = lockToken === player?.tradeLockedWeek;
                     if (!player) return null;
                     return (
                       <PlayerCardDetailed
@@ -187,6 +195,7 @@ const PlayersManagementCard = ({
                         onRemove={() => handleUndraftPlayer(player.id, player.name)}
                         getTrendIcon={getTrendIcon}
                         getStatusColor={getStatusColor}
+                        isLocked={isLocked}
                       />
                     );
                   })}

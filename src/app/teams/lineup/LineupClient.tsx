@@ -18,6 +18,8 @@ import { updateTeam } from "@/services/teamsService";
 
 import { Player, Team } from '@/types';
 
+import { weekTokenCET  } from '@/lib/utils';
+
 interface LineupClientProps {
   players: Player[];
   teams: Team[];
@@ -27,6 +29,7 @@ const TEAM_BUDGET = 200; // Budget in millions
 const MAX_PLAYERS_PER_TEAM = 10;
 
 const LineupClient = ({ players, teams }: LineupClientProps) => {
+  const lockToken = weekTokenCET();
   const { api } = useApi();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -191,6 +194,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         handleUndraftPlayer={handleUndraftPlayer}
         getRemainingBudget={getRemainingBudget}
         getRemainingSlots={getRemainingSlots}
+        lockToken={lockToken}
       />
     </Container>
   );

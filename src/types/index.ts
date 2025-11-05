@@ -14,6 +14,7 @@ export type Player = {
     nationality?: string;
     teamId?: string;
     sportsTeam?: string;
+    tradeLockedWeek?: string;
 }
 
 export type Team = {
