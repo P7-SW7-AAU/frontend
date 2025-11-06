@@ -85,7 +85,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
 
         <StatsCard 
           title="Sports Covered" 
-          value={5} 
+          value={new Set(teams.flatMap(team => team.roster.map(player => player.sport))).size} 
           valueColor="text-white" 
           description="different sports" 
           icon={Calendar} 
