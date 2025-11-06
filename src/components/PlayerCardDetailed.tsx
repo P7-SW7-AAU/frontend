@@ -9,7 +9,7 @@ import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 import React from 'react';
 
 interface PlayerCardDetailedProps {
-  player: Player;
+  player: Player; // ensure player.sport is 'football' | 'nba'
   isOwned: boolean;
   onAdd: () => void;
   onRemove: () => void;
@@ -30,7 +30,8 @@ const PlayerCardDetailed = ({
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
-  const delta = usePlayerDelta(player.id);
+  // sport-aware
+  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
 
   const changeColor =
     delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
@@ -92,16 +93,16 @@ const PlayerCardDetailed = ({
             </span>
           </div>
 
-          {/* NEW: Weekly change (amount) */}
+          {/* Live change (from WS) */}
           {/* <div className="flex items-center justify-between text-sm">
-            <span className="text-primary-gray font-medium">Weekly change</span>
+            <span className="text-primary-gray font-medium">Live change</span>
             <span className={`font-bold ${changeColor}`}>
               {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
             </span>
           </div> */}
 
 
-          {/* Optional: show preview price if present */}
+          {/* show preview price if present */}
           {delta?.previewPrice != null && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-primary-gray font-medium">Preview price</span>
