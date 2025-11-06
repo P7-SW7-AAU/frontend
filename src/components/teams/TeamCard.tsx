@@ -111,7 +111,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                                     {totalChange === 0 ? '-' : (() => {
                                         const value = totalChange / 1_000;
                                         // Remove trailing zeros but keep up to 3 decimals, add thousand separators
-                                        let formatted = value.toFixed(3).replace(/\.?(0{1,3})$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
+                                        let formatted = value.toFixed(3).replace(/\.?0+$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
                                         if (formatted.includes('.')) {
                                             const [intPart, decPart] = formatted.split('.');
                                             formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decPart;

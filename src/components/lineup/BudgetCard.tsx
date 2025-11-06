@@ -27,7 +27,7 @@ const BudgetCard = ({ teamBudget, maxPlayersPerTeam, getRemainingBudget, getBudg
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-primary-gray">Budget Remaining</span>
                         <span className="text-2xl font-bold text-white">
-                            ${getRemainingBudget(selectedTeamId).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                            ${getRemainingBudget(selectedTeamId).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M
                         </span>
                     </div>
                     <Progress 

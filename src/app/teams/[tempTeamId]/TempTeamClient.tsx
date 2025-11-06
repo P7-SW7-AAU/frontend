@@ -117,7 +117,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       };
     });
 
-    toast.message(`${playerName} joined for $${player.price}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+    toast.message(`${playerName} joined for $${(player.price / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
   }
 
   const handleUndraftPlayer = (playerId: number, playerName: string) => {
