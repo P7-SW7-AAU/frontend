@@ -94,12 +94,12 @@ const PlayerCardDetailed = ({
           </div>
 
           {/* Live change (from WS) */}
-          {/* <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Live change</span>
             <span className={`font-bold ${changeColor}`}>
               {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
             </span>
-          </div> */}
+          </div>
 
 
           {/* show preview price if present */}
@@ -109,11 +109,6 @@ const PlayerCardDetailed = ({
               <span className="font-bold text-white">{fmtMoney(delta.previewPrice)}</span>
             </div>
           )}
-          
-          {/* <div className="flex items-center justify-between text-sm">
-            <span className="text-primary-gray font-medium">Projected</span>
-            <span className="font-bold text-primary-green">{player.projectedPrice ?? "60"}</span>
-          </div> */}
         </div>
 
         {isOwned ? (
