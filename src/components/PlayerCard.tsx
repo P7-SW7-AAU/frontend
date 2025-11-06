@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, Plus, Minus } from 'lucide-react';
 import { PlayerWithTeam } from '@/types/database';
+import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 
 interface PlayerCardProps {
   player: PlayerWithTeam;
@@ -12,6 +13,7 @@ interface PlayerCardProps {
 }
 
 const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team_ID }: PlayerCardProps) => {
+  const delta = usePlayerDelta(Number(player.uniqueID));
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'injured':
@@ -60,6 +62,15 @@ const PlayerCard = ({ player, onAction, compact = false, isOwned = !!player.team
           <div className="space-y-1">
             <div className={`text-white font-medium ${compact ? 'text-sm' : 'text-base'}`}>
               {player.points || 0} pts
+            </div>
+            <div>
+              Value: ${player.value}M
+              {delta && (
+                <span className={`ml-2 ${delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {delta.liveDelta >= 0 ? '+' : ''}
+                  {delta.liveDelta.toFixed(2)}%
+                </span>
+              )}
             </div>
             <div className={`text-primary-gray font-medium ${compact ? 'text-xs' : 'text-sm'}`}>
               Proj: {player.projectedPoints || 0}
