@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from 'react';
-import { TrendingUp, TrendingDown, Minus, Trophy, Zap, Search } from 'lucide-react';
+import { Trophy, Zap, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,7 +59,6 @@ const PlayersManagementCard = ({
         const query = searchQuery.toLowerCase();
         const matchesName = player.name.toLowerCase().includes(query);
         // const matchesTeam = player.sportsTeam.name.toLowerCase().includes(query);
-        // const matchesPosition = player.position.toLowerCase().includes(query);
         return matchesName;
       }
 
