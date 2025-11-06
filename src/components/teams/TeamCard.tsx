@@ -86,8 +86,8 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                         <div className="text-lg font-semibold text-primary-yellow">
                             {(() => {
                                 const value = team.roster.map(player => player.price).reduce((acc, price) => acc + price, 0) / 1_000_000;
-                                // Remove trailing zeros but keep up to 3 decimals, add thousand separators
-                                let formatted = value.toFixed(3).replace(/\.?(0{1,3})$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
+                                // Remove trailing zeros but keep up to 6 decimals, add thousand separators
+                                let formatted = value.toFixed(6).replace(/\.?0+$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
                                 // Add thousand separators
                                 if (formatted.includes('.')) {
                                     const [intPart, decPart] = formatted.split('.');

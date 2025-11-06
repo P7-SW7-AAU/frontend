@@ -19,15 +19,16 @@ interface PlayerCardDetailedProps {
 
 
 const fmtMoney = (n: number, decimals = 0) => {
+  // Always show all decimals, but omit trailing zeros
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals
   }).format(n);
-  // Remove trailing zeros after decimal if all are zero
   if (decimals > 0) {
-    // e.g. $1.00 -> $1, $1.10 -> $1.1, $1.01 -> $1.01
+    // Remove trailing zeros after decimal, but keep at least one decimal if present
+    // $1.2300 -> $1.23, $1.200 -> $1.2, $1.000 -> $1
     return formatted.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'');
   }
   return formatted;
@@ -81,7 +82,7 @@ const PlayerCardDetailed = ({
           <div className="flex flex-col items-end gap-1">
             {getTrendIcon(player.weekPriceChange)}
             <Badge variant="secondary" className="text-xs font-bold">
-              {fmtMoney(player.price / 1000000, 2).replace(/\.00$/, '')}M
+              {fmtMoney(player.price / 1000000, 6).replace(/\.00$/, '')}M
             </Badge>
           </div>
         </div>
@@ -94,7 +95,7 @@ const PlayerCardDetailed = ({
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Value</span>
-            <span className="font-bold text-primary-yellow">{fmtMoney(player.price / 1000000, 2).replace(/\.00$/, '')}M</span>
+            <span className="font-bold text-primary-yellow">{fmtMoney(player.price / 1000000, 6).replace(/\.00$/, '')}M</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
