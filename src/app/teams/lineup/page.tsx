@@ -4,7 +4,6 @@ import { stackServerApp } from "@/stack/server";
 import LineupClient from "@/app/teams/lineup/LineupClient";
 import { getPlayers } from "@/services/playersService";
 import { getTeams } from "@/services/teamsService";
-import { getTeamPlayers } from "@/services/teamPlayersService";
 
 const LineupPage = async () => {
     const user = await stackServerApp.getUser();
@@ -14,17 +13,16 @@ const LineupPage = async () => {
         redirect('/handler/sign-in');
     }
 
-    const teams = await getTeams(user.id);
-    
-    const teamsWithPlayers = await Promise.all(
-        teams.map(async (team: any) => ({
-            ...team,
-            players: await getTeamPlayers(team.id)
-        }))
-    );
+    const { accessToken } = await user.getAuthJson();
+    if (!accessToken) {
+        redirect('/handler/sign-in');
+    }
+
+    const teams = await getTeams(user.id, accessToken);
+    const sortedTeams = teams.sort((a: any, b: any) => a.name.localeCompare(b.name));
 
     return (
-        <LineupClient players={players} teams={teamsWithPlayers} />
+        <LineupClient players={players} teams={sortedTeams} />
     );
 }
 

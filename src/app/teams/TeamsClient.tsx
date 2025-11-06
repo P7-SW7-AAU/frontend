@@ -67,7 +67,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
 
         <StatsCard 
           title="Total Players" 
-          value={teams.reduce((sum, team) => sum + team.players.length, 0)} 
+          value={teams.reduce((sum, team) => sum + team.roster.length, 0)} 
           valueColor="text-primary-green" 
           description="across all teams" 
           icon={Target} 
@@ -76,7 +76,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
 
         <StatsCard 
           title="Total Value" 
-          value={`$${teams.reduce((sum, team) => sum + team.players.reduce((playerSum, player) => playerSum + player.value, 0), 0).toFixed(1)}M`} 
+          value={`$${(teams.reduce((sum, team) => sum + team.roster.reduce((playerSum, player) => playerSum + player.price, 0), 0) / 1_000_000).toFixed(1)}M`} 
           valueColor="text-primary-yellow" 
           description="combined value" 
           icon={Trophy} 
@@ -85,7 +85,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
 
         <StatsCard 
           title="Sports Covered" 
-          value={5} 
+          value={new Set(teams.flatMap(team => team.roster.map(player => player.sport))).size} 
           valueColor="text-white" 
           description="different sports" 
           icon={Calendar} 

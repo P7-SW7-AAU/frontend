@@ -2,9 +2,6 @@ export type Player = {
     id: number;
     sport: string;
     name: string;
-    value: number;
-    trend: 'up' | 'down' | 'stable';
-    status: 'active' | 'injured';
     position: string;
     popularity: number;
     points: number;
@@ -15,10 +12,13 @@ export type Player = {
     teamId?: string;
     sportsTeam?: string;
     tradeLockedWeek?: string;
+    price: number;
+    weekPriceChange: number;
 }
 
 export type Team = {
     id: string;
     name: string;
-    players: Player[];
+    roster: Player[];
+    logo?: string;
 }

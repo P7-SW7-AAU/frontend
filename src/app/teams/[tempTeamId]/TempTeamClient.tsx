@@ -16,15 +16,18 @@ import { useApi } from "@/hooks/useApi";
 import { createTeam } from "@/services/teamsService";
 import { Player } from '@/types';
 
+import { weekTokenCET  } from '@/lib/utils';
+
 interface TempTeamClientProps {
   tempTeamId: string;
   players: Player[];
 }
 
-const TEAM_BUDGET = 200; // Budget in millions
+const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
 const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
+  const lockToken = weekTokenCET();
   const { api } = useApi();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +72,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     const drafted = draftedPlayers[teamId] || [];
     return drafted.reduce((sum, playerId) => {
       const player = players.find(p => p.id === playerId);
-      return sum + (player?.value || 0);
+      return sum + (player?.price || 0);
     }, 0);
   }
   
@@ -96,7 +99,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     const player = players.find(p => p.id === playerId);
     if (!player) return;
     
-    if (player.value > getRemainingBudget(selectedTeamId)) {
+    if (player.price > getRemainingBudget(selectedTeamId)) {
       toast.message("Insufficient budget");
       return;
     }
@@ -114,7 +117,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       };
     });
 
-    toast.message(`${playerName} joined for $${player.value}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+    toast.message(`${playerName} joined for $${(player.price / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
   }
 
   const handleUndraftPlayer = (playerId: number, playerName: string) => {
@@ -164,6 +167,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         handleUndraftPlayer={handleUndraftPlayer}
         getRemainingBudget={getRemainingBudget}
         getRemainingSlots={getRemainingSlots}
+        lockToken={lockToken}
       />
     </Container>
   );

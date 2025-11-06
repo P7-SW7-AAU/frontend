@@ -3,7 +3,6 @@ import { stackServerApp } from "@/stack/server";
 
 import TeamsClient from "@/app/teams/TeamsClient";
 import { getTeams } from "@/services/teamsService";
-import { getTeamPlayers } from "@/services/teamPlayersService";
 
 const TeamsPage = async () => {
     const user = await stackServerApp.getUser();
@@ -16,17 +15,10 @@ const TeamsPage = async () => {
         redirect('/handler/sign-in');
     }
 
-    const teams = await getTeams(user.id);
-
-    const teamsWithPlayers = await Promise.all(
-        teams.map(async (team: any) => ({
-            ...team,
-            players: await getTeamPlayers(team.id)
-        }))
-    );
+    const teams = await getTeams(user.id, accessToken);
 
     return (
-        <TeamsClient teams={teamsWithPlayers} />
+        <TeamsClient teams={teams} />
     );
 }
 
