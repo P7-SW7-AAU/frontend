@@ -1,11 +1,12 @@
 import axios from "axios";
 
-export const getTeams = async (userId: string) => {
+export const getTeams = async (userId: string, accessToken: string) => {
     try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        const response = await axios.get(apiUrl + "/teams");
-        // Filter teams by owner/user ID
-        return response.data.filter((team: any) => team.ownerId === userId);
+        const response = await axios.get(`${apiUrl}/teams/user/${userId}`, {
+            headers: { "x-stack-access-token": accessToken }
+        });
+        return response.data;
     } catch (error) {
         console.error("Error fetching teams:", error);
         throw error;

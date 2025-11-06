@@ -27,7 +27,7 @@ const BudgetCard = ({ teamBudget, maxPlayersPerTeam, getRemainingBudget, getBudg
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-primary-gray">Budget Remaining</span>
                         <span className="text-2xl font-bold text-white">
-                            ${getRemainingBudget(selectedTeamId).toFixed(1)}M
+                            ${getRemainingBudget(selectedTeamId).toFixed(1)}
                         </span>
                     </div>
                     <Progress 
@@ -35,7 +35,7 @@ const BudgetCard = ({ teamBudget, maxPlayersPerTeam, getRemainingBudget, getBudg
                         className="h-3"
                     />
                     <p className="text-xs text-primary-gray font-medium mt-1">
-                        ${getBudgetSpent(selectedTeamId).toFixed(1)}M / ${teamBudget}M spent
+                        ${getBudgetSpent(selectedTeamId).toFixed(1)} / ${teamBudget} spent
                     </p>
                 </div>
               

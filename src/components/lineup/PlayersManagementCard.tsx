@@ -154,11 +154,10 @@ const PlayersManagementCard = ({
                   onAdd={() => handleDraftPlayer(player.id, player.name)}
                   onRemove={() => handleUndraftPlayer(player.id, player.name)}
                   getTrendIcon={getTrendIcon}
-                  getStatusColor={getStatusColor}
                   isLocked={isLocked}
                   disabled={
                     !selectedTeamId ||
-                    player.value > getRemainingBudget(selectedTeamId) ||
+                    player.price > getRemainingBudget(selectedTeamId) ||
                     getRemainingSlots(selectedTeamId) <= 0
                   }
                 />
@@ -194,7 +193,6 @@ const PlayersManagementCard = ({
                         onAdd={() => {}}
                         onRemove={() => handleUndraftPlayer(player.id, player.name)}
                         getTrendIcon={getTrendIcon}
-                        getStatusColor={getStatusColor}
                         isLocked={isLocked}
                       />
                     );

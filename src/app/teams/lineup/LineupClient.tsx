@@ -25,7 +25,7 @@ interface LineupClientProps {
   teams: Team[];
 }
 
-const TEAM_BUDGET = 200; // Budget in millions
+const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
 const LineupClient = ({ players, teams }: LineupClientProps) => {
@@ -39,7 +39,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
     const initialDrafts: Record<string, number[]> = {};
     teams.forEach((team) => {
-      initialDrafts[team.id] = team.players?.map((p: any) => p.externalId) || [];
+      initialDrafts[team.id] = team.roster?.map((p: any) => p.externalId) || [];
     });
 
     return initialDrafts;
@@ -85,7 +85,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
     const drafted = draftedPlayers[teamId] || [];
     return drafted.reduce((sum, playerId) => {
       const player = players.find(p => p.id === playerId);
-      return sum + (player?.value || 0);
+      return sum + (player?.price || 0);
     }, 0);
   }
   
@@ -112,7 +112,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       const player = players.find(p => p.id === playerId);
       if (!player) return;
       
-      if (player.value > getRemainingBudget(selectedTeamId)) {
+      if (player.price > getRemainingBudget(selectedTeamId)) {
         toast.message("Insufficient budget");
         return;
       }
@@ -130,7 +130,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         };
       });
   
-      toast.message(`${playerName} joined for $${player.value}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+      toast.message(`${playerName} joined for $${player.price}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
     }
   
     const handleUndraftPlayer = (playerId: number, playerName: string) => {

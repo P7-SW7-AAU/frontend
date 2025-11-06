@@ -14,13 +14,12 @@ interface PlayerCardDetailedProps {
   onAdd: () => void;
   onRemove: () => void;
   getTrendIcon: (trend?: string) => React.ReactNode;
-  getStatusColor: (status: string) => string;
   disabled?: boolean;
   isLocked?: boolean;
 }
 
-const fmtMoney = (n: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+const fmtMoney = (n: number, decimals = 0) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
 
 const PlayerCardDetailed = ({
   player,
@@ -28,7 +27,6 @@ const PlayerCardDetailed = ({
   onAdd,
   onRemove,
   getTrendIcon,
-  getStatusColor,
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
@@ -65,7 +63,7 @@ const PlayerCardDetailed = ({
           <div className="flex flex-col items-end gap-1">
             {getTrendIcon(player.trend)}
             <Badge variant="secondary" className="text-xs font-bold">
-              ${player.value ?? 100}M
+              ${player.price / 1000000}M
             </Badge>
           </div>
         </div>
@@ -78,16 +76,30 @@ const PlayerCardDetailed = ({
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Value</span>
-            <span className="font-bold text-white">${player.value}M</span>
+            <span className="font-bold text-primary-green">${player.price / 1000000}M</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-primary-gray font-medium">Weekly Price Change</span>
+            <span className="font-bold text-primary-yellow">
+              {(() => {
+                if (player.weekPriceChange === 0) return '+$0.0k';
+                const value = player.weekPriceChange / 1000;
+                // Show one decimal for k-suffix
+                const sign = player.weekPriceChange > 0 ? '+' : '';
+                return `${sign}${fmtMoney(value, 3)}K`;
+              })()}
+            </span>
           </div>
 
           {/* NEW: Weekly change (amount) */}
-          <div className="flex items-center justify-between text-sm">
+          {/* <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Weekly change</span>
             <span className={`font-bold ${changeColor}`}>
               {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
             </span>
-          </div>
+          </div> */}
+
 
           {/* Optional: show preview price if present */}
           {delta?.previewPrice != null && (
@@ -96,31 +108,11 @@ const PlayerCardDetailed = ({
               <span className="font-bold text-white">{fmtMoney(delta.previewPrice)}</span>
             </div>
           )}
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-primary-gray font-medium">Points</span>
-            <span className="font-bold text-primary-green">{player.points ?? "50"}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
+          
+          {/* <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Projected</span>
-            <span className="font-bold text-white">{player.projectedPoints ?? "60"}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 mb-4">
-          <Badge
-            variant={
-              player.status
-                ? (getStatusColor(player.status) as "default" | "destructive" | "outline" | "secondary" | undefined)
-                : "default"
-            }
-            className="text-xs font-bold"
-          >
-            {player.status ? player.status.toUpperCase() : "ACTIVE"}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            {player.popularity ?? 0}% owned
-          </Badge>
+            <span className="font-bold text-primary-green">{player.projectedPrice ?? "60"}</span>
+          </div> */}
         </div>
 
         {isOwned ? (
@@ -137,6 +129,6 @@ const PlayerCardDetailed = ({
       </div>
     </div>
   );
-};
+}
 
 export default PlayerCardDetailed;

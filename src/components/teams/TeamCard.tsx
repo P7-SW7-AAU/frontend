@@ -20,11 +20,9 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const router = useRouter();
 
     const getTeamStats = (team: Team) => {
-        const totalPoints = team.players.reduce((sum: number, player: any) => sum + (player.points || 0), 0);
-        const projectedPoints = team.players.reduce((sum: number, player: any) => sum + (player.projectedPoints || 0), 0);
 
         // Group players by sport
-        const sportGroups = team.players.reduce((groups: any, player: any) => {
+        const sportGroups = team.roster.reduce((groups: any, player: any) => {
             const sportName = player.sport?.includes('FOOTBALL') ? 'Football' :
                                 player.sport?.includes('F1') ? 'Formula 1' :
                                 player.sport?.includes('NBA') ? 'NBA' : 'Other';
@@ -35,7 +33,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
         }, {});
 
         return { 
-            totalPoints, projectedPoints, sportGroups 
+            sportGroups 
         }
     }
 
@@ -85,14 +83,14 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">Total Value</div>
-                        <div className="text-lg font-semibold text-white">
-                            ${team.players.map(player => player.value).reduce((acc, val) => acc + val, 0)}M
+                        <div className="text-lg font-semibold text-primary-green">
+                            ${(team.roster.map(player => player.price).reduce((acc, price) => acc + price, 0) / 1_000_000).toFixed(1)}M
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <div className="text-sm font-medium text-primary-gray">Projected</div>
-                        <div className="text-lg font-semibold text-primary-green">
-                            $0.0M
+                        <div className="text-sm font-medium text-primary-gray">Weekly Price Change</div>
+                        <div className="text-lg font-semibold text-primary-yellow">
+                            ${(team.roster.map(player => player.weekPriceChange).reduce((acc, price) => acc + price, 0) / 1_000_000).toFixed(1)}M
                         </div>
                     </div>
                 </div>
