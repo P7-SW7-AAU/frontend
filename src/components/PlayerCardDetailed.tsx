@@ -9,7 +9,7 @@ import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 import React from 'react';
 
 interface PlayerCardDetailedProps {
-  player: Player;
+  player: Player; // ensure player.sport is 'football' | 'nba'
   isOwned: boolean;
   onAdd: () => void;
   onRemove: () => void;
@@ -100,7 +100,6 @@ const PlayerCardDetailed = ({
               {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
             </span>
           </div>
-
 
           {/* show preview price if present */}
           {delta?.previewPrice != null && (
