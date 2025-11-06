@@ -25,7 +25,15 @@ const Navbar = () => {
         ? [...baseNavigation, { name: 'Log Out', href: '/handler/sign-out', icon: LogOut }]
         : [...baseNavigation, { name: 'Log In', href: '/handler/sign-in', icon: LogIn }];
 
-    const isActive = (href: string) => pathname === href;
+    const isActive = (href: string) => {
+        if (href === '/teams') {
+            return pathname === '/teams' || pathname.startsWith('/teams');
+        }
+        if (href === '/leagues') {
+            return pathname === '/leagues' || pathname.startsWith('/leagues');
+        }
+        return pathname === href;
+    }
 
     return (
         <nav className="bg-card border-b border-border border-gray-800 sticky top-0 z-50 backdrop-blur-lg bg-card/80">
