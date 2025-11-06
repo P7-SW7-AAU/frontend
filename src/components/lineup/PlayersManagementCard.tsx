@@ -43,20 +43,6 @@ const PlayersManagementCard = ({
     { id: 'F1', name: 'F1' },
     { id: 'NBA', name: 'NBA' },
   ]
-  const getTrendIcon = (trend?: string) => {
-    if (trend === 'up') return <TrendingUp className="h-3 w-3 text-primary-green" />;
-    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
-    return <Minus className="h-3 w-3 text-muted-foreground" />;
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'default';
-      case 'injured': return 'destructive';
-      case 'bye': return 'secondary';
-      default: return 'outline';
-    }
-  }
 
   const isPlayerOnTeam = (playerId: number) => {
     return draftedPlayers[selectedTeamId]?.includes(playerId) || false;
@@ -153,7 +139,6 @@ const PlayersManagementCard = ({
                   isOwned={isPlayerOnTeam(player.id)}
                   onAdd={() => handleDraftPlayer(player.id, player.name)}
                   onRemove={() => handleUndraftPlayer(player.id, player.name)}
-                  getTrendIcon={getTrendIcon}
                   isLocked={isLocked}
                   disabled={
                     !selectedTeamId ||
@@ -192,7 +177,6 @@ const PlayersManagementCard = ({
                         isOwned={true}
                         onAdd={() => {}}
                         onRemove={() => handleUndraftPlayer(player.id, player.name)}
-                        getTrendIcon={getTrendIcon}
                         isLocked={isLocked}
                       />
                     );

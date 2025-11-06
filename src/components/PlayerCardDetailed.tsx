@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Lock, UserPlus, UserMinus } from 'lucide-react';
+import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Player } from '@/types';
 import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 import React from 'react';
@@ -13,20 +13,31 @@ interface PlayerCardDetailedProps {
   isOwned: boolean;
   onAdd: () => void;
   onRemove: () => void;
-  getTrendIcon: (trend?: string) => React.ReactNode;
   disabled?: boolean;
   isLocked?: boolean;
 }
 
-const fmtMoney = (n: number, decimals = 0) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
+
+const fmtMoney = (n: number, decimals = 0) => {
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(n);
+  // Remove trailing zeros after decimal if all are zero
+  if (decimals > 0) {
+    // e.g. $1.00 -> $1, $1.10 -> $1.1, $1.01 -> $1.01
+    return formatted.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'');
+  }
+  return formatted;
+};
 
 const PlayerCardDetailed = ({
   player,
   isOwned,
   onAdd,
   onRemove,
-  getTrendIcon,
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
@@ -35,6 +46,12 @@ const PlayerCardDetailed = ({
 
   const changeColor =
     delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
+
+  const getTrendIcon = (weeklyPriceChange: number) => {
+    if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
+    if (weeklyPriceChange < 0) return <TrendingDown className="h-3 w-3 text-destructive" />;
+    return <Minus className="h-3 w-3 text-primary-gray" />;
+  }
 
   return (
     <div className="hover:shadow-elegant border border-[#1E2938] hover:border-[#16A149] transition-all hover:-translate-y-1 group rounded-xl bg-card">
@@ -62,9 +79,9 @@ const PlayerCardDetailed = ({
           )}
 
           <div className="flex flex-col items-end gap-1">
-            {getTrendIcon(player.trend)}
+            {getTrendIcon(player.weekPriceChange)}
             <Badge variant="secondary" className="text-xs font-bold">
-              ${player.price / 1000000}M
+              {fmtMoney(player.price / 1000000, 2).replace(/\.00$/, '')}M
             </Badge>
           </div>
         </div>
@@ -72,21 +89,21 @@ const PlayerCardDetailed = ({
         <div className="space-y-2 mb-4 bg-[#131C25] rounded-lg p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Team</span>
-            <span className="font-bold text-white text-xs">{player.sportsTeam || "unknown"}</span>
+            <span className="font-bold text-white text-xs">{player.sportsTeam || "Name"}</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Value</span>
-            <span className="font-bold text-primary-green">${player.price / 1000000}M</span>
+            <span className="font-bold text-primary-yellow">{fmtMoney(player.price / 1000000, 2).replace(/\.00$/, '')}M</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Weekly Price Change</span>
-            <span className="font-bold text-primary-yellow">
+            <span className={`font-bold ${player.weekPriceChange > 0 ? 'text-primary-green' : player.weekPriceChange < 0 ? 'text-primary-red' : 'text-primary-gray'}`}> 
               {(() => {
-                if (player.weekPriceChange === 0) return '+$0.0k';
+                if (player.weekPriceChange === 0) return '—';
                 const value = player.weekPriceChange / 1000;
-                // Show one decimal for k-suffix
+                // Show three decimals for k-suffix
                 const sign = player.weekPriceChange > 0 ? '+' : '';
                 return `${sign}${fmtMoney(value, 3)}K`;
               })()}
@@ -94,12 +111,12 @@ const PlayerCardDetailed = ({
           </div>
 
           {/* Live change (from WS) */}
-          <div className="flex items-center justify-between text-sm">
+          {/* <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Live change</span>
             <span className={`font-bold ${changeColor}`}>
               {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
             </span>
-          </div>
+          </div> */}
 
           {/* show preview price if present */}
           {delta?.previewPrice != null && (

@@ -83,15 +83,46 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">Total Value</div>
-                        <div className="text-lg font-semibold text-primary-green">
-                            ${(team.roster.map(player => player.price).reduce((acc, price) => acc + price, 0) / 1_000_000).toFixed(1)}M
+                        <div className="text-lg font-semibold text-primary-yellow">
+                            {(() => {
+                                const value = team.roster.map(player => player.price).reduce((acc, price) => acc + price, 0) / 1_000_000;
+                                // Remove trailing zeros but keep up to 3 decimals, add thousand separators
+                                let formatted = value.toFixed(3).replace(/\.?(0{1,3})$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
+                                // Add thousand separators
+                                if (formatted.includes('.')) {
+                                    const [intPart, decPart] = formatted.split('.');
+                                    formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decPart;
+                                } else {
+                                    formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                }
+                                return `${formatted}M`;
+                            })()}
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <div className="text-sm font-medium text-primary-gray">Weekly Price Change</div>
-                        <div className="text-lg font-semibold text-primary-yellow">
-                            ${(team.roster.map(player => player.weekPriceChange).reduce((acc, price) => acc + price, 0) / 1_000_000).toFixed(1)}M
+                        <div className="text-sm font-medium text-primary-gray">
+                            Weekly Price Change
                         </div>
+                        {(() => {
+                            const totalChange = team.roster.map(player => player.weekPriceChange).reduce((acc, price) => acc + price, 0);
+                            const color = totalChange > 0 ? 'text-primary-green' : totalChange < 0 ? 'text-primary-red' : 'text-primary-gray';
+                            return (
+                                <div className={`text-lg font-semibold ${color}`}>
+                                    {totalChange === 0 ? '-' : (() => {
+                                        const value = totalChange / 1_000;
+                                        // Remove trailing zeros but keep up to 3 decimals, add thousand separators
+                                        let formatted = value.toFixed(3).replace(/\.?(0{1,3})$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
+                                        if (formatted.includes('.')) {
+                                            const [intPart, decPart] = formatted.split('.');
+                                            formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decPart;
+                                        } else {
+                                            formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                        }
+                                        return `${formatted}K`;
+                                    })()}
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
 

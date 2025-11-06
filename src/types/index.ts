@@ -2,7 +2,6 @@ export type Player = {
     id: number;
     sport: string;
     name: string;
-    trend: 'up' | 'down' | 'stable';
     position: string;
     popularity: number;
     points: number;
