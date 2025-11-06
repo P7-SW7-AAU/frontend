@@ -80,7 +80,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#1E2938]">
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">Total Value</div>
                         <div className="text-lg font-semibold text-primary-yellow">
@@ -108,7 +108,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                             const color = totalChange > 0 ? 'text-primary-green' : totalChange < 0 ? 'text-primary-red' : 'text-primary-gray';
                             return (
                                 <div className={`text-lg font-semibold ${color}`}>
-                                    {totalChange === 0 ? '-' : (() => {
+                                    {totalChange === 0 ? '—' : (() => {
                                         const value = totalChange / 1_000;
                                         // Remove trailing zeros but keep up to 3 decimals, add thousand separators
                                         let formatted = value.toFixed(3).replace(/\.?0+$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
@@ -118,7 +118,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                                         } else {
                                             formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                                         }
-                                        return `${formatted}K`;
+                                        return `${totalChange > 0 ? '+' : ''}${formatted}K`;
                                     })()}
                                 </div>
                             );

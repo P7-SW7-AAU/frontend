@@ -123,11 +123,13 @@
 
 /* Our custom colors */
 .text-primary-green {
-  color: #16A149;
+  /* color: #16A149; */
+  color: rgb(24, 203, 89);
 }
 
 .bg-primary-green {
   background-color: #16A149;
+  /* background-color: rgb(24, 203, 89); */
 }
 
 .text-primary-gray {

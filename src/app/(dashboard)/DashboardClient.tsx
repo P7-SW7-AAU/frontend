@@ -3,10 +3,9 @@
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, Target, Trophy, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Plus, Users, Target, Trophy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { getAvailablePlayers } from '@/data/multiSportMockData';
 import { useUser } from '@stackframe/stack';
 import Banner from '@/components/dashboard/Banner';
 import ShortcutCard from '@/components/dashboard/ShortcutCard';
@@ -20,7 +19,6 @@ interface DashboardClientProps {
 
 const DashboardClient = ({ players }: DashboardClientProps) => {
     const router = useRouter();
-    const availablePlayers = getAvailablePlayers();
 
     // -- ONLY FOR GETTING TOKEN FOR TESTING ENDPOINTS! REMOVE LATER AS WE USE A BETTER APPROACH GETTING TOKEN --
     const user = useUser();
@@ -32,26 +30,6 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
         })();
     }, [user]);
     // -- REMOVE ABOVE --
-
-    const getTrendIcon = (trend?: string) => {
-        if (trend === 'up') return <TrendingUp className="h-3 w-3 text-primary-green" />;
-        if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
-        return <Minus className="h-3 w-3 text-muted-foreground" />;
-    }
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'active': return 'default';
-            case 'injured': return 'destructive';
-            case 'bye': return 'secondary';
-            default: return 'outline';
-        }
-    }
-
-    const handlePlayerAction = () => {
-        // TODO: If user has no teams, redirect to create team page
-        router.push('/teams/lineup');
-    }
 
     return (
         <div className="min-h-screen bg-background">
@@ -102,10 +80,8 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
                             key={player.id}
                             player={player}
                             isOwned={false}
-                            onAdd={handlePlayerAction}
+                            onAdd={() => router.push('/teams/lineup')}
                             onRemove={() => {}}
-                            getTrendIcon={getTrendIcon}
-                            getStatusColor={getStatusColor}
                         />
                     ))}
                 </div>
@@ -128,10 +104,8 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
                             key={player.id}
                             player={player}
                             isOwned={false}
-                            onAdd={handlePlayerAction}
+                            onAdd={() => router.push('/teams/lineup')}
                             onRemove={() => {}}
-                            getTrendIcon={getTrendIcon}
-                            getStatusColor={getStatusColor}
                         />
                     ))}
                 </div>
