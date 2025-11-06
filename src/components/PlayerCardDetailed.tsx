@@ -9,7 +9,7 @@ import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 import React from 'react';
 
 interface PlayerCardDetailedProps {
-  player: Player; // ensure player.sport is 'football' | 'nba'
+  player: Player;
   isOwned: boolean;
   onAdd: () => void;
   onRemove: () => void;
