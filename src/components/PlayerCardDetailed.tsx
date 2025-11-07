@@ -60,9 +60,13 @@ const PlayerCardDetailed = ({
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12 group-hover:scale-110 transition-transform">
-              <AvatarFallback className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold">
-                {player.name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
+              {player.logo ? (
+                <img src={player.logo} alt={`${player.teamName} logo`} className="h-full w-full object-contain" />
+              ) : (
+                <AvatarFallback className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold">
+                  {player.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              )}
             </Avatar>
             <div>
               <h3 className="font-semibold text-white">{player.name}</h3>
@@ -81,16 +85,13 @@ const PlayerCardDetailed = ({
 
           <div className="flex flex-col items-end gap-1">
             {getTrendIcon(player.weekPriceChange)}
-            <Badge variant="secondary" className="text-xs font-bold">
-              {fmtMoney(player.price / 1000000, 6).replace(/\.00$/, '')}M
-            </Badge>
           </div>
         </div>
 
         <div className="space-y-2 mb-4 bg-[#131C25] rounded-lg p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Team</span>
-            <span className="font-bold text-white text-xs">{player.sportsTeam || "Name"}</span>
+            <span className="font-bold text-white text-xs">{player.teamName || "No Team"}</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
