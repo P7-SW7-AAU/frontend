@@ -58,8 +58,9 @@ const PlayersManagementCard = ({
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = player.name.toLowerCase().includes(query);
-        // const matchesTeam = player.sportsTeam.name.toLowerCase().includes(query);
-        return matchesName;
+        const matchesTeam = player.teamName?.toLowerCase().includes(query);
+        const matchesSport = player.sport.toLowerCase().includes(query);
+        return matchesName || matchesTeam || matchesSport;
       }
 
       return true;
@@ -82,7 +83,7 @@ const PlayersManagementCard = ({
           <div className="relative flex-1 bg-[#0F141B]">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-primary-gray" />
             <Input
-              placeholder="Search players, teams, positions..."
+              placeholder="Search players, teams, sports..."
               className="pl-10 border-[#1E2938] text-white font-medium"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -151,9 +152,9 @@ const PlayersManagementCard = ({
 
             {filteredPlayers.length === 0 && (
               <div className="text-center py-12 col-span-full">
-                <Search className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground text-lg">No players found</p>
-                <p className="text-sm text-muted-foreground mt-2">Try adjusting your search or filters</p>
+                <Search className="h-16 w-16 mx-auto text-primary-gray mb-4" />
+                <p className="text-primary-gray text-lg font-medium">No players found</p>
+                <p className="text-sm text-primary-gray font-medium mt-2">Try adjusting your search or filters</p>
               </div>
             )}
           </>

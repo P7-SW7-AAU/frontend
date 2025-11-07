@@ -16,7 +16,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-lg hover:scale-105 font-semibold transition-all duration-200",
+        hero: "bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-lg hover:scale-105 font-semibold transition-all duration-200 border-none",
         gold: "bg-gradient-to-r from-yellow-300 to-yellow-400 text-black hover:shadow-lg hover:scale-105 font-semibold transition-all duration-200",
       },
       size: {
