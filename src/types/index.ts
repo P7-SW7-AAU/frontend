@@ -14,6 +14,8 @@ export type Player = {
     tradeLockedWeek?: string;
     price: number;
     weekPriceChange: number;
+    logo?: string;
+    teamName?: string;
 }
 
 export type Team = {
