@@ -74,6 +74,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         leagueId={selectedLeagueId} 
         leagueName={selectedLeague?.name} 
         maxTeams={selectedLeague?.maxTeams} 
+        currentTeamsCount={selectedLeague?.teams.length}
       />
       <SelectTeamModal leagueId={selectedLeagueId} teams={teams} />
 

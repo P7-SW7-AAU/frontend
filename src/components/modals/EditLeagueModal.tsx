@@ -17,9 +17,10 @@ interface EditLeagueModalProps {
     leagueId: string | null;
     leagueName?: string;
     maxTeams?: number;
+    currentTeamsCount?: number;
 }
 
-const EditLeagueModal = ({ leagueId, leagueName, maxTeams }: EditLeagueModalProps) => {
+const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: EditLeagueModalProps) => {
     const { api } = useApi();
     const router = useRouter();
     const editLeagueModal = useEditLeagueModal();
@@ -42,6 +43,16 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams }: EditLeagueModalProp
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         if (!leagueId) {
             toast.error("No league ID provided for editing.");
+            return;
+        }
+
+        const newMaxTeams = data.maxTeamSize;
+        if (
+            typeof newMaxTeams === "number" &&
+            typeof currentTeamsCount === "number" &&
+            newMaxTeams < currentTeamsCount
+        ) {
+            toast.error(`Cannot set maximum teams (${newMaxTeams}) below current number of teams (${currentTeamsCount}).`);
             return;
         }
 
