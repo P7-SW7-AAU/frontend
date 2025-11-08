@@ -57,7 +57,7 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
         }
 
         setIsLoading(true);
-        // -- UNCOMMENT WHEN updateLeague IS IMPLEMENTED ON BACKEND --
+        // -- TODO: UNCOMMENT WHEN updateLeague IS IMPLEMENTED ON BACKEND --
         // updateLeague(leagueId, data, api)
         //     .then(() => {
         //         toast.success("League updated successfully!");
@@ -103,7 +103,6 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
             )}
 
             <Input
-                // TODO: Make sure you can't set team size to a smaller number than current team size
                 type="number"
                 inputMode="numeric"
                 pattern="\d*"
@@ -112,7 +111,7 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
                 {...register("maxTeamSize", {
                     required: "Maximum team size is required",
                     valueAsNumber: true,
-                    min: { value: 1, message: "Minimum team size is 1" },
+                    min: { value: 2, message: "Minimum team size is 2" },
                     max: { value: 100, message: "Maximum team size is 100" },
                 })}
                 onKeyDown={(e) => {
