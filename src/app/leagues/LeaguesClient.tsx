@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Users, Trophy, Target, Crown } from 'lucide-react';
 
@@ -9,24 +10,24 @@ import Container from '@/components/Container';
 import Header from "@/components/Header";
 import LeagueCard from '@/components/leagues/LeagueCard';
 
-import { 
-  getCurrentUser, 
-  leagues, 
-  teamLeagues, 
-  getUserTeams,
-  getLeagueById,
-  getLeagueStandings 
-} from '@/data/multiSportMockData';
-
 import { useCreateLeagueModal } from "@/hooks/useCreateLeagueModal";
 import { useDeleteLeagueModal } from '@/hooks/useDeleteLeagueModal';
 import { useEditLeagueModal } from "@/hooks/useEditLeagueModal";
 import { useJoinLeagueModal } from "@/hooks/useJoinLeagueModal";
 import { useSelectTeamModal } from "@/hooks/useSelectTeam";
 
-const LeaguesClient = () => {
-  const currentUser = getCurrentUser();
-  const userTeams = getUserTeams(currentUser.uniqueID);
+import { League, Team } from "@/types";
+import DeleteLeagueModal from "@/components/modals/DeleteLeagueModal";
+import EditLeagueModal from "@/components/modals/EditLeagueModal";
+import SelectTeamModal from "@/components/modals/SelectTeamModal";
+
+interface LeaguesClientProps {
+  currentUser: any;
+  leagues: League[];
+  teams: Team[];
+}
+
+const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
   const router = useRouter();
   
   const createLeagueModal = useCreateLeagueModal();
@@ -35,57 +36,47 @@ const LeaguesClient = () => {
   const joinLeagueModal = useJoinLeagueModal();
   const selectTeamModal = useSelectTeamModal();
 
-  const getUserLeagues = () => {
-    const userTeamIds = userTeams.map(team => team.uniqueID);
-    const userLeagueIds = teamLeagues
-      .filter(tl => userTeamIds.includes(tl.team_ID) && tl.isActive)
-      .map(tl => tl.league_ID);
-    
-    return leagues
-      .filter(league => userLeagueIds.includes(league.uniqueID))
-      .map(league => {
-        const leagueData = getLeagueById(league.uniqueID);
-        const standings = getLeagueStandings(league.uniqueID);
-        const userTeamsInLeague = userTeams.filter(team => 
-          teamLeagues.some(tl => 
-            tl.team_ID === team.uniqueID && 
-            tl.league_ID === league.uniqueID && 
-            tl.isActive
-          )
-        );
-        
-        return {
-          ...league,
-          standings,
-          userTeamsInLeague,
-          totalTeams: leagueData?.teams.length || 0,
-          isAdmin: league.admin_ID === currentUser.uniqueID
-        }
-      });
-  }
-
-  const userLeagues = getUserLeagues();
+  const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
 
   const getLeagueStats = () => {
-    const totalLeagues = userLeagues.length;
-    const adminCount = userLeagues.filter(l => l.isAdmin).length;
-    const totalTeamsInLeagues = userLeagues.reduce((sum, league) => {
-      return sum + league.userTeamsInLeague.length;
+    const totalLeagues = leagues.length;
+    const adminCount = leagues.filter(l => l.commissionerId === currentUser.id).length;
+    const totalTeamsInLeagues = leagues.reduce((sum, league) => {
+      return sum + league.teams.length;
     }, 0);
-    const bestRanking = Math.min(...userLeagues.flatMap(league => 
-      league.userTeamsInLeague.map(team => {
-        const standing = league.standings.find(s => s.uniqueID === team.uniqueID);
-        return standing?.ranking || 999;
-      })
-    ));
 
-    return { totalLeagues, adminCount, totalTeamsInLeagues, bestRanking };
+    return { totalLeagues, adminCount, totalTeamsInLeagues };
   }
 
   const stats = getLeagueStats();
 
+  const handleDelete = (leagueId: string) => {
+    setSelectedLeagueId(leagueId);
+    deleteLeagueModal.onOpen();
+  }
+
+  const handleEdit = (leagueId: string) => {
+    setSelectedLeagueId(leagueId);
+    editLeagueModal.onOpen();
+  }
+
+  const handleSelectTeam = (leagueId: string) => {
+    setSelectedLeagueId(leagueId);
+    selectTeamModal.onOpen();
+  }
+
+  const selectedLeague = leagues.find((league) => league.id === selectedLeagueId);
+
   return (
     <Container>
+      <DeleteLeagueModal leagueId={selectedLeagueId} />
+      <EditLeagueModal 
+        leagueId={selectedLeagueId} 
+        leagueName={selectedLeague?.name} 
+        maxTeams={selectedLeague?.maxTeams} 
+      />
+      <SelectTeamModal leagueId={selectedLeagueId} teams={teams} />
+
       <Header 
         title="My Leagues" 
         description="Manage your league participation and track your performance" 
@@ -129,7 +120,7 @@ const LeaguesClient = () => {
 
         <StatsCard 
           title="Best Rank" 
-          value={stats.bestRanking === 999 ? 'N/A' : `#${stats.bestRanking}`} 
+          value={"#10"} 
           valueColor="text-white" 
           description="highest position" 
           icon={Target} 
@@ -140,14 +131,16 @@ const LeaguesClient = () => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-white">Your Leagues</h2>        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {userLeagues.map((league) => (
+          {leagues.map((league) => (
             <LeagueCard
-              key={league.uniqueID}
+              key={league.id}
               league={league}
-              onEdit={editLeagueModal.onOpen}
-              onDelete={deleteLeagueModal.onOpen}
+              teams={teams}
+              currentUser={currentUser}
+              onEdit={() => handleEdit(league.id)}
+              onDelete={() => handleDelete(league.id)}
               onViewLeague={(id: string) => router.push(`/leagues/${id}`)}
-              onSelectTeam={selectTeamModal.onOpen}
+              onSelectTeam={() => handleSelectTeam(league.id)}
             />
           ))}
 

@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import type { ClipboardEvent } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import { useApi } from "@/hooks/useApi";
 import { useCreateLeagueModal } from "@/hooks/useCreateLeagueModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
+
+import { createLeague } from "@/services/leaguesService";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
@@ -14,7 +18,8 @@ import { Input } from "../ui/input";
 const CreateLeagueModal = () => {
     const router = useRouter();
     const createLeagueModal = useCreateLeagueModal();
-    
+    const api = useApi();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const {
@@ -26,12 +31,25 @@ const CreateLeagueModal = () => {
     } = useForm<FieldValues>({
         defaultValues: {
             name: "",
+            maxTeamSize: undefined,
         }
     });
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(true);
-        // TODO: Endpoint call
+
+        createLeague(data, api)
+            .then(() => {
+                toast.success("League created successfully!");
+                createLeagueModal.onClose();
+                router.refresh();
+            })
+            .catch((error) => {
+                toast.error("Failed to create league: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     useEffect(() => {
@@ -72,7 +90,7 @@ const CreateLeagueModal = () => {
                 {...register("maxTeamSize", {
                     required: "Maximum team size is required",
                     valueAsNumber: true,
-                    min: { value: 1, message: "Minimum team size is 1" },
+                    min: { value: 2, message: "Minimum team size is 2" },
                     max: { value: 100, message: "Maximum team size is 100" },
                 })}
                 onKeyDown={(e) => {

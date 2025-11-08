@@ -1,18 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import { useApi } from "@/hooks/useApi";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import { updateTeam } from "@/services/teamsService";
-import { useApi } from "@/hooks/useApi";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
-import { toast } from "sonner";
 
 interface EditTeamModalProps {
     teamId: string | null;

@@ -1,17 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import type { ClipboardEvent } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import { useApi } from "@/hooks/useApi";
 import { useEditLeagueModal } from "@/hooks/useEditLeagueModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
 
-const EditLeagueModal = () => {
+interface EditLeagueModalProps {
+    leagueId: string | null;
+    leagueName?: string;
+    maxTeams?: number;
+}
+
+const EditLeagueModal = ({ leagueId, leagueName, maxTeams }: EditLeagueModalProps) => {
+    const { api } = useApi();
     const router = useRouter();
     const editLeagueModal = useEditLeagueModal();
 
@@ -25,17 +34,36 @@ const EditLeagueModal = () => {
         formState: { errors },
     } = useForm<FieldValues>({
         defaultValues: {
-            name: "", // TODO: Display current league name and size
+            name: "",
+            maxTeams: undefined,
         }
     });
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        if (!leagueId) {
+            toast.error("No league ID provided for editing.");
+            return;
+        }
+
         setIsLoading(true);
-        // TODO: Endpoint call
+        // -- UNCOMMENT WHEN updateLeague IS IMPLEMENTED ON BACKEND --
+        // updateLeague(leagueId, data, api)
+        //     .then(() => {
+        //         toast.success("League updated successfully!");
+        //         editLeagueModal.onClose();
+        //         router.refresh();
+        //     })
+        //     .catch((error) => {
+        //         toast.error("Failed to update league: " + error.message);
+        //     })
+        //     .finally(() => {
+        //         setIsLoading(false);
+        //     });
     }
 
     useEffect(() => {
         if (editLeagueModal.isOpen) {
+            reset({ name: leagueName, maxTeams: maxTeams });
             setTimeout(() => setFocus("name"), 50);
         }
     }, [editLeagueModal.isOpen, setFocus]);

@@ -7,17 +7,27 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-type League = any;
+import { League, Team } from '@/types';
 
-type Props = {
+type LeagueCardProps = {
   league: League;
+  teams: Team[];
+  currentUser: any;
   onEdit: () => void;
   onDelete: () => void;
   onViewLeague: (id: string) => void;
   onSelectTeam: () => void;
 }
 
-const LeagueCard: React.FC<Props> = ({ league, onEdit, onDelete, onViewLeague, onSelectTeam }) => {
+const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague, onSelectTeam }: LeagueCardProps) => {
+  const isAdmin = league.commissionerId === currentUser.id;
+  const selectedTeam = teams.find(team => team.leagueId === league.id)
+    ? {
+        id: teams.find(team => team.leagueId === league.id)!.id, // TODO: Pass this to SelectTeamModal to show the already selected team in the dropdown
+        name: teams.find(team => team.leagueId === league.id)!.name
+      }
+    : null;
+
   return (
     <Card>
       <CardHeader>
@@ -25,26 +35,23 @@ const LeagueCard: React.FC<Props> = ({ league, onEdit, onDelete, onViewLeague, o
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <CardTitle className="text-xl text-white">{league.name}</CardTitle>
-              {league.isAdmin && (
+              {isAdmin && (
                 <Crown className="h-5 w-5 text-primary-yellow" />
               )}
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="secondary" className="px-2 py-1">
-                {league.totalTeams}/{league.maxTeams} Teams
-              </Badge>
-              <Badge variant="outline" className="px-2 py-1 capitalize">
-                {league.sportType}
+                {league.teams.length}/{league.maxTeams} Teams
               </Badge>
             </div>
           </div>
           <div className="flex space-x-2">
-            {league.isAdmin && (
+            {isAdmin && (
               <Button size="sm" variant="outline" onClick={onEdit}>
                 <Edit2 className="h-4 w-4" />
               </Button>
             )}
-            {league.isAdmin && (
+            {isAdmin && (
               <Button size="sm" variant="trash" onClick={onDelete}>
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -57,25 +64,20 @@ const LeagueCard: React.FC<Props> = ({ league, onEdit, onDelete, onViewLeague, o
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-primary-gray">Your Team</h4>
           <div className="space-y-2">
-            {league.userTeamsInLeague.map((team: any) => {
-              const standing = league.standings.find((s: any) => s.uniqueID === team.uniqueID);
-              return (
-                <div key={team.uniqueID} className="flex items-center justify-between p-2 bg-primary-yellow rounded-md">
-                  <div className="flex items-center space-x-3">
-                    <Badge 
-                      variant="secondary"
-                      className="px-2 py-1"
-                    >
-                      #{standing?.ranking || 'N/A'}
-                    </Badge>
-                    <span className="font-semibold text-black">{team.name}</span>
-                  </div>
-                  <div className="text-sm font-semibold text-black">
-                    {standing?.totalPoints.toLocaleString() || 0} pts
-                  </div>
+              <div className="flex items-center justify-between p-2 bg-primary-yellow rounded-md">
+                <div className="flex items-center space-x-3">
+                  <Badge 
+                    variant="secondary"
+                    className="px-2 py-1"
+                  >
+                    #{'N/A'}
+                  </Badge>
+                  <span className="font-semibold text-black">{selectedTeam?.name}</span>
                 </div>
-              );
-            })}
+                <div className="text-sm font-semibold text-black">
+                  {0} pts
+                </div>
+              </div>
           </div>
         </div>
 
@@ -87,9 +89,9 @@ const LeagueCard: React.FC<Props> = ({ league, onEdit, onDelete, onViewLeague, o
             </div>
           </div>
           <div className="space-y-1">
-            <div className="text-sm font-medium text-primary-gray">Sports</div>
+            <div className="text-sm font-medium text-primary-gray">Owner</div>
             <div className="text-sm font-medium text-white">
-              {league.allowedSports?.length || 0} allowed
+              {league.commissioner.displayName || "Unknown"}
             </div>
           </div>
         </div>
@@ -98,7 +100,7 @@ const LeagueCard: React.FC<Props> = ({ league, onEdit, onDelete, onViewLeague, o
           <Button 
             variant="hero" 
             className="flex-1"
-            onClick={() => onViewLeague(league.uniqueID)}
+            onClick={() => onViewLeague(league.id)}
           >
             <Trophy className="h-4 w-4 mr-2" />
             View League

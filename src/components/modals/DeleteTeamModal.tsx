@@ -12,7 +12,11 @@ import Modal from "./Modal";
 
 import { useApi } from "@/hooks/useApi";
 
-const DeleteTeamModal = ({ teamId }: { teamId: string | null }) => {
+interface DeleteTeamModalProps {
+    teamId: string | null;
+}
+
+const DeleteTeamModal = ({ teamId }: DeleteTeamModalProps) => {
     const { api } = useApi();
     const router = useRouter();
     const deleteTeamModal = useDeleteTeamModal();

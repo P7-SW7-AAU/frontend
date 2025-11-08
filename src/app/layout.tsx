@@ -44,14 +44,14 @@ export default function RootLayout({
           <StackTheme>
             <Toaster />
             <CreateTeamModal />
-            <DeleteTeamModal />
-            <EditTeamModal />
+            <DeleteTeamModal teamId={null} />
+            <EditTeamModal teamId={null} />
             <CreateLeagueModal />
-            <DeleteLeagueModal />
-            <EditLeagueModal />
+            <DeleteLeagueModal leagueId={null} />
+            <EditLeagueModal leagueId={null} />
             <JoinLeagueModal />
             <LeaveLeagueModal />
-            <SelectTeamModal />
+            <SelectTeamModal leagueId={null} teams={[]} />
             {children}
           </StackTheme>
         </StackProvider>
