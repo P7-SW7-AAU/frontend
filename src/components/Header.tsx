@@ -31,15 +31,15 @@ const Header = ({ title, description, icon: Icon, buttonText, buttonIcon: Button
                     </p>
                 </div>
             </div>
-            <div className="flex space-x-3">            
+            <div className="flex space-x-3">
                 {secondaryOnClick && (
-                    <Button onClick={secondaryOnClick} variant="outline" size="lg" disabled={isLoading}>
+                    <Button onClick={secondaryOnClick} variant="outline" size="lg" disabled={isLoading} className="px-6.5">
                         {SecondaryButtonIcon && <SecondaryButtonIcon className={`h-${SecondaryButtonIconSize} w-${SecondaryButtonIconSize} mr-2`} />}
                         {secondaryButtonText}
                     </Button>
                 )}
                 {onClick && (
-                    <Button onClick={onClick} variant="hero" size="lg" disabled={isLoading}>
+                    <Button onClick={onClick} variant="hero" size="lg" disabled={isLoading} className="px-6.5">
                         {ButtonIcon && <ButtonIcon className={`h-${ButtonIconSize} w-${ButtonIconSize} mr-2`} />}
                         {buttonText}
                     </Button>

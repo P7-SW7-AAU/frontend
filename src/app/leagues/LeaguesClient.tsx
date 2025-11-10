@@ -116,7 +116,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         />
 
         <StatsCard 
-          title="Admin of" 
+          title="Owner Of" 
           value={stats.adminCount} 
           valueColor="text-primary-yellow" 
           description="leagues managed" 
