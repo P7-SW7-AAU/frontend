@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner'
-import { Trophy, Plus } from 'lucide-react';
+import { ArrowUp, Trophy, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useRouter } from 'next/navigation';
 
@@ -27,6 +28,7 @@ const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
 const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const lockToken = weekTokenCET();
   const { api } = useApi();
   const router = useRouter();
@@ -132,6 +134,19 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     toast.message(`${playerName} has been removed from ${tempTeamId}.`);
   }
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 1000);
+    }
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <Container>
       <Header 
@@ -169,6 +184,23 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         getRemainingSlots={getRemainingSlots}
         lockToken={lockToken}
       />
+
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            key="scrollTop"
+            onClick={scrollToTop}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-6 right-6 z-50 bg-[#131920cc] text-white p-3 rounded-full shadow-lg hover:bg-[#1E2938] transition-all duration-300 ease-in-out border border-[#1E2938] cursor-pointer"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="w-5 h-5 text-gray-100" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </Container>
   );
 }
