@@ -18,7 +18,7 @@ import { Input } from "../ui/input";
 const CreateLeagueModal = () => {
     const router = useRouter();
     const createLeagueModal = useCreateLeagueModal();
-    const api = useApi();
+    const { api } = useApi();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -31,7 +31,7 @@ const CreateLeagueModal = () => {
     } = useForm<FieldValues>({
         defaultValues: {
             name: "",
-            maxTeamSize: undefined,
+            maxTeams: undefined,
         }
     });
 
@@ -87,7 +87,7 @@ const CreateLeagueModal = () => {
                 pattern="\d*"
                 placeholder="Set maximum team size"
                 className="text-white font-medium border-[#1E2938]"
-                {...register("maxTeamSize", {
+                {...register("maxTeams", {
                     required: "Maximum team size is required",
                     valueAsNumber: true,
                     min: { value: 2, message: "Minimum team size is 2" },

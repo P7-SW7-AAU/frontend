@@ -18,7 +18,7 @@ interface DeleteLeagueModalProps {
 const DeleteLeagueModal = ({ leagueId }: DeleteLeagueModalProps) => {
     const router = useRouter();
     const deleteLeagueModal = useDeleteLeagueModal();
-    const api = useApi();
+    const { api } = useApi();
 
     const [isLoading, setIsLoading] = useState(false);
 

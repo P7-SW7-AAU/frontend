@@ -108,7 +108,7 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
                 pattern="\d*"
                 placeholder="Set maximum team size"
                 className="text-white font-medium border-[#1E2938]"
-                {...register("maxTeamSize", {
+                {...register("maxTeams", {
                     required: "Maximum team size is required",
                     valueAsNumber: true,
                     min: { value: 2, message: "Minimum team size is 2" },

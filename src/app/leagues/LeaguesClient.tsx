@@ -42,7 +42,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
     const totalLeagues = leagues.length;
     const adminCount = leagues.filter(l => l.commissionerId === currentUser.id).length;
     const totalTeamsInLeagues = leagues.reduce((sum, league) => {
-      return sum + league.teams.length;
+      return sum + (league.teams ? league.teams.length : 0);
     }, 0);
 
     return { totalLeagues, adminCount, totalTeamsInLeagues };
@@ -74,7 +74,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         leagueId={selectedLeagueId} 
         leagueName={selectedLeague?.name} 
         maxTeams={selectedLeague?.maxTeams} 
-        currentTeamsCount={selectedLeague?.teams.length}
+        currentTeamsCount={selectedLeague?.teams ? selectedLeague.teams.length : 0}
       />
       <SelectTeamModal leagueId={selectedLeagueId} teams={teams} />
 
