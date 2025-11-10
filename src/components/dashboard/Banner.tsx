@@ -20,7 +20,7 @@ const Banner = ({ title, description, onClick, onSecondaryClick }: BannerProps) 
                     <h1 className="text-4xl md:text-6xl font-bold text-white">
                         {title}
                         <span className="block text-[#1B8143] animate-pulse-glow">
-                            Command Center
+                            For everyone
                         </span>
                     </h1>
                     <p className="text-xl font-medium text-primary-gray max-w-2xl mx-auto">
