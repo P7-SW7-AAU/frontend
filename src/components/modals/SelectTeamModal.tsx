@@ -3,7 +3,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useApi } from "@/hooks/useApi";
@@ -13,23 +13,24 @@ import Modal from "./Modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 import { Team } from "@/types";
-import { updateTeam } from "@/services/teamsService";
+import { removeLeagueId, updateTeam } from "@/services/teamsService";
 
 interface SelectTeamModalProps {
     leagueId: string | null;
+    selectedTeam?: { id: string } | null;
     teams: Team[];
 }
 
-const SelectTeamModal = ({ leagueId, teams }: SelectTeamModalProps) => {
+const SelectTeamModal = ({ leagueId, selectedTeam, teams }: SelectTeamModalProps) => {
     const { api } = useApi();
     const router = useRouter();
     const selectTeamModal = useSelectTeamModal();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedTeamId, setSelectedTeamId] = useState<string | undefined>(undefined);
+    const [selectedTeamId, setSelectedTeamId] = useState<string | undefined>(selectedTeam?.id);
     const [error, setError] = useState<string | null>(null);
 
-    const onSubmit = () => {
+    const onSubmit = async () => {
         if (!selectedTeamId) {
             setError("Please select a team.");
             toast.error("Please select a team.");
@@ -38,19 +39,25 @@ const SelectTeamModal = ({ leagueId, teams }: SelectTeamModalProps) => {
         setError(null);
         setIsLoading(true);
 
-        updateTeam(selectedTeamId, { leagueId }, api)
-            .then(() => {
-                toast.success("Team updated successfully!");
-                selectTeamModal.onClose();
-                router.refresh();
-            })
-            .catch((error) => {
-                toast.error("Failed to update team: " + error.message);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
+        try {
+            // If changing teams, remove previous team from league
+            if (selectedTeam?.id && selectedTeam?.id !== selectedTeamId) {
+                await removeLeagueId(selectedTeam.id, api);
+            }
+            await updateTeam(selectedTeamId, { leagueId }, api);
+            toast.success("Team updated successfully!");
+            selectTeamModal.onClose();
+            router.refresh();
+        } catch (error: any) {
+            toast.error("Failed to update team: " + error.message);
+        } finally {
+            setIsLoading(false);
+        }
     }
+    
+    useEffect(() => {
+        setSelectedTeamId(selectedTeam?.id);
+    }, [selectedTeam]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">

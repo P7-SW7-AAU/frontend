@@ -23,7 +23,15 @@ export const createLeague = async (data: any, api: any) => {
     }
 }
 
-// -- INSERT updateLeague FUNCTION HERE --
+export const updateLeague = async (leagueId: string, data: any, api: any) => {
+    try {
+        const response = await api.patch(`/leagues/${leagueId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating league:", error);
+        throw error;
+    }
+}
 
 export const deleteLeague = async (leagueId: string, api: any) => {
     try {

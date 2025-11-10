@@ -42,7 +42,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
     const totalLeagues = leagues.length;
     const adminCount = leagues.filter(l => l.commissionerId === currentUser.id).length;
     const totalTeamsInLeagues = leagues.reduce((sum, league) => {
-      return sum + (league.teams ? league.teams.length : 0);
+      return sum + league.counts.teams;
     }, 0);
 
     return { totalLeagues, adminCount, totalTeamsInLeagues };
@@ -66,6 +66,11 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
   }
 
   const selectedLeague = leagues.find((league) => league.id === selectedLeagueId);
+  const selectedTeam = teams.find(team => team.leagueId === selectedLeagueId)
+    ? {
+        id: teams.find(team => team.leagueId === selectedLeagueId)!.id,
+      }
+    : null;
 
   return (
     <Container>
@@ -74,9 +79,9 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         leagueId={selectedLeagueId} 
         leagueName={selectedLeague?.name} 
         maxTeams={selectedLeague?.maxTeams} 
-        currentTeamsCount={selectedLeague?.teams ? selectedLeague.teams.length : 0}
+        currentTeamsCount={selectedLeague?.counts.teams}
       />
-      <SelectTeamModal leagueId={selectedLeagueId} teams={teams} />
+      <SelectTeamModal leagueId={selectedLeagueId} selectedTeam={selectedTeam} teams={teams} />
 
       <Header 
         title="My Leagues" 
@@ -102,21 +107,21 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         />
 
         <StatsCard 
-          title="Admin of" 
-          value={stats.adminCount} 
-          valueColor="text-primary-yellow" 
-          description="leagues managed" 
-          icon={Crown} 
-          iconColor="text-primary-yellow" 
-        />
-
-        <StatsCard 
           title="Teams Active" 
           value={stats.totalTeamsInLeagues} 
           valueColor="text-primary-green" 
           description="across leagues" 
           icon={Users} 
           iconColor="text-primary-green" 
+        />
+
+        <StatsCard 
+          title="Admin of" 
+          value={stats.adminCount} 
+          valueColor="text-primary-yellow" 
+          description="leagues managed" 
+          icon={Crown} 
+          iconColor="text-primary-yellow" 
         />
 
         <StatsCard 

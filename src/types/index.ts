@@ -42,14 +42,14 @@ export type League = {
     id: string;
     name: string;
     commissionerId: string;
-    createdAt: Date;
+    createdAt: string;
     joinCode: string;
     joinOpen: boolean;
     joinExpiresAt?: Date;
     maxTeams: number;
     commissioner: UserProfile;
     members: LeagueMember[];
-    teams: Team[];
+    counts: any;
 }
 
 export type LeagueMember = {

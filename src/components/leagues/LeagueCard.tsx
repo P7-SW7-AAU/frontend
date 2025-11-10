@@ -24,7 +24,8 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
   const selectedTeam = teams.find(team => team.leagueId === league.id)
     ? {
         id: teams.find(team => team.leagueId === league.id)!.id, // TODO: Pass this to SelectTeamModal to show the already selected team in the dropdown
-        name: teams.find(team => team.leagueId === league.id)!.name
+        name: teams.find(team => team.leagueId === league.id)!.name,
+        value: "$" + (teams.find(team => team.leagueId === league.id)!.roster.reduce((playerSum, player) => playerSum + player.price, 0) / 1_000_000).toFixed(1) + "M"
       }
     : null;
 
@@ -41,7 +42,7 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="secondary" className="px-2 py-1">
-                {(league.teams ? league.teams.length : 0)}/{league.maxTeams} Teams
+                {league.counts.teams}/{league.maxTeams} Teams
               </Badge>
             </div>
           </div>
@@ -64,18 +65,15 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-primary-gray">Your Team</h4>
           <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 bg-primary-yellow rounded-md">
+              <div className="flex items-center justify-between p-2 bg-[#152332] border border-gray-800 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <Badge 
-                    variant="secondary"
-                    className="px-2 py-1"
-                  >
+                  <span className="text-sm font-semibold text-primary-yellow">
                     #{'N/A'}
-                  </Badge>
-                  <span className="font-semibold text-black">{selectedTeam?.name}</span>
+                  </span>
+                  <span className="font-semibold text-white">{selectedTeam?.name}</span>
                 </div>
-                <div className="text-sm font-semibold text-black">
-                  {0} pts
+                <div className="font-semibold text-primary-yellow">
+                  {selectedTeam?.value}
                 </div>
               </div>
           </div>
@@ -85,13 +83,19 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
           <div className="space-y-1">
             <div className="text-sm font-medium text-primary-gray">Created</div>
             <div className="text-sm font-medium text-white">
-              {league.createdAt?.toLocaleDateString?.()}
+                {league.createdAt ? new Date(league.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A'}
             </div>
           </div>
           <div className="space-y-1">
             <div className="text-sm font-medium text-primary-gray">Owner</div>
             <div className="text-sm font-medium text-white">
-              {league.commissioner.displayName || "Unknown"}
+              {league.commissioner.displayName
+                ? league.commissioner.displayName
+                    .split("@")[0]
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')
+                : "Anonymous"}
             </div>
           </div>
         </div>

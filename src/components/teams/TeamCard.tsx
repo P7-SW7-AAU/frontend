@@ -95,7 +95,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                                 } else {
                                     formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                                 }
-                                return `${formatted}M`;
+                                return `$${formatted}M`;
                             })()}
                         </div>
                     </div>
@@ -118,7 +118,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                                         } else {
                                             formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                                         }
-                                        return `${totalChange > 0 ? '+' : ''}${formatted}K`;
+                                        return `${totalChange > 0 ? '+' : ''}$${formatted}K`;
                                     })()}
                                 </div>
                             );

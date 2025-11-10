@@ -108,8 +108,8 @@ const CreateLeagueModal = () => {
                     }
                 }}
             />
-            {errors.maxTeamSize && (
-                <p className="text-sm text-red-400">{String(errors.maxTeamSize.message)}</p>
+            {errors.maxTeams && (
+                <p className="text-sm text-red-400">{String(errors.maxTeams.message)}</p>
             )}
         </div>
     );

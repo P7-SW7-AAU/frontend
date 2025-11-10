@@ -13,6 +13,8 @@ import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 import Modal from "./Modal";
 import { Input } from "../ui/input";
 
+import { updateLeague } from "@/services/leaguesService";
+
 interface EditLeagueModalProps {
     leagueId: string | null;
     leagueName?: string;
@@ -46,30 +48,29 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
             return;
         }
 
-        const newMaxTeams = data.maxTeamSize;
+        const newMaxTeams = data.maxTeams;
         if (
             typeof newMaxTeams === "number" &&
             typeof currentTeamsCount === "number" &&
             newMaxTeams < currentTeamsCount
         ) {
-            toast.error(`Cannot set maximum teams (${newMaxTeams}) below current number of teams (${currentTeamsCount}).`);
+            toast.error(`Cannot set maximum teams to ${newMaxTeams} because the current number of teams is ${currentTeamsCount}.`);
             return;
         }
 
         setIsLoading(true);
-        // -- TODO: UNCOMMENT WHEN updateLeague IS IMPLEMENTED ON BACKEND --
-        // updateLeague(leagueId, data, api)
-        //     .then(() => {
-        //         toast.success("League updated successfully!");
-        //         editLeagueModal.onClose();
-        //         router.refresh();
-        //     })
-        //     .catch((error) => {
-        //         toast.error("Failed to update league: " + error.message);
-        //     })
-        //     .finally(() => {
-        //         setIsLoading(false);
-        //     });
+        updateLeague(leagueId, data, api)
+            .then(() => {
+                toast.success("League updated successfully!");
+                editLeagueModal.onClose();
+                router.refresh();
+            })
+            .catch((error) => {
+                toast.error("Failed to update league: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     useEffect(() => {
@@ -129,8 +130,8 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
                     }
                 }}
             />
-            {errors.maxTeamSize && (
-                <p className="text-sm text-red-400">{String(errors.maxTeamSize.message)}</p>
+            {errors.maxTeams && (
+                <p className="text-sm text-red-400">{String(errors.maxTeams.message)}</p>
             )}
         </div>
     );

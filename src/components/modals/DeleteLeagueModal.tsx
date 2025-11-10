@@ -32,7 +32,7 @@ const DeleteLeagueModal = ({ leagueId }: DeleteLeagueModalProps) => {
 
         deleteLeague(leagueId, api)
             .then(() => {
-                toast.success("Team deleted successfully!");
+                toast.success("League deleted successfully!");
                 deleteLeagueModal.onClose();
                 router.refresh();
             })
