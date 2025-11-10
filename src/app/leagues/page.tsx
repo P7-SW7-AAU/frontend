@@ -16,11 +16,13 @@ const LeaguesPage = async () => {
     if (!accessToken) {
         redirect('/handler/sign-in');
     }
-    
-    const leagues = await getLeagues(accessToken);
+
+    const [leagues, teams] = await Promise.all([
+        getLeagues(accessToken),
+        getTeams(user.id, accessToken)
+    ]);
     const sortedLeagues = leagues.sort((a: any, b: any) => a.name.localeCompare(b.name));
 
-    const teams = await getTeams(user.id, accessToken);
     const sortedTeams = teams.sort((a: any, b: any) => a.name.localeCompare(b.name));
 
     // Passing entire user object to client causes serialization issues
