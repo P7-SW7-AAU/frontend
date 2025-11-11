@@ -41,9 +41,8 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
   const getLeagueStats = () => {
     const totalLeagues = leagues.length;
     const adminCount = leagues.filter(l => l.commissionerId === currentUser.id).length;
-    const totalTeamsInLeagues = leagues.reduce((sum, league) => {
-      return sum + league.counts.teams;
-    }, 0);
+    const totalTeamsInLeagues = teams.filter((team) => leagues.some((league) => league.id === team.leagueId)
+    ).length;
 
     return { totalLeagues, adminCount, totalTeamsInLeagues };
   }
@@ -125,10 +124,10 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         />
 
         <StatsCard 
-          title="Best Rank" 
-          value={"#10"} 
+          title="Placeholder" 
+          value={"Placeholder"} 
           valueColor="text-white" 
-          description="highest position" 
+          description="Placeholder" 
           icon={Target} 
           iconColor="text-primary-gray" 
         />

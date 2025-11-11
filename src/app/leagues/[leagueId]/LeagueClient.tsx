@@ -6,9 +6,11 @@ import StatsCard from '@/components/StatsCard';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
 import CardLeaderboard from '@/components/leagues/LeaderboardCard';
+import LeaveLeagueModal from '@/components/modals/LeaveLeagueModal';
 
 import { useLeaveLeagueModal } from '@/hooks/useLeaveLeagueModal';
 import { League } from '@/types';
+import { toast } from 'sonner';
 
 interface LeagueClientProps {
     currentUser: any;
@@ -17,6 +19,7 @@ interface LeagueClientProps {
 
 const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
     const leaveLeagueModal = useLeaveLeagueModal();
+
     const myTeam = league.teams.find(team => team.ownerId === currentUser.id) || null;
     const adminId = league.members.find(member => member.userId === league.commissionerId)?.userId;
 
@@ -38,8 +41,15 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
         week = Math.floor(diffDays / 7) + 1;
     }
 
+    const handleCopyJoinCode = () => {
+        navigator.clipboard.writeText(league.joinCode);
+        toast.success("Code copied to clipboard!");
+    }
+
     return (
         <Container>
+            <LeaveLeagueModal leagueId={league.id} teamId={myTeam?.id || null} userId={currentUser.id} />
+            
             <Header
                 title={league.name}
                 description="Track the performance of all teams in the league"
@@ -50,7 +60,7 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
                 secondaryButtonText="View Code"
                 secondaryButtonIcon={Eye}
                 secondaryButtonIconSize="4"
-                secondaryOnClick={() => {}}
+                secondaryOnClick={handleCopyJoinCode}
             />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

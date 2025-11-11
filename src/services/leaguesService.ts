@@ -55,3 +55,13 @@ export const deleteLeague = async (leagueId: string, api: any) => {
         throw error;
     }
 }
+
+export const joinLeague = async (data: any, api: any) => {
+    try {
+        const response = await api.post("/leagues/join", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error joining league:", error);
+        throw error;
+    }
+}

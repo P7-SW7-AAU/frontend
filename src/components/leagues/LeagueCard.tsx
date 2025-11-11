@@ -89,7 +89,7 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
               {league.commissioner.displayName
                 ? league.commissioner.displayName
                     .split("@")[0]
-                    .split(' ')
+                    .split(/[ .]/)
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ')
                 : "Anonymous"}

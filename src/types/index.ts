@@ -36,6 +36,7 @@ export type Team = {
     bank: number;
     roster: Player[];
     logo?: string;
+    ownerDisplayName: string;
 }
 
 export type League = {

@@ -25,7 +25,11 @@ const LeaderboardCard = ({ team, index, adminId, myTeam }: LeaderboardCardProps)
                 {team.name}
               </h3>
                 <p className="text-xs sm:text-sm font-medium text-primary-gray truncate flex items-center gap-1">
-                  Managed by {"John Doe"}
+                  Managed by {team.ownerDisplayName
+                              .split("@")[0]
+                              .split(/[ .]/)
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                              .join(' ')}
                   {adminId === team.ownerId && <Crown className="inline w-4 h-4 text-primary-yellow ml-1" />}
                 </p>
             </div>
