@@ -65,7 +65,7 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-primary-gray">Your Team</h4>
           <div className="space-y-2">
-              <div className="flex items-center bg-[#0F141B] justify-between p-3 border-[1.5] rounded-lg border-yellow-500/40 shadow-[0_0_12px_rgba(255,215,0,0.15)]">
+              <div className="flex items-center bg-[#0F141B] justify-between p-3 border-[1.5] rounded-lg border-yellow-500/40 shadow-[0_0_16px_rgba(255,215,0,0.35)]">
                 <div className="flex items-center space-x-3">
                   <span className="text-lg font-semibold text-white">{selectedTeam?.name || "No Team Selected"}</span>
                 </div>

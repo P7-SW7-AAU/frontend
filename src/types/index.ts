@@ -50,6 +50,7 @@ export type League = {
     commissioner: UserProfile;
     members: LeagueMember[];
     counts: any;
+    teams: Team[];
 }
 
 export type LeagueMember = {
