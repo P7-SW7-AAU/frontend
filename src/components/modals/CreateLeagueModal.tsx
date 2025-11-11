@@ -41,6 +41,7 @@ const CreateLeagueModal = () => {
         createLeague(data, api)
             .then(() => {
                 toast.success("League created successfully!");
+                reset();
                 createLeagueModal.onClose();
                 router.refresh();
             })
