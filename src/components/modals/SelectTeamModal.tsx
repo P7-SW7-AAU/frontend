@@ -1,4 +1,5 @@
-// TODO: Make sure a team can be assigned to multiple leagues
+// TODO (future enhancement): Support assigning a team to multiple leagues. 
+// The current implementation only allows a single league per team, which is intentional for now.
 
 "use client";
 

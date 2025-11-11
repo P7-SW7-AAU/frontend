@@ -21,13 +21,12 @@ type LeagueCardProps = {
 
 const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague, onSelectTeam }: LeagueCardProps) => {
   const isAdmin = league.commissionerId === currentUser.id;
-  const selectedTeam = teams.find(team => team.leagueId === league.id)
-    ? {
-        id: teams.find(team => team.leagueId === league.id)!.id, // TODO: Pass this to SelectTeamModal to show the already selected team in the dropdown
-        name: teams.find(team => team.leagueId === league.id)!.name,
-        value: "$" + (teams.find(team => team.leagueId === league.id)!.roster.reduce((playerSum, player) => playerSum + player.price, 0) / 1_000_000).toFixed(1) + "M"
-      }
-    : null;
+  const teamForLeague = teams.find(team => team.leagueId === league.id);
+  const selectedTeam = teamForLeague ? {
+    id: teamForLeague.id,
+    name: teamForLeague.name,
+    value: "$" + (teamForLeague.roster.reduce((playerSum, player) => playerSum + player.price, 0) / 1_000_000).toFixed(1) + "M"
+  } : null;
 
   return (
     <Card>

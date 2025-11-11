@@ -32,7 +32,7 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
 
         setIsLoading(true);
 
-        updateTeam(teamId || "", { leagueId: null }, api)
+        updateTeam(teamId || "", { leagueId: null }, api);
 
         deleteLeagueMember(leagueId, userId || "")
             .then(() => {
@@ -46,7 +46,7 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
             .finally(() => {
                 setIsLoading(false);
             })
-    }, [leagueId, userId]);
+    }, [leagueId, userId, teamId, api, router, leaveLeagueModal]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">

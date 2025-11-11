@@ -21,7 +21,7 @@ export const getLeague = async (leagueId: string, accessToken: string) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error fetching leagues:", error);
+        console.error("Error fetching league:", error);
         throw error;
     }
 }

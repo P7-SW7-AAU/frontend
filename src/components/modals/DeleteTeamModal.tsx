@@ -43,7 +43,7 @@ const DeleteTeamModal = ({ teamId }: DeleteTeamModalProps) => {
             .finally(() => {
                 setIsLoading(false);
             })
-    }, [teamId]);
+    }, [teamId, api, router, deleteTeamModal]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">

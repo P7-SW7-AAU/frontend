@@ -50,7 +50,10 @@ export type League = {
     maxTeams: number;
     commissioner: UserProfile;
     members: LeagueMember[];
-    counts: any;
+    counts: {
+        teams: number;
+        members: number;
+    };
     teams: Team[];
 }
 

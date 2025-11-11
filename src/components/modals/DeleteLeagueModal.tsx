@@ -42,7 +42,7 @@ const DeleteLeagueModal = ({ leagueId }: DeleteLeagueModalProps) => {
             .finally(() => {
                 setIsLoading(false);
             })
-    }, [leagueId]);
+    }, [leagueId, api, router, deleteLeagueModal]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">

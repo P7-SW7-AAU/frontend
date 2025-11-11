@@ -78,7 +78,7 @@ const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: 
             reset({ name: leagueName, maxTeams: maxTeams });
             setTimeout(() => setFocus("name"), 50);
         }
-    }, [editLeagueModal.isOpen, setFocus]);
+    }, [editLeagueModal.isOpen, setFocus, leagueName, maxTeams, reset]);
 
     useResetOnRouteChange(reset);
 

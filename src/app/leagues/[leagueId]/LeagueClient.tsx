@@ -84,7 +84,7 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
 
                 <StatsCard 
                     title="Current Rank" 
-                    value={`#${sortedTeams.findIndex(team => team.id === myTeam?.id) + 1}`} 
+                    value={myTeam ? `#${sortedTeams.findIndex(team => team.id === myTeam.id) + 1}` : 'N/A'}
                     valueColor="text-primary-yellow" 
                     description={`out of ${league.teams.length} teams`}
                     icon={Trophy} 

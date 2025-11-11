@@ -65,11 +65,8 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
   }
 
   const selectedLeague = leagues.find((league) => league.id === selectedLeagueId);
-  const selectedTeam = teams.find(team => team.leagueId === selectedLeagueId)
-    ? {
-        id: teams.find(team => team.leagueId === selectedLeagueId)!.id,
-      }
-    : null;
+  const selectedTeam = teams.find(team => team.leagueId === selectedLeagueId);
+  const selectedTeamData = selectedTeam ? { id: selectedTeam.id } : null;
 
   return (
     <Container>
@@ -80,7 +77,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
         maxTeams={selectedLeague?.maxTeams} 
         currentTeamsCount={selectedLeague?.counts.teams}
       />
-      <SelectTeamModal leagueId={selectedLeagueId} selectedTeam={selectedTeam} teams={teams} />
+      <SelectTeamModal leagueId={selectedLeagueId} selectedTeam={selectedTeamData} teams={teams} />
 
       <Header 
         title="My Leagues" 
@@ -123,6 +120,7 @@ const LeaguesClient = ({ currentUser, leagues, teams }: LeaguesClientProps) => {
           iconColor="text-primary-yellow" 
         />
 
+        {/* TODO: Replace with actual data */}
         <StatsCard 
           title="Placeholder" 
           value={"Placeholder"} 
