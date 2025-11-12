@@ -24,7 +24,7 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
     const leaveLeagueModal = useLeaveLeagueModal();
     const [isLoading, setIsLoading] = useState(false);
 
-    const onLeave = useCallback(() => {
+    const onLeave = useCallback(async () => {
         if (!leagueId) {
             toast.error("No league selected for leaving.");
             return;
@@ -32,20 +32,17 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
 
         setIsLoading(true);
 
-        updateTeam(teamId || "", { leagueId: null }, api);
-
-        deleteLeagueMember(leagueId, userId || "")
-            .then(() => {
-                toast.success("Left league successfully!");
-                leaveLeagueModal.onClose();
-                router.push("/leagues");
-            })
-            .catch((error) => {
-                toast.error("Failed to leave league: " + error.message);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            })
+        try {
+            await updateTeam(teamId || "", { leagueId: null }, api);
+            await deleteLeagueMember(leagueId, userId || "");
+            toast.success("Left league successfully!");
+            leaveLeagueModal.onClose();
+            router.push("/leagues");
+        } catch (error: any) {
+            toast.error("Failed to leave league: " + error.message);
+        } finally {
+            setIsLoading(false);
+        }
     }, [leagueId, userId, teamId, api, router, leaveLeagueModal]);
 
     const bodyContent = (

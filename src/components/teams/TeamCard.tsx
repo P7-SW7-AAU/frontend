@@ -7,7 +7,10 @@ import { Users, Trophy, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Team } from '@/types';
+
+import { useTeamValueFormat } from "@/hooks/useValueFormat";
 
 type TeamProps = {
     team: Team;
@@ -18,6 +21,7 @@ type TeamProps = {
 
 const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const router = useRouter();
+    const { totalValue, weeklyChange } = useTeamValueFormat(team);
 
     const getTeamStats = (team: Team) => {
 
@@ -52,9 +56,6 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                             >
                                 10/10 Players
                             </Badge>
-                            {/* <Badge variant="outline" className="px-2 py-1">
-                                ${team.players.map(player => player.value).reduce((acc, val) => acc + val, 0)}M Value
-                            </Badge> */}
                         </div>
                     </div>
                     <div className="flex space-x-2">
@@ -83,46 +84,15 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#1E2938]">
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">Total Value</div>
-                        <div className="text-lg font-semibold text-primary-yellow">
-                            {(() => {
-                                const value = team.roster.map(player => player.price).reduce((acc, price) => acc + price, 0) / 1_000_000;
-                                // Remove trailing zeros but keep up to 6 decimals, add thousand separators
-                                let formatted = value.toFixed(6).replace(/\.?0+$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
-                                // Add thousand separators
-                                if (formatted.includes('.')) {
-                                    const [intPart, decPart] = formatted.split('.');
-                                    formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decPart;
-                                } else {
-                                    formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                                }
-                                return `$${formatted}M`;
-                            })()}
-                        </div>
+                        <div className="text-lg font-semibold text-primary-yellow">{totalValue()}</div>
                     </div>
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">
                             Weekly Price Change
                         </div>
-                        {(() => {
-                            const totalChange = team.roster.map(player => player.weekPriceChange).reduce((acc, price) => acc + price, 0);
-                            const color = totalChange > 0 ? 'text-primary-green' : totalChange < 0 ? 'text-primary-red' : 'text-primary-gray';
-                            return (
-                                <div className={`text-lg font-semibold ${color}`}>
-                                    {totalChange === 0 ? '—' : (() => {
-                                        const value = totalChange / 1_000;
-                                        // Remove trailing zeros but keep up to 3 decimals, add thousand separators
-                                        let formatted = value.toFixed(3).replace(/\.?0+$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
-                                        if (formatted.includes('.')) {
-                                            const [intPart, decPart] = formatted.split('.');
-                                            formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decPart;
-                                        } else {
-                                            formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                                        }
-                                        return `${totalChange > 0 ? '+' : ''}$${formatted}K`;
-                                    })()}
-                                </div>
-                            );
-                        })()}
+                        <div className={`text-lg font-semibold ${weeklyChange().color}`}>
+                            {weeklyChange().formatted}
+                        </div>
                     </div>
                 </div>
 

@@ -1,12 +1,15 @@
 "use client";
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Player } from '@/types';
-import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 import React from 'react';
+import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+
+import { usePlayerDelta } from '@/hooks/usePlayerDelta';
+import { useTeamValueFormat } from "@/hooks/useValueFormat";
+
+import { Player } from '@/types';
 
 interface PlayerCardDetailedProps {
   player: Player;
@@ -16,7 +19,6 @@ interface PlayerCardDetailedProps {
   disabled?: boolean;
   isLocked?: boolean;
 }
-
 
 const fmtMoney = (n: number, decimals = 0) => {
   // Always show all decimals, but omit trailing zeros
