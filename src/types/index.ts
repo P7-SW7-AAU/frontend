@@ -25,6 +25,7 @@ export type Player = {
     weekPriceChange: number;
     logo?: string;
     teamName?: string;
+    externalId: number;
 }
 
 export type Team = {

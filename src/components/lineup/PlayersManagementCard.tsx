@@ -9,13 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import PlayerCardDetailed from '@/components/PlayerCardDetailed';
-import { Player } from '@/types';
+import { Player, Team } from '@/types';
 
 interface Props {
   players: Player[];
   draftedPlayers: Record<string, number[]>;
   selectedTeamId: string;
-  selectedTeam?: any;
+  selectedTeam?: Team;
   handleDraftPlayer: (id: number, name: string) => void;
   handleUndraftPlayer: (id: number, name: string) => void;
   getRemainingBudget: (teamId: string) => number;

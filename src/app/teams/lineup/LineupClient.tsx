@@ -41,7 +41,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
     const initialDrafts: Record<string, number[]> = {};
     teams.forEach((team) => {
-      initialDrafts[team.id] = team.roster?.map((p: any) => p.externalId) || [];
+      initialDrafts[team.id] = team.roster?.map((p: Player) => p.externalId) || [];
     });
 
     return initialDrafts;

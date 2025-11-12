@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { Team } from '@/types';
+import { Player, Team } from '@/types';
 
 import { useTeamValueFormat } from "@/hooks/useValueFormat";
 
@@ -26,7 +26,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const getTeamStats = (team: Team) => {
 
         // Group players by sport
-        const sportGroups = team.roster.reduce((groups: any, player: any) => {
+        const sportGroups = team.roster.reduce((groups: any, player: Player) => {
             const sportName = player.sport?.includes('FOOTBALL') ? 'Football' :
                                 player.sport?.includes('F1') ? 'Formula 1' :
                                 player.sport?.includes('NBA') ? 'NBA' : 'Other';
