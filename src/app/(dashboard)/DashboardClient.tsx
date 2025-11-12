@@ -36,8 +36,8 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
             <Navbar />
 
             <Banner
-                title="Multi-Sport Fantasy"
-                description="Build teams with players from football, basketball, soccer, chess, tennis and more. Dominate across all sports!"
+                title="Fantasy Arena"
+                description="Build teams with players from basketball, soccer and F1. Dominate across all sports!"
                 onClick={() => router.push('/teams')}
                 onSecondaryClick={() => router.push('/players')}
             />
@@ -92,7 +92,7 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
                     <h2 className="text-2xl font-bold text-white">Trending Players</h2>
                     <Button
                         onClick={() => router.push('/players')}
-                        className="text-white font-bold hover:scale-105 transition-all duration-200"
+                        className="text-white font-bold hover:scale-105 transition-all duration-200 p-0 bg-transparent hover:bg-transparent"
                     >
                         View All
                         <Plus className="h-4 w-4 ml-2" />

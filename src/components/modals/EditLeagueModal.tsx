@@ -1,17 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import type { ClipboardEvent } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+import { useApi } from "@/hooks/useApi";
 import { useEditLeagueModal } from "@/hooks/useEditLeagueModal";
 import { useResetOnRouteChange } from "@/hooks/useResetOnRouteChange";
 
 import Modal from "./Modal";
 import { Input } from "../ui/input";
 
-const EditLeagueModal = () => {
+import { updateLeague } from "@/services/leaguesService";
+
+interface EditLeagueModalProps {
+    leagueId: string | null;
+    leagueName?: string;
+    maxTeams?: number;
+    currentTeamsCount?: number;
+}
+
+const EditLeagueModal = ({ leagueId, leagueName, maxTeams, currentTeamsCount }: EditLeagueModalProps) => {
+    const { api } = useApi();
     const router = useRouter();
     const editLeagueModal = useEditLeagueModal();
 
@@ -25,20 +37,48 @@ const EditLeagueModal = () => {
         formState: { errors },
     } = useForm<FieldValues>({
         defaultValues: {
-            name: "", // TODO: Display current league name and size
+            name: "",
+            maxTeams: undefined,
         }
     });
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        if (!leagueId) {
+            toast.error("No league ID provided for editing.");
+            return;
+        }
+
+        const newMaxTeams = data.maxTeams;
+        if (
+            typeof newMaxTeams === "number" &&
+            typeof currentTeamsCount === "number" &&
+            newMaxTeams < currentTeamsCount
+        ) {
+            toast.error(`Cannot set maximum teams to ${newMaxTeams} because the current number of teams is ${currentTeamsCount}.`);
+            return;
+        }
+
         setIsLoading(true);
-        // TODO: Endpoint call
+        updateLeague(leagueId, data, api)
+            .then(() => {
+                toast.success("League updated successfully!");
+                editLeagueModal.onClose();
+                router.refresh();
+            })
+            .catch((error) => {
+                toast.error("Failed to update league: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     useEffect(() => {
         if (editLeagueModal.isOpen) {
+            reset({ name: leagueName, maxTeams: maxTeams });
             setTimeout(() => setFocus("name"), 50);
         }
-    }, [editLeagueModal.isOpen, setFocus]);
+    }, [editLeagueModal.isOpen, setFocus, leagueName, maxTeams, reset]);
 
     useResetOnRouteChange(reset);
 
@@ -64,16 +104,15 @@ const EditLeagueModal = () => {
             )}
 
             <Input
-                // TODO: Make sure you can't set team size to a smaller number than current team size
                 type="number"
                 inputMode="numeric"
                 pattern="\d*"
                 placeholder="Set maximum team size"
                 className="text-white font-medium border-[#1E2938]"
-                {...register("maxTeamSize", {
+                {...register("maxTeams", {
                     required: "Maximum team size is required",
                     valueAsNumber: true,
-                    min: { value: 1, message: "Minimum team size is 1" },
+                    min: { value: 2, message: "Minimum team size is 2" },
                     max: { value: 100, message: "Maximum team size is 100" },
                 })}
                 onKeyDown={(e) => {
@@ -91,8 +130,8 @@ const EditLeagueModal = () => {
                     }
                 }}
             />
-            {errors.maxTeamSize && (
-                <p className="text-sm text-red-400">{String(errors.maxTeamSize.message)}</p>
+            {errors.maxTeams && (
+                <p className="text-sm text-red-400">{String(errors.maxTeams.message)}</p>
             )}
         </div>
     );

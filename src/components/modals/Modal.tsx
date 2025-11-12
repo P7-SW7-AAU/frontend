@@ -66,7 +66,7 @@ const Modal = ({ isOpen, onClose, onSubmit, body, footer, actionLabel, disabled,
             className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.7)] backdrop-blur-sm"
             onClick={handleBackdropClick}
         >
-            <div className="modal-pop-in bg-[#131920] rounded-xl border border-gray-800 shadow-sm w-full max-w-lg mx-4 relative">
+            <div className="modal-pop-in bg-[#131920] rounded-xl border-2 border-gray-800 shadow-sm w-full max-w-lg mx-4 relative">
                 <button
                     className="absolute top-4 right-4 text-[#94A4B8] hover:text-[#707882] focus:outline-none cursor-pointer"
                     onClick={onClose}

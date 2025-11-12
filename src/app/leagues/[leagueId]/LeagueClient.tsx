@@ -1,70 +1,103 @@
 "use client";
 
-import { Trophy, Eye, DoorOpen, Target } from 'lucide-react';
+import { Trophy, Eye, DoorOpen, Target, Users, Calendar } from 'lucide-react';
 
 import StatsCard from '@/components/StatsCard';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
 import CardLeaderboard from '@/components/leagues/LeaderboardCard';
+import LeaveLeagueModal from '@/components/modals/LeaveLeagueModal';
 
 import { useLeaveLeagueModal } from '@/hooks/useLeaveLeagueModal';
+import { League } from '@/types';
+import { toast } from 'sonner';
 
-import { getLeagueStandings, leagueWithTeams } from '@/data/mockData';
+interface LeagueClientProps {
+    currentUser: any;
+    league: League;
+}
 
-const LeagueClient = () => {
-    const standings = getLeagueStandings();
+const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
     const leaveLeagueModal = useLeaveLeagueModal();
+
+    const myTeam = league.teams.find(team => team.ownerId === currentUser.id) || null;
+    const adminId = league.members.find(member => member.userId === league.commissionerId)?.userId;
+
+    const teamPrices = league.teams.map(team =>
+        team.roster.reduce((sum, player) => sum + player.price, 0)
+    );
+
+    const sortedTeams = [...league.teams]
+        .map((team, idx) => ({ team, price: teamPrices[idx] }))
+        .sort((a, b) => b.price - a.price)
+        .map(({ team }) => team);
+
+    let week = 1;
+    if (league.createdAt) {
+        const created = new Date(league.createdAt);
+        const now = new Date();
+        const diffMs = now.getTime() - created.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        week = Math.floor(diffDays / 7) + 1;
+    }
+
+    const handleCopyJoinCode = () => {
+        navigator.clipboard.writeText(league.joinCode);
+        toast.success("Code copied to clipboard!");
+    }
 
     return (
         <Container>
+            <LeaveLeagueModal leagueId={league.id} teamId={myTeam?.id || null} userId={currentUser.id} />
+            
             <Header
-                title={leagueWithTeams.name}
+                title={league.name}
                 description="Track the performance of all teams in the league"
                 buttonText="Leave League"
                 buttonIcon={DoorOpen}
                 buttonIconSize="4"
-                onClick={leaveLeagueModal.onOpen}
+                {...(adminId !== currentUser.id && { onClick: leaveLeagueModal.onOpen })}
                 secondaryButtonText="View Code"
                 secondaryButtonIcon={Eye}
                 secondaryButtonIconSize="4"
-                secondaryOnClick={() => {}}
+                secondaryOnClick={handleCopyJoinCode}
             />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <StatsCard 
-                    title="Week" 
-                    value={5} 
+                    title="Your Team" 
+                    value={myTeam ? myTeam.name : "N/A"} 
                     valueColor="text-white" 
-                    description={`in ${leagueWithTeams.name}`}
-                    icon={Trophy} 
+                    description="in the league" 
+                    icon={Target} 
                     iconColor="text-primary-green" 
                 />
 
                 <StatsCard 
-                    title="Total Points" 
-                    value={standings[0].totalPoints} 
+                    title="Total Teams" 
+                    value={league.teams.length} 
                     valueColor="text-primary-green" 
-                    description="in this league" 
-                    icon={Target} 
+                    description="in the league" 
+                    icon={Users} 
                     iconColor="text-primary-green" 
                 />
 
                 <StatsCard 
-                    title="Weekly Points" 
-                    value={standings[0].weeklyPoints} 
-                    valueColor="text-white" 
-                    description="in this league" 
-                    icon={Target} 
-                    iconColor="text-primary-gray" 
+                    title="Current Rank" 
+                    value={myTeam ? `#${sortedTeams.findIndex(team => team.id === myTeam.id) + 1}` : 'N/A'}
+                    valueColor="text-primary-yellow" 
+                    description={`out of ${league.teams.length} teams`}
+                    icon={Trophy} 
+                    iconColor="text-primary-yellow" 
                 />
 
                 <StatsCard 
-                    title="Best Rank" 
-                    value={`#${standings[0].ranking}`} 
-                    valueColor="text-primary-yellow" 
-                    description="highest position" 
-                    icon={Target} 
-                    iconColor="text-primary-yellow" 
+                    title="Week" 
+                    value={week} 
+                    valueColor="text-white" 
+                    description={"since league started"}
+                    icon={Calendar} 
+                    iconColor="text-primary-gray" 
                 />
             </div>
 
@@ -73,15 +106,21 @@ const LeagueClient = () => {
                     <Trophy className="h-6 w-6 mr-2 text-primary-yellow" />
                     Leaderboard
                 </h2>
-                <div className="space-y-6">
-                    {standings.map((team, index) => (
-                        <CardLeaderboard 
-                            key={team.uniqueID}
-                            team={team}
-                            index={index}
-                        />
-                    ))}
-                </div>
+                {league.teams.length === 0 ? (
+                    <div className="text-primary-gray font-medium text-lg">No teams in this league yet.</div>
+                ) : (
+                    <div className="space-y-6">
+                        {sortedTeams.map((team, index) => (
+                            <CardLeaderboard 
+                                key={team.id}
+                                team={team}
+                                index={index}
+                                adminId={adminId}
+                                myTeam={myTeam ?? null}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </Container>
     );

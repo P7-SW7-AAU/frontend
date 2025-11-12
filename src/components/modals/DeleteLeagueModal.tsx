@@ -1,23 +1,48 @@
 "use client";
 
+import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useDeleteLeagueModal } from "@/hooks/useDeleteLeagueModal";
+import { useApi } from "@/hooks/useApi";
 
 import Modal from "./Modal";
 
-const DeleteLeagueModal = () => {
+import { deleteLeague } from "@/services/leaguesService";
+
+interface DeleteLeagueModalProps {
+    leagueId: string | null;
+}
+
+const DeleteLeagueModal = ({ leagueId }: DeleteLeagueModalProps) => {
     const router = useRouter();
     const deleteLeagueModal = useDeleteLeagueModal();
-    
+    const { api } = useApi();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const onDelete = useCallback(() => {
+        if (!leagueId) {
+            toast.error("No league selected for deletion.");
+            return;
+        }
+
         setIsLoading(true);
-        // TODO: Endpoint call
-        console.log("Delete league");
-    }, []);
+
+        deleteLeague(leagueId, api)
+            .then(() => {
+                toast.success("League deleted successfully!");
+                deleteLeagueModal.onClose();
+                router.refresh();
+            })
+            .catch((error) => {
+                toast.error("Failed to delete league: " + error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            })
+    }, [leagueId, api, router, deleteLeagueModal]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">

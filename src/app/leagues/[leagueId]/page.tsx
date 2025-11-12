@@ -1,4 +1,7 @@
+import { stackServerApp } from "@/stack/server";
 import LeagueClient from "./LeagueClient";
+import { redirect } from "next/navigation";
+import { getLeague } from "@/services/leaguesService";
 
 interface Props {
     params: Promise<{ leagueId: string }>
@@ -6,11 +9,26 @@ interface Props {
 
 const LeaguePage = async ({ params }: Props) => {
     const { leagueId } = await params;
-    // Use leagueId to fetch league-specific data and send it to LeagueClient
+    const user = await stackServerApp.getUser();
+    if (!user) {
+        redirect('/handler/sign-in');
+    }
+        
+    const { accessToken } = await user.getAuthJson();
+    if (!accessToken) {
+        redirect('/handler/sign-in');
+    }
+    const league = await getLeague(leagueId, accessToken);
+
+    // Passing entire user object to client causes serialization issues
+    const clientUser = {
+        id: user.id,
+        profileImageUrl: user.profileImageUrl,
+    };
 
     return (
         <div>
-            <LeagueClient />
+            <LeagueClient currentUser={clientUser} league={league} />
         </div>
     );
 }

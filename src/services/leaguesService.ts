@@ -1,0 +1,67 @@
+import axios from "axios";
+
+export const getLeagues = async (accessToken: string) => {
+    try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const response = await axios.get(`${apiUrl}/leagues/my-leagues`, {
+            headers: { "x-stack-access-token": accessToken }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching leagues:", error);
+        throw error;
+    }
+}
+
+export const getLeague = async (leagueId: string, accessToken: string) => {
+    try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const response = await axios.get(`${apiUrl}/leagues/${leagueId}`, {
+            headers: { "x-stack-access-token": accessToken }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching league:", error);
+        throw error;
+    }
+}
+
+export const createLeague = async (data: any, api: any) => {
+    try {
+        const response = await api.post("/leagues", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error creating league:", error);
+        throw error;
+    }
+}
+
+export const updateLeague = async (leagueId: string, data: any, api: any) => {
+    try {
+        const response = await api.patch(`/leagues/${leagueId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating league:", error);
+        throw error;
+    }
+}
+
+export const deleteLeague = async (leagueId: string, api: any) => {
+    try {
+        const response = await api.delete(`/leagues/${leagueId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting league:", error);
+        throw error;
+    }
+}
+
+export const joinLeague = async (data: any, api: any) => {
+    try {
+        const response = await api.post("/leagues/join", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error joining league:", error);
+        throw error;
+    }
+}

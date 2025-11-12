@@ -1,12 +1,15 @@
 "use client";
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Player } from '@/types';
-import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 import React from 'react';
+import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+
+import { usePlayerDelta } from '@/hooks/usePlayerDelta';
+import { useTeamValueFormat } from "@/hooks/useValueFormat";
+
+import { Player } from '@/types';
 
 interface PlayerCardDetailedProps {
   player: Player;
@@ -16,7 +19,6 @@ interface PlayerCardDetailedProps {
   disabled?: boolean;
   isLocked?: boolean;
 }
-
 
 const fmtMoney = (n: number, decimals = 0) => {
   // Always show all decimals, but omit trailing zeros
@@ -55,7 +57,7 @@ const PlayerCardDetailed = ({
   }
 
   return (
-    <div className="hover:shadow-elegant border border-[#1E2938] hover:border-[#16A149] transition-all hover:-translate-y-1 group rounded-xl bg-card">
+    <div className="border-2 border-[#1E2938] hover:border-[#16A149] transition-all hover:-translate-y-1 group rounded-2xl bg-card">
       <div className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">

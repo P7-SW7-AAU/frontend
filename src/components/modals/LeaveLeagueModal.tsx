@@ -1,23 +1,49 @@
 "use client";
 
+import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useApi } from "@/hooks/useApi";
 import { useLeaveLeagueModal } from "@/hooks/useLeaveLeagueModal";
 
 import Modal from "./Modal";
 
-const LeaveLeagueModal = () => {
+import { deleteLeagueMember } from "@/services/leagueMembersService";
+import { updateTeam } from "@/services/teamsService";
+
+interface LeaveLeagueModalProps {
+    leagueId: string | null;
+    teamId: string | null;
+    userId: string | null;
+}
+
+const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) => {
+    const { api } = useApi();
     const router = useRouter();
     const leaveLeagueModal = useLeaveLeagueModal();
-    
     const [isLoading, setIsLoading] = useState(false);
 
-    const onLeave = useCallback(() => {
+    const onLeave = useCallback(async () => {
+        if (!leagueId) {
+            toast.error("No league selected for leaving.");
+            return;
+        }
+
         setIsLoading(true);
-        // TODO: Endpoint call
-        console.log("Leave league");
-    }, []);
+
+        try {
+            await updateTeam(teamId || "", { leagueId: null }, api);
+            await deleteLeagueMember(leagueId, userId || "");
+            toast.success("Left league successfully!");
+            leaveLeagueModal.onClose();
+            router.push("/leagues");
+        } catch (error: any) {
+            toast.error("Failed to leave league: " + error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [leagueId, userId, teamId, api, router, leaveLeagueModal]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
