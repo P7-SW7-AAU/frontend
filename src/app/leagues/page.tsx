@@ -6,6 +6,8 @@ import LeaguesClient from "@/app/leagues/LeaguesClient";
 import { getLeagues } from "@/services/leaguesService";
 import { getTeams } from "@/services/teamsService";
 
+import { League, Team } from "@/types";
+
 const LeaguesPage = async () => {
     const user = await stackServerApp.getUser();
     if (!user) {
@@ -21,9 +23,9 @@ const LeaguesPage = async () => {
         getLeagues(accessToken),
         getTeams(user.id, accessToken)
     ]);
-    const sortedLeagues = leagues.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    const sortedLeagues = leagues.sort((a: League, b: League) => a.name.localeCompare(b.name));
 
-    const sortedTeams = teams.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    const sortedTeams = teams.sort((a: Team, b: Team) => a.name.localeCompare(b.name));
 
     // Passing entire user object to client causes serialization issues
     const clientUser = {
