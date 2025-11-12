@@ -7,12 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { League, Team } from '@/types';
+import { League, Team, UserProfile } from '@/types';
 
 type LeagueCardProps = {
   league: League;
   teams: Team[];
-  currentUser: any;
+  currentUser: UserProfile;
   onEdit: () => void;
   onDelete: () => void;
   onViewLeague: (id: string) => void;
@@ -86,12 +86,10 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
             <div className="text-sm font-medium text-primary-gray">Owner</div>
             <div className="text-sm font-medium text-white">
               {league.commissioner.displayName
-                ? league.commissioner.displayName
-                    .split("@")[0]
-                    .split(/[ .]/)
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
-                : "Anonymous"}
+                .split("@")[0]
+                .split(/[ .]/)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
             </div>
           </div>
         </div>

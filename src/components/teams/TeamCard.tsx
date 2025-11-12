@@ -24,17 +24,15 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const { totalValue, weeklyChange } = useTeamValueFormat(team);
 
     const getTeamStats = (team: Team) => {
+        const sportGroups = team.roster.reduce((groups: Record<string, number>, player: Player) => {
+                const sportName = player.sport?.includes('FOOTBALL') ? 'Football' :
+                                    player.sport?.includes('F1') ? 'Formula 1' :
+                                    player.sport?.includes('NBA') ? 'NBA' : 'Other';
 
-        // Group players by sport
-        const sportGroups = team.roster.reduce((groups: any, player: Player) => {
-            const sportName = player.sport?.includes('FOOTBALL') ? 'Football' :
-                                player.sport?.includes('F1') ? 'Formula 1' :
-                                player.sport?.includes('NBA') ? 'NBA' : 'Other';
-
-            if (!groups[sportName]) groups[sportName] = 0;
-            groups[sportName]++;
-            return groups;
-        }, {});
+                if (!groups[sportName]) groups[sportName] = 0;
+                groups[sportName]++;
+                return groups;
+            }, {});
 
         return { 
             sportGroups 

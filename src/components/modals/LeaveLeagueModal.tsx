@@ -33,13 +33,23 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
         setIsLoading(true);
 
         try {
-            await updateTeam(teamId || "", { leagueId: null }, api);
+            if (teamId) {
+                await updateTeam(teamId, { leagueId: null }, api);
+            }
             await deleteLeagueMember(leagueId, userId || "");
             toast.success("Left league successfully!");
             leaveLeagueModal.onClose();
             router.push("/leagues");
-        } catch (error: any) {
-            toast.error("Failed to leave league: " + error.message);
+        } catch (error: unknown) {
+            let message = "";
+            if (error instanceof Error) {
+                message = error.message;
+            } else if (typeof error === "string") {
+                message = error;
+            } else {
+                message = "An unknown error occurred.";
+            }
+            toast.error("Failed to leave league: " + message);
         } finally {
             setIsLoading(false);
         }

@@ -9,11 +9,11 @@ import CardLeaderboard from '@/components/leagues/LeaderboardCard';
 import LeaveLeagueModal from '@/components/modals/LeaveLeagueModal';
 
 import { useLeaveLeagueModal } from '@/hooks/useLeaveLeagueModal';
-import { League } from '@/types';
+import { League, UserProfile } from '@/types';
 import { toast } from 'sonner';
 
 interface LeagueClientProps {
-    currentUser: any;
+    currentUser: UserProfile;
     league: League;
 }
 

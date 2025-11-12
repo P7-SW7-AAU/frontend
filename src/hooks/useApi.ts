@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 
 export function useApi() {
     const stackApp = useStackApp();
-    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [, setAccessToken] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchAccessToken = async () => {
@@ -40,7 +40,7 @@ export function useApi() {
         });
 
         return instance;
-    }, [accessToken]);
+    }, [stackApp]);
 
     return { api };
 }
