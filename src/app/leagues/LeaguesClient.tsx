@@ -16,13 +16,13 @@ import { useEditLeagueModal } from "@/hooks/useEditLeagueModal";
 import { useJoinLeagueModal } from "@/hooks/useJoinLeagueModal";
 import { useSelectTeamModal } from "@/hooks/useSelectTeam";
 
-import { League, Team } from "@/types";
+import { League, Team, UserProfile } from "@/types";
 import DeleteLeagueModal from "@/components/modals/DeleteLeagueModal";
 import EditLeagueModal from "@/components/modals/EditLeagueModal";
 import SelectTeamModal from "@/components/modals/SelectTeamModal";
 
 interface LeaguesClientProps {
-  currentUser: any;
+  currentUser: UserProfile;
   leagues: League[];
   teams: Team[];
 }

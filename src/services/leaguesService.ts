@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 export const getLeagues = async (accessToken: string) => {
     try {
@@ -26,7 +26,7 @@ export const getLeague = async (leagueId: string, accessToken: string) => {
     }
 }
 
-export const createLeague = async (data: any, api: any) => {
+export const createLeague = async (data: Record<string, unknown>, api: AxiosInstance) => {
     try {
         const response = await api.post("/leagues", data);
         return response.data;
@@ -36,7 +36,7 @@ export const createLeague = async (data: any, api: any) => {
     }
 }
 
-export const updateLeague = async (leagueId: string, data: any, api: any) => {
+export const updateLeague = async (leagueId: string, data: Record<string, unknown>, api: AxiosInstance) => {
     try {
         const response = await api.patch(`/leagues/${leagueId}`, data);
         return response.data;
@@ -46,7 +46,7 @@ export const updateLeague = async (leagueId: string, data: any, api: any) => {
     }
 }
 
-export const deleteLeague = async (leagueId: string, api: any) => {
+export const deleteLeague = async (leagueId: string, api: AxiosInstance) => {
     try {
         const response = await api.delete(`/leagues/${leagueId}`);
         return response.data;
@@ -56,7 +56,7 @@ export const deleteLeague = async (leagueId: string, api: any) => {
     }
 }
 
-export const joinLeague = async (data: any, api: any) => {
+export const joinLeague = async (data: Record<string, unknown>, api: AxiosInstance) => {
     try {
         const response = await api.post("/leagues/join", data);
         return response.data;

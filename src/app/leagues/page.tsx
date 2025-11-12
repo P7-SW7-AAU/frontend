@@ -28,7 +28,7 @@ const LeaguesPage = async () => {
     // Passing entire user object to client causes serialization issues
     const clientUser = {
         id: user.id,
-        profileImageUrl: user.profileImageUrl,
+        displayName: user.displayName ?? "Unknown User",
     };
 
     return (

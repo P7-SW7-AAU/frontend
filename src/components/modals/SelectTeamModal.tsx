@@ -49,8 +49,16 @@ const SelectTeamModal = ({ leagueId, selectedTeam, teams }: SelectTeamModalProps
             toast.success("Team updated successfully!");
             selectTeamModal.onClose();
             router.refresh();
-        } catch (error: any) {
-            toast.error("Failed to update team: " + error.message);
+        } catch (error: unknown) {
+            let message = "";
+            if (error instanceof Error) {
+                message = error.message;
+            } else if (typeof error === "string") {
+                message = error;
+            } else {
+                message = "An unknown error occurred.";
+            }
+            toast.error("Failed to update team: " + message);
         } finally {
             setIsLoading(false);
         }

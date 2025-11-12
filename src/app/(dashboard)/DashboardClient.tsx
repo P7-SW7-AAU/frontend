@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Users, Target, Trophy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useUser } from '@stackframe/stack';
 import Banner from '@/components/dashboard/Banner';
 import ShortcutCard from '@/components/dashboard/ShortcutCard';
 import PlayerCardDetailed from '@/components/PlayerCardDetailed';

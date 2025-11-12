@@ -1,7 +1,6 @@
 import { Target } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Badge } from "../ui/badge";
 
 import { Team } from "@/types";
 

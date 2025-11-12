@@ -1,10 +1,6 @@
 export type UserProfile = {
     id: string;
-    displayName?: string;
-    createdAt: Date;
-    leagues: League[];
-    memberShips: LeagueMember[];
-    teamsOwned: Team[];
+    displayName: string;
 }
 
 export type Player = {

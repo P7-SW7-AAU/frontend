@@ -6,8 +6,7 @@ import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'luci
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 
-import { usePlayerDelta } from '@/hooks/usePlayerDelta';
-import { useTeamValueFormat } from "@/hooks/useValueFormat";
+// import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 
 import { Player } from '@/types';
 
