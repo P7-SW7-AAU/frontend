@@ -21,14 +21,14 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
     const router = useRouter();
 
     // -- ONLY FOR GETTING TOKEN FOR TESTING ENDPOINTS! REMOVE LATER AS WE USE A BETTER APPROACH GETTING TOKEN --
-    const user = useUser();
-    useEffect(() => {
-        (async () => {
-            if (!user) return;
-            const { accessToken } = await user.getAuthJson(); // ← correct API
-            console.log('Access token:', accessToken);
-        })();
-    }, [user]);
+    // const user = useUser();
+    // useEffect(() => {
+    //     (async () => {
+    //         if (!user) return;
+    //         const { accessToken } = await user.getAuthJson(); // ← correct API
+    //         console.log('Access token:', accessToken);
+    //     })();
+    // }, [user]);
     // -- REMOVE ABOVE --
 
     return (

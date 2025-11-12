@@ -45,10 +45,10 @@ const PlayerCardDetailed = ({
   isLocked,
 }: PlayerCardDetailedProps) => {
   // sport-aware
-  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
+  // const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
 
-  const changeColor =
-    delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
+  // const changeColor =
+  //   delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
 
   const getTrendIcon = (weeklyPriceChange: number) => {
     if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
@@ -123,12 +123,12 @@ const PlayerCardDetailed = ({
           </div> */}
 
           {/* show preview price if present */}
-          {delta?.previewPrice != null && (
+          {/* {delta?.previewPrice != null && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-primary-gray font-medium">Preview price</span>
               <span className="font-bold text-white">{fmtMoney(delta.previewPrice)}</span>
             </div>
-          )}
+          )} */}
         </div>
 
         {isOwned ? (
