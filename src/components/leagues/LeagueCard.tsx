@@ -103,7 +103,7 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
             onClick={() => onViewLeague(league.id)}
           >
             <Trophy className="h-4 w-4 mr-2" />
-            View League
+            Leaderboard
           </Button>
           <Button variant="outline" className="flex-1" onClick={onSelectTeam}>
             <Users className="h-4 w-4 mr-2" />
