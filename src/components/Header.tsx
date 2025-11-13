@@ -1,6 +1,8 @@
 "use client";
 
+import { useTooltip } from "@/hooks/useTooltip";
 import { Button } from "./ui/button";
+import { Info } from "lucide-react";
 
 interface HeaderProps {
     title: string;
@@ -15,20 +17,31 @@ interface HeaderProps {
     secondaryButtonIconSize?: string;
     secondaryOnClick?: () => void;
     isLoading?: boolean;
+    tooltipMessage?: string;
 }
 
-const Header = ({ title, description, icon: Icon, buttonText, buttonIcon: ButtonIcon, buttonIconSize: ButtonIconSize, onClick, secondaryButtonText, secondaryButtonIcon: SecondaryButtonIcon, secondaryButtonIconSize: SecondaryButtonIconSize, secondaryOnClick, isLoading }: HeaderProps) => {
+const Header = ({ title, description, icon: Icon, buttonText, buttonIcon: ButtonIcon, buttonIconSize: ButtonIconSize, onClick, secondaryButtonText, secondaryButtonIcon: SecondaryButtonIcon, secondaryButtonIconSize: SecondaryButtonIconSize, secondaryOnClick, isLoading, tooltipMessage }: HeaderProps) => {
+    const { show, hide, Tooltip } = useTooltip();
+    
     return (
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div className="flex items-center gap-3 mb-4">
                 {Icon && <Icon className="h-10 w-10 text-primary-green animate-pulse" />}
-                <div>
-                    <h1 className="text-3xl font-bold text-white">
-                        {title}
-                    </h1>
-                    <p className="text-primary-gray font-medium mt-1">
-                        {description}
-                    </p>
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-3xl font-bold text-white">{title}</h1>
+                        {tooltipMessage && (
+                            <>
+                                <Info
+                                    className="h-5 w-5 mt-1 text-primary-gray hover:text-white cursor-pointer transition-colors"
+                                    onMouseEnter={show}
+                                    onMouseLeave={hide}
+                                />
+                                <Tooltip message={tooltipMessage} />
+                            </>
+                        )}
+                    </div>
+                    <p className="text-primary-gray font-medium mt-1">{description}</p>
                 </div>
             </div>
             <div className="flex space-x-3">
