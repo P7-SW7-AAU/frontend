@@ -5,8 +5,7 @@ import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'luci
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-
-// import { usePlayerDelta } from '@/hooks/usePlayerDelta';
+ import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 
 import { Player } from '@/types';
 
@@ -43,11 +42,11 @@ const PlayerCardDetailed = ({
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
-  // sport-aware
-  // const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
+   //sport-aware
+   const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
 
-  // const changeColor =
-  //   delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
+   const changeColor =
+    delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
 
   const getTrendIcon = (weeklyPriceChange: number) => {
     if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
@@ -114,20 +113,20 @@ const PlayerCardDetailed = ({
           </div>
 
           {/* Live change (from WS) */}
-          {/* <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Live change</span>
             <span className={`font-bold ${changeColor}`}>
               {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
             </span>
-          </div> */}
+          </div> 
 
           {/* show preview price if present */}
-          {/* {delta?.previewPrice != null && (
+           {delta?.previewPrice != null && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-primary-gray font-medium">Preview price</span>
               <span className="font-bold text-white">{fmtMoney(delta.previewPrice)}</span>
             </div>
-          )} */}
+          )} 
         </div>
 
         {isOwned ? (

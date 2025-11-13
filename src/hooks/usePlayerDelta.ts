@@ -1,20 +1,28 @@
-// hooks/usePlayerDelta.ts
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { io, Manager, Socket } from 'socket.io-client';
 
-type Sport = 'football' | 'nba';
-type DeltaMsg = { playerId: number; liveDelta: number; previewPrice: number };
+type Sport = 'football' | 'nba' | 'f1';
+
+// Raw messages from servers (football/nba use playerId; f1 uses driverId)
+type RawDeltaMsg = { playerId?: number; driverId?: number; liveDelta: number; previewPrice: number };
+
+// Normalized shape your UI can use regardless of sport
+type DeltaMsg = { id: number; liveDelta: number; previewPrice: number };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
 const SOCKET_PATH = '/socket.io';
 
 function nsFor(sport: Sport) {
-  return sport === 'football' ? '/ws/football' : '/ws/nba';
+  if (sport === 'football') return '/ws/football';
+  if (sport === 'nba') return '/ws/nba';
+  return '/ws/f1';
 }
 function eventFor(sport: Sport) {
-  return sport === 'football' ? 'playerWeekDelta' : 'playerGameDelta';
+  if (sport === 'football') return 'playerWeekDelta';
+  if (sport === 'nba') return 'playerGameDelta';
+  return 'driverRaceDelta';
 }
 
 const managerCache = new Map<string, Manager>();
@@ -36,12 +44,18 @@ function getManager(baseUrl: string) {
   return m;
 }
 
-export function usePlayerDelta(sport: Sport, playerId: number) {
+/**
+ * Subscribe to live price deltas for a single entity:
+ * - football: playerId
+ * - nba:      playerId
+ * - f1:       driverId
+ */
+export function usePlayerDelta(sport: Sport, entityId: number) {
   const [delta, setDelta] = useState<DeltaMsg | null>(null);
   const sockRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (!Number.isFinite(playerId)) return;
+    if (!Number.isFinite(entityId)) return;
 
     const namespace = nsFor(sport);
     const evt = eventFor(sport);
@@ -61,16 +75,26 @@ export function usePlayerDelta(sport: Sport, playerId: number) {
 
     const onConnect = () => {
       console.debug('[WS] connect', { ns: namespace, id: socket.id });
-      socket.emit('subscribe', { type: 'player', playerId });
-      console.debug('[WS] subscribe sent', { ns: namespace, playerId });
+
+      // Subscribe payload differs for F1 vs others
+      if (sport === 'f1') {
+        socket.emit('subscribe', { type: 'driver', driverId: entityId });
+      } else {
+        socket.emit('subscribe', { type: 'player', playerId: entityId });
+      }
+
+      console.debug('[WS] subscribe sent', { ns: namespace, entityId, sport });
     };
 
-    const onMsg = (msg: DeltaMsg) => {
+    const onMsg = (msg: RawDeltaMsg) => {
       console.debug('[WS] message', { ns: namespace, evt, msg });
-      if (msg?.playerId === playerId) setDelta(msg);
+      const id = msg.playerId ?? msg.driverId;
+      if (id === entityId) {
+        setDelta({ id, liveDelta: msg.liveDelta, previewPrice: msg.previewPrice });
+      }
     };
 
-    // log everything
+    // log everything (handy while integrating)
     const onAny = (event: string, ...args: unknown[]) => {
       console.debug('[WS] onAny', { ns: namespace, event, args });
     };
@@ -83,7 +107,6 @@ export function usePlayerDelta(sport: Sport, playerId: number) {
     );
     socket.on('error', (e) => console.error('[WS] error', { ns: namespace, error: e }));
 
-    // ensure namespace connects if Manager path
     if (!API_BASE) socket.connect();
 
     return () => {
@@ -96,7 +119,7 @@ export function usePlayerDelta(sport: Sport, playerId: number) {
       console.debug('[WS] cleanup', { ns: namespace });
       sockRef.current = null;
     };
-  }, [sport, playerId]);
+  }, [sport, entityId]);
 
   return delta;
 }
