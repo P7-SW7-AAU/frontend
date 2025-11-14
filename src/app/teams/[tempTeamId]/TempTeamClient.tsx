@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from 'next/navigation';
 
 import Container from '@/components/Container';
+import DraftedPlayerDelta from '@/components/teams/DraftedPlayerDelta';
 import Header from '@/components/Header';
 import BudgetCard from '@/components/lineup/BudgetCard';
 import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
@@ -69,13 +70,28 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         setIsLoading(false);
       });
   }
+
+  // Instead of using usePlayerDelta in a loop, we render a child component for each drafted player
+  // const draftedPlayerIds = draftedPlayers[selectedTeamId] || [];
+
+  // State to track liveDelta for each drafted player 
+  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({});
+
+  // Callback for DraftedPlayerDelta to report liveDelta 
+  const handlePlayerDelta = (playerId: number, liveDelta: number | undefined) => { 
+    setPlayerLiveDeltas(prev => {
+      if (prev[playerId] === liveDelta) return prev; 
+      return { ...prev, [playerId]: liveDelta }; 
+    }); 
+  }
   
-  const getBudgetSpent = (teamId: string) => {
-    const drafted = draftedPlayers[teamId] || [];
-    return drafted.reduce((sum, playerId) => {
-      const player = players.find(p => p.id === playerId);
-      return sum + (player?.price || 0);
-    }, 0);
+  const getBudgetSpent = (teamId: string) => { 
+    const drafted = draftedPlayers[teamId] || []; 
+    return drafted.reduce((sum, playerId) => { 
+      const player = players.find(p => p.id === playerId); 
+      const liveDelta = playerLiveDeltas[playerId]; 
+      return sum + ((player?.price || 0) + (liveDelta ?? player?.weekPriceChange ?? 0)); 
+    }, 0); 
   }
   
   const getRemainingBudget = (teamId: string) => {
@@ -101,7 +117,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     const player = players.find(p => p.id === playerId);
     if (!player) return;
     
-    if (player.price > getRemainingBudget(selectedTeamId)) {
+    if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
       toast.message("Insufficient budget");
       return;
     }
@@ -119,7 +135,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       };
     });
 
-    toast.message(`${playerName} joined for $${(player.price / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+    toast.message(`${playerName} joined for $${((player.price + player.weekPriceChange) / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
   }
 
   const handleUndraftPlayer = (playerId: number, playerName: string) => {
@@ -173,6 +189,10 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
           />
         )}
       </div>
+
+      {players.map(player => (
+        <DraftedPlayerDelta key={player.id} player={player} onDelta={handlePlayerDelta} />
+      ))}
 
       <PlayersManagementCard
         players={players}

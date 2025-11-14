@@ -87,7 +87,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
     const drafted = draftedPlayers[teamId] || [];
     return drafted.reduce((sum, playerId) => {
       const player = players.find(p => p.id === playerId);
-      return sum + (player?.price || 0);
+      return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
   }
   
@@ -114,7 +114,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       const player = players.find(p => p.id === playerId);
       if (!player) return;
       
-      if (player.price > getRemainingBudget(selectedTeamId)) {
+      if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
         toast.message("Insufficient budget");
         return;
       }
@@ -132,7 +132,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         };
       });
   
-      toast.message(`${playerName} joined for $${(player.price / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+      toast.message(`${playerName} joined for $${((player.price + player.weekPriceChange) / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
     }
   
     const handleUndraftPlayer = (playerId: number, playerName: string) => {
