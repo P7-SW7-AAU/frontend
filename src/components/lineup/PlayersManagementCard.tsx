@@ -173,7 +173,7 @@ const PlayersManagementCard = ({
                     isLocked={isLocked}
                     disabled={
                       !selectedTeamId ||
-                      player.price > getRemainingBudget(selectedTeamId) ||
+                      (player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId) ||
                       getRemainingSlots(selectedTeamId) <= 0
                     }
                   />

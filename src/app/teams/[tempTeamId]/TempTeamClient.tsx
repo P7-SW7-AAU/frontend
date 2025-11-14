@@ -52,6 +52,10 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       toast.message(`You must draft exactly ${MAX_PLAYERS_PER_TEAM} players before submitting. Currently drafted: ${draftedCount}.`);
       return;
     }
+    if (getBudgetSpent(selectedTeamId) > TEAM_BUDGET) {
+      toast.message(`Your team exceeds the budget of $${(TEAM_BUDGET/1_000_000).toFixed(1)}M as one of your players just increased in price! Please adjust your lineup.`);
+      return;
+    }
     setIsLoading(true);
 
     // Transform draftedPlayers to [{ sport, externalId }]

@@ -44,13 +44,14 @@ const PlayerCardDetailed = ({
   isLocked,
 }: PlayerCardDetailedProps) => {
   const pathname = usePathname();
+  // Always call the hook, but only use its value when needed
+  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
   let newWeekPriceChange: number;
   let newPrice: number;
   if (pathname.includes('/teams')) {
     newWeekPriceChange = player.weekPriceChange;
     newPrice = player.price + newWeekPriceChange;
   } else {
-    const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
     newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
     newPrice = player.price + newWeekPriceChange;
   }
