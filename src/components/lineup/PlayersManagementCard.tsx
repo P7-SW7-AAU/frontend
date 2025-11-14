@@ -155,7 +155,7 @@ const PlayersManagementCard = ({
               </p>
             )}
             {viewMode === 'my' && selectedTeamId && (
-              <p className="text-sm text-primary-gray mb-4">
+              <p className="text-sm text-primary-gray font-medium mb-4">
                 {draftedPlayers[selectedTeamId]?.length || 0} players in {selectedTeam?.name || selectedTeamId}
               </p>
             )}

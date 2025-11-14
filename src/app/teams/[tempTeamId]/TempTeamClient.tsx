@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner'
 import { ArrowUp, Trophy, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
-
-import { useRouter } from 'next/navigation';
 
 import Container from '@/components/Container';
 import DraftedPlayerDelta from '@/components/teams/DraftedPlayerDelta';
@@ -16,6 +15,7 @@ import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
 import { useApi } from "@/hooks/useApi";
 
 import { createTeam } from "@/services/teamsService";
+
 import { Player } from '@/types';
 
 import { weekTokenCET  } from '@/lib/utils';
@@ -28,15 +28,23 @@ interface TempTeamClientProps {
 const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
+const BATCH_SIZE = 10; // Number of DraftedPlayerDelta components to render per batch
+const BATCH_DELAY = 400;
+
 const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const lockToken = weekTokenCET();
   const { api } = useApi();
   const router = useRouter();
+  const lockToken = weekTokenCET();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [deltaBatchCount, setDeltaBatchCount] = useState(BATCH_SIZE);
+  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>({}); // draftedPlayers is a map from teamId -> array of player IDs
+  const [playersState, setPlayersState] = useState<Player[]>(players);
+  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({}); // State to track liveDelta for each drafted player 
+
+  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const selectedTeamId = tempTeamId;
-  // draftedPlayers is a map from teamId -> array of player IDs
-  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>({});
 
   const onSubmit = () => {
     const draftedCount = getDraftedCount(selectedTeamId);
@@ -71,11 +79,29 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       });
   }
 
-  // Instead of using usePlayerDelta in a loop, we render a child component for each drafted player
-  // const draftedPlayerIds = draftedPlayers[selectedTeamId] || [];
-
-  // State to track liveDelta for each drafted player 
-  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({});
+    useEffect(() => {
+    // Reset batching if players change
+    setDeltaBatchCount(BATCH_SIZE);
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+    }
+    // Progressive batching
+    if (players.length > BATCH_SIZE) {
+      let current = BATCH_SIZE;
+      function loadNextBatch() {
+        if (current >= players.length) return;
+        batchTimeoutRef.current = setTimeout(() => {
+          current = Math.min(current + BATCH_SIZE, players.length);
+          setDeltaBatchCount(current);
+          loadNextBatch();
+        }, BATCH_DELAY);
+      }
+      loadNextBatch();
+    }
+    return () => {
+      if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current);
+    };
+  }, [players]);
 
   // Callback for DraftedPlayerDelta to report liveDelta 
   const handlePlayerDelta = (playerId: number, liveDelta: number | undefined) => { 
@@ -163,6 +189,18 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  useEffect(() => {
+    setPlayersState(prevPlayers =>
+      prevPlayers.map(player => {
+        const liveDelta = playerLiveDeltas[player.id];
+        if (liveDelta !== undefined) {
+          return { ...player, weekPriceChange: liveDelta };
+        }
+        return player;
+      })
+    );
+  }, [playerLiveDeltas]);
+
   return (
     <Container>
       <Header 
@@ -190,12 +228,12 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         )}
       </div>
 
-      {players.map(player => (
+      {players.slice(0, deltaBatchCount).map(player => (
         <DraftedPlayerDelta key={player.id} player={player} onDelta={handlePlayerDelta} />
       ))}
 
       <PlayersManagementCard
-        players={players}
+        players={playersState}
         draftedPlayers={draftedPlayers}
         selectedTeamId={selectedTeamId}
         handleDraftPlayer={handleDraftPlayer}

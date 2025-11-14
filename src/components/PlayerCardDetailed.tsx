@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import { usePathname } from 'next/navigation';
 import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -43,9 +43,17 @@ const PlayerCardDetailed = ({
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
-   const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
-   const newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
-   const newPrice = player.price + newWeekPriceChange;
+  const pathname = usePathname();
+  let newWeekPriceChange: number;
+  let newPrice: number;
+  if (pathname.includes('/teams')) {
+    newWeekPriceChange = player.weekPriceChange;
+    newPrice = player.price + newWeekPriceChange;
+  } else {
+    const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
+    newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
+    newPrice = player.price + newWeekPriceChange;
+  }
 
   const getTrendIcon = (weeklyPriceChange: number) => {
     if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
