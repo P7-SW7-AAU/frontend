@@ -6,7 +6,7 @@ import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'luci
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 
-// import { usePlayerDelta } from '@/hooks/usePlayerDelta';
+import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 
 import { Player } from '@/types';
 
@@ -43,11 +43,9 @@ const PlayerCardDetailed = ({
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
-  //  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
-  //  const newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
-  //  const newPrice = player.price + newWeekPriceChange;
-  const newWeekPriceChange = player.weekPriceChange;
-  const newPrice = player.price + newWeekPriceChange;
+   const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
+   const newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
+   const newPrice = player.price + newWeekPriceChange;
 
   const getTrendIcon = (weeklyPriceChange: number) => {
     if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
