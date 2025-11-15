@@ -36,14 +36,36 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTeamId = searchParams.get('team') || '';
+
+  const getInitialDraftedBudget = (team: Team) => {
+    if (!team.roster) return 0;
+    return team.roster.reduce((sum: number, player: Player) => {
+      return sum + ((player.price || 0) + (player.weekPriceChange || 0));
+    }, 0);
+  };
+
+  // Determine the team budget: if initial drafted value exceeds 50M, use that value, else 50M
+  const getTeamBudget = (team: Team) => {
+    const initialBudget = getInitialDraftedBudget(team);
+    return initialBudget > TEAM_BUDGET ? initialBudget : TEAM_BUDGET;
+  };
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState(initialTeamId);
+
+  const [teamBudgets] = useState<Record<string, number>>(() => {
+    const budgets: Record<string, number> = {};
+    teams.forEach((team) => {
+      budgets[team.id] = getTeamBudget(team);
+    });
+    return budgets;
+  });
+
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
     const initialDrafts: Record<string, number[]> = {};
     teams.forEach((team) => {
       initialDrafts[team.id] = team.roster?.map((p: Player) => p.externalId) || [];
     });
-
     return initialDrafts;
   });
 
@@ -92,60 +114,61 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   }
   
   const getRemainingBudget = (teamId: string) => {
-      return TEAM_BUDGET - getBudgetSpent(teamId);
+    const budget = teamBudgets[teamId] || TEAM_BUDGET;
+    return budget - getBudgetSpent(teamId);
+  }
+    
+  const getDraftedCount = (teamId: string) => {
+    return (draftedPlayers[teamId] || []).length;
+  }
+    
+  const getRemainingSlots = (teamId: string) => {
+    const currentPlayers = 0;
+    const draftedCount = getDraftedCount(teamId);
+    return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
+  }
+  
+  const handleDraftPlayer = (playerId: number, playerName: string) => {
+    if (!selectedTeamId) {
+      toast.message("No team selected");
+      return;
     }
     
-    const getDraftedCount = (teamId: string) => {
-      return (draftedPlayers[teamId] || []).length;
+    const player = players.find(p => p.id === playerId);
+    if (!player) return;
+    
+    if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
+      toast.message("Insufficient budget");
+      return;
     }
     
-    const getRemainingSlots = (teamId: string) => {
-      const currentPlayers = 0;
-      const draftedCount = getDraftedCount(teamId);
-      return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
+    if (getRemainingSlots(selectedTeamId) <= 0) {
+      toast.message("You've reached the maximum number of players");
+      return;
     }
-  
-    const handleDraftPlayer = (playerId: number, playerName: string) => {
-      if (!selectedTeamId) {
-        toast.message("No team selected");
-        return;
-      }
-      
-      const player = players.find(p => p.id === playerId);
-      if (!player) return;
-      
-      if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
-        toast.message("Insufficient budget");
-        return;
-      }
-      
-      if (getRemainingSlots(selectedTeamId) <= 0) {
-        toast.message("You've reached the maximum number of players");
-        return;
-      }
-  
-      setDraftedPlayers(prev => {
-        const teamDrafts = prev[selectedTeamId] || [];
-        return {
-          ...prev,
-          [selectedTeamId]: [...teamDrafts, playerId],
-        };
-      });
-  
-      toast.message(`${playerName} joined for $${((player.price + player.weekPriceChange) / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
-    }
-  
-    const handleUndraftPlayer = (playerId: number, playerName: string) => {
-      setDraftedPlayers(prev => {
-        const teamDrafts = (prev[selectedTeamId] || []).filter(id => id !== playerId);
-        return {
-          ...prev,
-          [selectedTeamId]: teamDrafts,
-        };
-      });
 
-      toast.message(`${playerName} has been removed from ${selectedTeam?.name}.`);
-    }
+    setDraftedPlayers(prev => {
+      const teamDrafts = prev[selectedTeamId] || [];
+      return {
+        ...prev,
+        [selectedTeamId]: [...teamDrafts, playerId],
+      };
+    });
+
+    toast.message(`${playerName} joined for $${((player.price + player.weekPriceChange) / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+  }
+  
+  const handleUndraftPlayer = (playerId: number, playerName: string) => {
+    setDraftedPlayers(prev => {
+      const teamDrafts = (prev[selectedTeamId] || []).filter(id => id !== playerId);
+      return {
+        ...prev,
+        [selectedTeamId]: teamDrafts,
+      };
+    });
+
+    toast.message(`${playerName} has been removed from ${selectedTeam?.name}.`);
+  }
 
   const handleTeamChange = (teamId: string) => {
     setSelectedTeamId(teamId);
@@ -189,7 +212,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         
         {selectedTeamId && (
           <BudgetCard
-            teamBudget={TEAM_BUDGET}
+            teamBudget={teamBudgets[selectedTeamId] || TEAM_BUDGET}
             maxPlayersPerTeam={MAX_PLAYERS_PER_TEAM}
             selectedTeamId={selectedTeamId}
             getRemainingBudget={getRemainingBudget}
