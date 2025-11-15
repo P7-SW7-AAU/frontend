@@ -7,7 +7,6 @@ import { Plus, Users, Trophy, Target, Calendar } from 'lucide-react';
 import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
-import { useTeamValueFormat } from "@/hooks/useValueFormat";
 
 import ActionCard from '@/components/ActionCard';
 import StatsCard from '@/components/StatsCard';

@@ -24,10 +24,11 @@ type LeagueCardProps = {
 const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague, onSelectTeam }: LeagueCardProps) => {
   const isAdmin = league.commissionerId === currentUser.id;
   const teamForLeague = teams.find(team => team.leagueId === league.id);
+  const { combinedValue } = useTeamValueFormat(teamForLeague as Team);
   const selectedTeam = teamForLeague ? {
     id: teamForLeague.id,
     name: teamForLeague.name,
-    value: useTeamValueFormat(teamForLeague).combinedValue(),
+    value: combinedValue(),
   } : null;
 
   return (
