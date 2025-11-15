@@ -15,8 +15,22 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set environment variable for production build
-ENV NEXT_TELEMETRY_DISABLED 1
+# Accept build arguments for environment variables
+ARG NEON_AUTH_JWKS_URL
+ARG NEXT_PUBLIC_API_BASE
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_STACK_PROJECT_ID
+ARG NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY
+ARG STACK_SECRET_SERVER_KEY
+
+# Set environment variables for build (NEXT_PUBLIC_* must be available at build time)
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEON_AUTH_JWKS_URL=$NEON_AUTH_JWKS_URL
+ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_STACK_PROJECT_ID=$NEXT_PUBLIC_STACK_PROJECT_ID
+ENV NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=$NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY
+ENV STACK_SECRET_SERVER_KEY=$STACK_SECRET_SERVER_KEY
 
 # Build the application
 RUN npm run build
@@ -25,8 +39,16 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Accept build arguments for runtime environment variables
+ARG NEON_AUTH_JWKS_URL
+ARG STACK_SECRET_SERVER_KEY
+
+# Set runtime environment variables (server-side only)
+ENV NEON_AUTH_JWKS_URL=$NEON_AUTH_JWKS_URL
+ENV STACK_SECRET_SERVER_KEY=$STACK_SECRET_SERVER_KEY
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -44,8 +66,8 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
 
