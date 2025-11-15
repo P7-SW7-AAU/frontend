@@ -43,7 +43,7 @@ jobs:
           containerAppName: olympicks
           resourceGroup: Olympicks
           imageToBuild: olympicks.azurecr.io/olympicks:${{ github.sha }}
-          _buildArgumentsKey_: |
+          buildArguments: |
             NEON_AUTH_JWKS_URL=${{ vars.NEON_AUTH_JWKS_URL }}
             NEXT_PUBLIC_API_BASE=${{ vars.NEXT_PUBLIC_API_BASE }}
             NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
