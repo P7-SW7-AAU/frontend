@@ -31,24 +31,40 @@ jobs:
           tenant-id: ${{ secrets.OLYMPICKS_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.OLYMPICKS_AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and push container image to registry
+      - name: Login to Azure Container Registry
+        run: |
+          echo "${{ secrets.OLYMPICKS_REGISTRY_PASSWORD }}" | docker login olympicks.azurecr.io -u ${{ secrets.OLYMPICKS_REGISTRY_USERNAME }} --password-stdin
+
+      - name: Build and push Docker image
+        env:
+          NEON_AUTH_JWKS_URL: ${{ vars.NEON_AUTH_JWKS_URL }}
+          NEXT_PUBLIC_API_BASE: ${{ vars.NEXT_PUBLIC_API_BASE }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_STACK_PROJECT_ID: ${{ vars.NEXT_PUBLIC_STACK_PROJECT_ID }}
+          NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: ${{ vars.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY }}
+          STACK_SECRET_SERVER_KEY: ${{ secrets.STACK_SECRET_SERVER_KEY }}
+        run: |
+          docker build \
+            --build-arg NEON_AUTH_JWKS_URL="$NEON_AUTH_JWKS_URL" \
+            --build-arg NEXT_PUBLIC_API_BASE="$NEXT_PUBLIC_API_BASE" \
+            --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+            --build-arg NEXT_PUBLIC_STACK_PROJECT_ID="$NEXT_PUBLIC_STACK_PROJECT_ID" \
+            --build-arg NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY="$NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY" \
+            --build-arg STACK_SECRET_SERVER_KEY="$STACK_SECRET_SERVER_KEY" \
+            -t olympicks.azurecr.io/olympicks:${{ github.sha }} \
+            -t olympicks.azurecr.io/olympicks:latest \
+            .
+          docker push olympicks.azurecr.io/olympicks:${{ github.sha }}
+          docker push olympicks.azurecr.io/olympicks:latest
+
+      - name: Deploy to Azure Container Apps
         uses: azure/container-apps-deploy-action@v2
         with:
-          appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
           registryUrl: olympicks.azurecr.io
           registryUsername: ${{ secrets.OLYMPICKS_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.OLYMPICKS_REGISTRY_PASSWORD }}
           containerAppName: olympicks
           resourceGroup: Olympicks
-          imageToBuild: olympicks.azurecr.io/olympicks:${{ github.sha }}
-          buildArguments: |
-            NEON_AUTH_JWKS_URL=${{ vars.NEON_AUTH_JWKS_URL }}
-            NEXT_PUBLIC_API_BASE=${{ vars.NEXT_PUBLIC_API_BASE }}
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_STACK_PROJECT_ID=${{ vars.NEXT_PUBLIC_STACK_PROJECT_ID }}
-            NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=${{ vars.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY }}
-            STACK_SECRET_SERVER_KEY=${{ secrets.STACK_SECRET_SERVER_KEY }}
+          imageToDeploy: olympicks.azurecr.io/olympicks:${{ github.sha }}
 
 
