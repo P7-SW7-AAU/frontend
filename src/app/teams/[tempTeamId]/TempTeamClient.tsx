@@ -83,7 +83,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       });
   }
 
-    useEffect(() => {
+  useEffect(() => {
     // Reset batching if players change
     setDeltaBatchCount(BATCH_SIZE);
     if (batchTimeoutRef.current) {

@@ -7,6 +7,7 @@ import { Plus, Users, Trophy, Target, Calendar } from 'lucide-react';
 import { useCreateTeamModal } from '@/hooks/useCreateTeamModal';
 import { useDeleteTeamModal } from "@/hooks/useDeleteTeamModal";
 import { useEditTeamModal } from "@/hooks/useEditTeamModal";
+import { useTeamValueFormat } from "@/hooks/useValueFormat";
 
 import ActionCard from '@/components/ActionCard';
 import StatsCard from '@/components/StatsCard';
@@ -76,7 +77,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
 
         <StatsCard 
           title="Total Value" 
-          value={`$${(teams.reduce((sum, team) => sum + team.roster.reduce((playerSum, player) => playerSum + player.price, 0), 0) / 1_000_000).toFixed(1)}M`} 
+          value={`$${(teams.reduce((sum, team) => sum + team.roster.reduce((playerSum, player) => playerSum + player.price + player.weekPriceChange, 0), 0) / 1_000_000).toFixed(1)}M`} 
           valueColor="text-primary-yellow" 
           description="combined value" 
           icon={Trophy} 

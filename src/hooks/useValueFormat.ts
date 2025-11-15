@@ -29,5 +29,20 @@ export function useTeamValueFormat(team: { roster: { price: number; weekPriceCha
     return { formatted: `${totalChange > 0 ? '+' : ''}$${formatted}K`, color };
   }
 
-  return { totalValue, weeklyChange }
+  const combinedValue = () => {
+    // Get raw values
+    const total = team.roster.map(p => p.price).reduce((a, b) => a + b, 0);
+    const change = team.roster.map(p => p.weekPriceChange).reduce((a, b) => a + b, 0);
+    const combined = (total + change) / 1_000_000;
+    let formatted = combined.toFixed(6).replace(/\.?0+$/, '').replace(/(\.[0-9]*[1-9])0+$/, '$1');
+    if (formatted.includes('.')) {
+      const [intPart, decPart] = formatted.split('.');
+      formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decPart;
+    } else {
+      formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    return `$${formatted}M`;
+  }
+
+  return { totalValue, weeklyChange, combinedValue }
 }
