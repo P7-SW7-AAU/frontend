@@ -49,6 +49,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
 
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Use original player prices for initial drafted budget
   const getInitialDraftedBudget = (team: Team) => {
     if (!team.roster) return 0;
     return team.roster.reduce((sum: number, player: Player) => {
@@ -146,17 +147,19 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
 
   const selectedTeam = teams.find(team => team.id === selectedTeamId);
   
+  // Use real-time player prices (with deltas) for budget spent
   const getBudgetSpent = (teamId: string) => {
     const drafted = draftedPlayers[teamId] || [];
     return drafted.reduce((sum, playerId) => {
-      const player = players.find(p => p.id === playerId);
+      const player = playersState.find(p => p.id === playerId);
       return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
   }
   
   const getRemainingBudget = (teamId: string) => {
     const budget = teamBudgets[teamId] || TEAM_BUDGET;
-    return budget - getBudgetSpent(teamId);
+    const remaining = budget - getBudgetSpent(teamId);
+    return remaining < 0 ? 0 : remaining;
   }
     
   const getDraftedCount = (teamId: string) => {
@@ -174,15 +177,16 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       toast.message("No team selected");
       return;
     }
-    
-    const player = players.find(p => p.id === playerId);
+
+    // Use real-time player prices for draft checks
+    const player = playersState.find(p => p.id === playerId);
     if (!player) return;
-    
+
     if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
       toast.message("Insufficient budget");
       return;
     }
-    
+
     if (getRemainingSlots(selectedTeamId) <= 0) {
       toast.message("You've reached the maximum number of players");
       return;
