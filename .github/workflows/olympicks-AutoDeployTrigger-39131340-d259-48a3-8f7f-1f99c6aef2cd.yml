@@ -37,7 +37,7 @@ jobs:
 
       - name: Verify environment variables
         env:
-          NEON_AUTH_JWKS_URL: ${{ vars.NEON_AUTH_JWKS_URL }}
+          NEON_AUTH_JWKS_URL: ${{ vars.NEON_AUTH_JWKS_URL-Frontend }}
           NEXT_PUBLIC_API_BASE: ${{ vars.NEXT_PUBLIC_API_BASE }}
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_STACK_PROJECT_ID: ${{ vars.NEXT_PUBLIC_STACK_PROJECT_ID }}
@@ -87,5 +87,6 @@ jobs:
           containerAppName: olympicks
           resourceGroup: Olympicks
           imageToDeploy: olympicks.azurecr.io/olympicks:${{ github.sha }}
+
 
 
