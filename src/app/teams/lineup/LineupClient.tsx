@@ -49,27 +49,18 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
 
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Use original player prices for initial drafted budget
-  const getInitialDraftedBudget = (team: Team) => {
-    if (!team.roster) return 0;
-    return team.roster.reduce((sum: number, player: Player) => {
-      return sum + ((player.price || 0) + (player.weekPriceChange || 0));
+  // Dynamically calculate the team budget in real time
+  const getTeamBudget = (teamId: string) => {
+    const team = teams.find(t => t.id === teamId);
+    if (!team) return TEAM_BUDGET;
+    // Always use the sum of the original 10-player roster or TEAM_BUDGET, whichever is higher
+    const originalRoster = team.roster?.map((p: Player) => p.externalId) || [];
+    const originalSum = originalRoster.reduce((sum, playerId) => {
+      const player = playersState.find(p => p.id === playerId);
+      return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
+    return Math.max(TEAM_BUDGET, originalSum);
   }
-
-  // Determine the team budget: if initial drafted value exceeds 50M, use that value, else 50M
-  const getTeamBudget = (team: Team) => {
-    const initialBudget = getInitialDraftedBudget(team);
-    return initialBudget > TEAM_BUDGET ? initialBudget : TEAM_BUDGET;
-  }
-
-  const [teamBudgets] = useState<Record<string, number>>(() => {
-    const budgets: Record<string, number> = {};
-    teams.forEach((team) => {
-      budgets[team.id] = getTeamBudget(team);
-    });
-    return budgets;
-  });
 
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
     const initialDrafts: Record<string, number[]> = {};
@@ -157,7 +148,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   }
   
   const getRemainingBudget = (teamId: string) => {
-    const budget = teamBudgets[teamId] || TEAM_BUDGET;
+    const budget = getTeamBudget(teamId);
     const remaining = budget - getBudgetSpent(teamId);
     return remaining < 0 ? 0 : remaining;
   }
@@ -269,7 +260,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         
         {selectedTeamId && (
           <BudgetCard
-            teamBudget={teamBudgets[selectedTeamId] || TEAM_BUDGET}
+            teamBudget={getTeamBudget(selectedTeamId)}
             maxPlayersPerTeam={MAX_PLAYERS_PER_TEAM}
             selectedTeamId={selectedTeamId}
             getRemainingBudget={getRemainingBudget}
