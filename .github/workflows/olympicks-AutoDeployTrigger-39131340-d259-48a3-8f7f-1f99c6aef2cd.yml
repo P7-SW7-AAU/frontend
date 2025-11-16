@@ -35,6 +35,27 @@ jobs:
         run: |
           echo "${{ secrets.OLYMPICKS_REGISTRY_PASSWORD }}" | docker login olympicks.azurecr.io -u ${{ secrets.OLYMPICKS_REGISTRY_USERNAME }} --password-stdin
 
+      - name: Verify environment variables
+        env:
+          NEON_AUTH_JWKS_URL: ${{ vars.NEON_AUTH_JWKS_URL }}
+          NEXT_PUBLIC_API_BASE: ${{ vars.NEXT_PUBLIC_API_BASE }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_STACK_PROJECT_ID: ${{ vars.NEXT_PUBLIC_STACK_PROJECT_ID }}
+          NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: ${{ vars.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY }}
+          STACK_SECRET_SERVER_KEY: ${{ secrets.STACK_SECRET_SERVER_KEY }}
+        run: |
+          echo "Checking environment variables..."
+          echo "NEON_AUTH_JWKS_URL is set: $([ -n "$NEON_AUTH_JWKS_URL" ] && echo 'yes' || echo 'NO - MISSING')"
+          echo "NEXT_PUBLIC_API_BASE is set: $([ -n "$NEXT_PUBLIC_API_BASE" ] && echo 'yes' || echo 'NO - MISSING')"
+          echo "NEXT_PUBLIC_API_URL is set: $([ -n "$NEXT_PUBLIC_API_URL" ] && echo 'yes' || echo 'NO - MISSING')"
+          echo "NEXT_PUBLIC_STACK_PROJECT_ID is set: $([ -n "$NEXT_PUBLIC_STACK_PROJECT_ID" ] && echo 'yes' || echo 'NO - MISSING')"
+          echo "NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY is set: $([ -n "$NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY" ] && echo 'yes' || echo 'NO - MISSING')"
+          echo "STACK_SECRET_SERVER_KEY is set: $([ -n "$STACK_SECRET_SERVER_KEY" ] && echo 'yes' || echo 'NO - MISSING')"
+          
+          # Show lengths (to verify they're not empty)
+          echo "NEXT_PUBLIC_STACK_PROJECT_ID length: ${#NEXT_PUBLIC_STACK_PROJECT_ID}"
+          echo "NEXT_PUBLIC_API_URL length: ${#NEXT_PUBLIC_API_URL}"
+
       - name: Build and push Docker image
         env:
           NEON_AUTH_JWKS_URL: ${{ vars.NEON_AUTH_JWKS_URL }}
