@@ -45,7 +45,7 @@ const PlayerCardDetailed = ({
 }: PlayerCardDetailedProps) => {
   const pathname = usePathname();
   // Always call the hook, but only use its value when needed
-  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
+  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba' | 'f1', player.id);
   let newWeekPriceChange: number;
   let newPrice: number;
   if (pathname.includes('/teams')) {
