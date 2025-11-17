@@ -33,16 +33,6 @@ export const updateTeam = async (teamId: string, data: Record<string, unknown>, 
     }
 }
 
-export const removeLeagueId = async (teamId: string, api: AxiosInstance) => {
-    try {
-        const response = await api.patch(`/teams/${teamId}/remove-league`);
-        return response.data;
-    } catch (error) {
-        console.error("Error removing leagueId from team:", error);
-        throw error;
-    }
-}
-
 export const deleteTeam = async (teamId: string, api: AxiosInstance) => {
     try {
         const response = await api.delete(`/teams/${teamId}`);

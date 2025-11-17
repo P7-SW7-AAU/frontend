@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner'
 import { ArrowUp, Trophy, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useRouter } from 'next/navigation';
-
 import Container from '@/components/Container';
+import DraftedPlayerDelta from '@/components/teams/DraftedPlayerDelta';
 import Header from '@/components/Header';
 import BudgetCard from '@/components/lineup/BudgetCard';
 import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
@@ -15,6 +15,7 @@ import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
 import { useApi } from "@/hooks/useApi";
 
 import { createTeam } from "@/services/teamsService";
+
 import { Player } from '@/types';
 
 import { weekTokenCET  } from '@/lib/utils';
@@ -27,20 +28,32 @@ interface TempTeamClientProps {
 const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
+const BATCH_SIZE = 10; // Number of DraftedPlayerDelta components to render per batch
+const BATCH_DELAY = 400;
+
 const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const lockToken = weekTokenCET();
   const { api } = useApi();
   const router = useRouter();
+  const lockToken = weekTokenCET();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [deltaBatchCount, setDeltaBatchCount] = useState(BATCH_SIZE);
+  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>({}); // draftedPlayers is a map from teamId -> array of player IDs
+  const [playersState, setPlayersState] = useState<Player[]>(players);
+  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({}); // State to track liveDelta for each drafted player 
+
+  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const selectedTeamId = tempTeamId;
-  // draftedPlayers is a map from teamId -> array of player IDs
-  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>({});
 
   const onSubmit = () => {
     const draftedCount = getDraftedCount(selectedTeamId);
     if (draftedCount !== MAX_PLAYERS_PER_TEAM) {
       toast.message(`You must draft exactly ${MAX_PLAYERS_PER_TEAM} players before submitting. Currently drafted: ${draftedCount}.`);
+      return;
+    }
+    if (getBudgetSpent(selectedTeamId) > TEAM_BUDGET) {
+      toast.message(`Your team exceeds the budget of $${(TEAM_BUDGET/1_000_000).toFixed(1)}M as one of your players just increased in price! Please adjust your lineup.`);
       return;
     }
     setIsLoading(true);
@@ -69,13 +82,46 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         setIsLoading(false);
       });
   }
+
+  useEffect(() => {
+    // Reset batching if players change
+    setDeltaBatchCount(BATCH_SIZE);
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+    }
+    // Progressive batching
+    if (players.length > BATCH_SIZE) {
+      let current = BATCH_SIZE;
+      function loadNextBatch() {
+        if (current >= players.length) return;
+        batchTimeoutRef.current = setTimeout(() => {
+          current = Math.min(current + BATCH_SIZE, players.length);
+          setDeltaBatchCount(current);
+          loadNextBatch();
+        }, BATCH_DELAY);
+      }
+      loadNextBatch();
+    }
+    return () => {
+      if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current);
+    };
+  }, [players]);
+
+  // Callback for DraftedPlayerDelta to report liveDelta 
+  const handlePlayerDelta = (playerId: number, liveDelta: number | undefined) => { 
+    setPlayerLiveDeltas(prev => {
+      if (prev[playerId] === liveDelta) return prev; 
+      return { ...prev, [playerId]: liveDelta }; 
+    }); 
+  }
   
-  const getBudgetSpent = (teamId: string) => {
-    const drafted = draftedPlayers[teamId] || [];
-    return drafted.reduce((sum, playerId) => {
-      const player = players.find(p => p.id === playerId);
-      return sum + (player?.price || 0);
-    }, 0);
+  const getBudgetSpent = (teamId: string) => { 
+    const drafted = draftedPlayers[teamId] || []; 
+    return drafted.reduce((sum, playerId) => { 
+      const player = players.find(p => p.id === playerId); 
+      const liveDelta = playerLiveDeltas[playerId]; 
+      return sum + ((player?.price || 0) + (liveDelta ?? player?.weekPriceChange ?? 0)); 
+    }, 0); 
   }
   
   const getRemainingBudget = (teamId: string) => {
@@ -101,7 +147,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     const player = players.find(p => p.id === playerId);
     if (!player) return;
     
-    if (player.price > getRemainingBudget(selectedTeamId)) {
+    if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
       toast.message("Insufficient budget");
       return;
     }
@@ -119,7 +165,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       };
     });
 
-    toast.message(`${playerName} joined for $${(player.price / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+    toast.message(`${playerName} joined the team! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
   }
 
   const handleUndraftPlayer = (playerId: number, playerName: string) => {
@@ -146,6 +192,18 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  useEffect(() => {
+    setPlayersState(prevPlayers =>
+      prevPlayers.map(player => {
+        const liveDelta = playerLiveDeltas[player.id];
+        if (liveDelta !== undefined) {
+          return { ...player, weekPriceChange: liveDelta };
+        }
+        return player;
+      })
+    );
+  }, [playerLiveDeltas]);
 
   return (
     <Container>
@@ -174,8 +232,12 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         )}
       </div>
 
+      {players.slice(0, deltaBatchCount).map(player => (
+        <DraftedPlayerDelta key={player.id} player={player} onDelta={handlePlayerDelta} />
+      ))}
+
       <PlayersManagementCard
-        players={players}
+        players={playersState}
         draftedPlayers={draftedPlayers}
         selectedTeamId={selectedTeamId}
         handleDraftPlayer={handleDraftPlayer}

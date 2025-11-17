@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner'
 import { ArrowUp, Trophy, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useRouter, useSearchParams } from 'next/navigation';
-
-import Header from '@/components/Header';
 import Container from '@/components/Container';
+import DraftedPlayerDelta from '@/components/teams/DraftedPlayerDelta';
+import Header from '@/components/Header';
 import BudgetCard from '@/components/lineup/BudgetCard';
 import PlayersManagementCard from '@/components/lineup/PlayersManagementCard';
 import TeamSelectorCard from '@/components/lineup/TeamSelectorCard';
@@ -29,21 +29,44 @@ interface LineupClientProps {
 const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
+const BATCH_SIZE = 10; // Number of DraftedPlayerDelta components to render per batch
+const BATCH_DELAY = 400;
+
 const LineupClient = ({ players, teams }: LineupClientProps) => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const lockToken = weekTokenCET();
   const { api } = useApi();
   const router = useRouter();
+  const lockToken = weekTokenCET();
+  
   const searchParams = useSearchParams();
   const initialTeamId = searchParams.get('team') || '';
+
+  const [deltaBatchCount, setDeltaBatchCount] = useState(BATCH_SIZE);
   const [isLoading, setIsLoading] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState(initialTeamId);
+  const [playersState, setPlayersState] = useState<Player[]>(players);
+  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({}); // State to track liveDelta for each drafted player 
+
+  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Dynamically calculate the team budget in real time
+  const getTeamBudget = (teamId: string) => {
+    const team = teams.find(t => t.id === teamId);
+    if (!team) return TEAM_BUDGET;
+    // Always use the sum of the original 10-player roster or TEAM_BUDGET, whichever is higher
+    const originalRoster = team.roster?.map((p: Player) => p.externalId) || [];
+    const originalSum = originalRoster.reduce((sum, playerId) => {
+      const player = playersState.find(p => p.id === playerId);
+      return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
+    }, 0);
+    return Math.max(TEAM_BUDGET, originalSum);
+  }
+
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
     const initialDrafts: Record<string, number[]> = {};
     teams.forEach((team) => {
       initialDrafts[team.id] = team.roster?.map((p: Player) => p.externalId) || [];
     });
-
     return initialDrafts;
   });
 
@@ -81,71 +104,107 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       });
   }
 
+  useEffect(() => {
+    // Reset batching if players change
+    setDeltaBatchCount(BATCH_SIZE);
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+    }
+    // Progressive batching
+    if (players.length > BATCH_SIZE) {
+      let current = BATCH_SIZE;
+      function loadNextBatch() {
+        if (current >= players.length) return;
+        batchTimeoutRef.current = setTimeout(() => {
+          current = Math.min(current + BATCH_SIZE, players.length);
+          setDeltaBatchCount(current);
+          loadNextBatch();
+        }, BATCH_DELAY);
+      }
+      loadNextBatch();
+    }
+    return () => {
+      if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current);
+    };
+  }, [players]);
+
+  // Callback for DraftedPlayerDelta to report liveDelta 
+  const handlePlayerDelta = (playerId: number, liveDelta: number | undefined) => { 
+    setPlayerLiveDeltas(prev => {
+      if (prev[playerId] === liveDelta) return prev; 
+      return { ...prev, [playerId]: liveDelta }; 
+    }); 
+  }
+
   const selectedTeam = teams.find(team => team.id === selectedTeamId);
   
+  // Use real-time player prices (with deltas) for budget spent
   const getBudgetSpent = (teamId: string) => {
     const drafted = draftedPlayers[teamId] || [];
     return drafted.reduce((sum, playerId) => {
-      const player = players.find(p => p.id === playerId);
-      return sum + (player?.price || 0);
+      const player = playersState.find(p => p.id === playerId);
+      return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
   }
   
   const getRemainingBudget = (teamId: string) => {
-      return TEAM_BUDGET - getBudgetSpent(teamId);
-    }
+    const budget = getTeamBudget(teamId);
+    const remaining = budget - getBudgetSpent(teamId);
+    return remaining < 0 ? 0 : remaining;
+  }
     
-    const getDraftedCount = (teamId: string) => {
-      return (draftedPlayers[teamId] || []).length;
-    }
+  const getDraftedCount = (teamId: string) => {
+    return (draftedPlayers[teamId] || []).length;
+  }
     
-    const getRemainingSlots = (teamId: string) => {
-      const currentPlayers = 0;
-      const draftedCount = getDraftedCount(teamId);
-      return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
+  const getRemainingSlots = (teamId: string) => {
+    const currentPlayers = 0;
+    const draftedCount = getDraftedCount(teamId);
+    return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
+  }
+  
+  const handleDraftPlayer = (playerId: number, playerName: string) => {
+    if (!selectedTeamId) {
+      toast.message("No team selected");
+      return;
     }
-  
-    const handleDraftPlayer = (playerId: number, playerName: string) => {
-      if (!selectedTeamId) {
-        toast.message("No team selected");
-        return;
-      }
-      
-      const player = players.find(p => p.id === playerId);
-      if (!player) return;
-      
-      if (player.price > getRemainingBudget(selectedTeamId)) {
-        toast.message("Insufficient budget");
-        return;
-      }
-      
-      if (getRemainingSlots(selectedTeamId) <= 0) {
-        toast.message("You've reached the maximum number of players");
-        return;
-      }
-  
-      setDraftedPlayers(prev => {
-        const teamDrafts = prev[selectedTeamId] || [];
-        return {
-          ...prev,
-          [selectedTeamId]: [...teamDrafts, playerId],
-        };
-      });
-  
-      toast.message(`${playerName} joined for $${(player.price / 1_000_000).toFixed(1)}M! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
-    }
-  
-    const handleUndraftPlayer = (playerId: number, playerName: string) => {
-      setDraftedPlayers(prev => {
-        const teamDrafts = (prev[selectedTeamId] || []).filter(id => id !== playerId);
-        return {
-          ...prev,
-          [selectedTeamId]: teamDrafts,
-        };
-      });
 
-      toast.message(`${playerName} has been removed from ${selectedTeam?.name}.`);
+    // Use real-time player prices for draft checks
+    const player = playersState.find(p => p.id === playerId);
+    if (!player) return;
+
+    if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
+      toast.message("Insufficient budget");
+      return;
     }
+
+    if (getRemainingSlots(selectedTeamId) <= 0) {
+      toast.message("You've reached the maximum number of players");
+      return;
+    }
+
+    setDraftedPlayers(prev => {
+      const teamDrafts = prev[selectedTeamId] || [];
+      return {
+        ...prev,
+        [selectedTeamId]: [...teamDrafts, playerId],
+      };
+    });
+
+    toast.message(`${playerName} joined the team! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
+  }
+  
+  const handleUndraftPlayer = (playerId: number, playerName: string) => {
+    setDraftedPlayers(prev => {
+      const teamDrafts = (prev[selectedTeamId] || []).filter(id => id !== playerId);
+      return {
+        ...prev,
+        [selectedTeamId]: teamDrafts,
+      };
+    });
+
+    toast.message(`${playerName} has been removed from ${selectedTeam?.name}.`);
+  }
 
   const handleTeamChange = (teamId: string) => {
     setSelectedTeamId(teamId);
@@ -166,6 +225,18 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  useEffect(() => {
+    setPlayersState(prevPlayers =>
+      prevPlayers.map(player => {
+        const liveDelta = playerLiveDeltas[player.id];
+        if (liveDelta !== undefined) {
+          return { ...player, weekPriceChange: liveDelta };
+        }
+        return player;
+      })
+    );
+  }, [playerLiveDeltas]);
 
   return (
     <Container>
@@ -189,7 +260,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         
         {selectedTeamId && (
           <BudgetCard
-            teamBudget={TEAM_BUDGET}
+            teamBudget={getTeamBudget(selectedTeamId)}
             maxPlayersPerTeam={MAX_PLAYERS_PER_TEAM}
             selectedTeamId={selectedTeamId}
             getRemainingBudget={getRemainingBudget}
@@ -200,8 +271,12 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
         )}
       </div>
 
+      {players.slice(0, deltaBatchCount).map(player => (
+        <DraftedPlayerDelta key={player.id} player={player} onDelta={handlePlayerDelta} />
+      ))}
+
       <PlayersManagementCard
-        players={players}
+        players={playersState}
         draftedPlayers={draftedPlayers}
         selectedTeamId={selectedTeamId}
         selectedTeam={selectedTeam}

@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { League, Team, UserProfile } from '@/types';
 
+import { useTeamValueFormat } from '@/hooks/useValueFormat';
+
 type LeagueCardProps = {
   league: League;
   teams: Team[];
@@ -22,10 +24,11 @@ type LeagueCardProps = {
 const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague, onSelectTeam }: LeagueCardProps) => {
   const isAdmin = league.commissionerId === currentUser.id;
   const teamForLeague = teams.find(team => team.leagueId === league.id);
+  const { combinedValue } = useTeamValueFormat(teamForLeague as Team);
   const selectedTeam = teamForLeague ? {
     id: teamForLeague.id,
     name: teamForLeague.name,
-    value: "$" + (teamForLeague.roster.reduce((playerSum, player) => playerSum + player.price, 0) / 1_000_000).toFixed(1) + "M"
+    value: combinedValue(),
   } : null;
 
   return (

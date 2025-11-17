@@ -21,7 +21,7 @@ type TeamProps = {
 
 const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
     const router = useRouter();
-    const { totalValue, weeklyChange } = useTeamValueFormat(team);
+    const { combinedValue, weeklyChange } = useTeamValueFormat(team);
 
     const getTeamStats = (team: Team) => {
         const sportGroups = team.roster.reduce((groups: Record<string, number>, player: Player) => {
@@ -82,7 +82,7 @@ const TeamCard = ({ team, onEdit, onDelete, onManage }: TeamProps) => {
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#1E2938]">
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">Total Value</div>
-                        <div className="text-lg font-semibold text-primary-yellow">{totalValue()}</div>
+                        <div className="text-lg font-semibold text-primary-yellow">{combinedValue()}</div>
                     </div>
                     <div className="space-y-1">
                         <div className="text-sm font-medium text-primary-gray">

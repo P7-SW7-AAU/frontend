@@ -68,6 +68,19 @@ const PlayersManagementCard = ({
     .sort((a, b) => a.name.localeCompare(b.name));
   }, [players, selectedSport, searchQuery]);
 
+  // Compute the list of players to display based on viewMode
+  const displayPlayers = useMemo(() => {
+    if (viewMode === 'all') {
+      return filteredPlayers;
+    } else if (selectedTeamId && draftedPlayers[selectedTeamId]?.length > 0) {
+      // Only show drafted players for "my" tab
+      return draftedPlayers[selectedTeamId]
+        .map((playerId: number) => players.find((p: Player) => p.id === playerId))
+        .filter(Boolean) as Player[];
+    }
+    return [];
+  }, [viewMode, filteredPlayers, selectedTeamId, draftedPlayers, players]);
+
   return (
     <Card>
       <CardHeader>
@@ -124,74 +137,54 @@ const PlayersManagementCard = ({
       </CardHeader>
 
       <CardContent>
-        {viewMode === 'all' ? (
-          <>
-            <p className="text-sm text-primary-gray font-medium mb-4">
-              {filteredPlayers.length} players found
+        {viewMode === 'my' && (!selectedTeamId || (draftedPlayers[selectedTeamId]?.length ?? 0) === 0) ? (
+          <div className="text-center py-12">
+            <Trophy className="h-16 w-16 mx-auto text-primary-gray mb-4" />
+            <p className="text-primary-gray text-lg font-medium">
+              {selectedTeamId ? 'No players added yet' : 'Select a team to view players'}
             </p>
+            <p className="text-sm text-primary-gray font-medium mt-2">
+              {selectedTeamId ? 'Start adding players from the "All Players" tab' : 'Choose a team from the dropdown above'}
+            </p>
+          </div>
+        ) : (
+          <>
+            {viewMode === 'all' && (
+              <p className="text-sm text-primary-gray font-medium mb-4">
+                {filteredPlayers.length} players found
+              </p>
+            )}
+            {viewMode === 'my' && selectedTeamId && (
+              <p className="text-sm text-primary-gray font-medium mb-4">
+                {draftedPlayers[selectedTeamId]?.length || 0} players in {selectedTeam?.name || selectedTeamId}
+              </p>
+            )}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPlayers.map((player: Player) => {
+              {displayPlayers.map((player: Player) => {
                 const isLocked = lockToken === player?.tradeLockedWeek;
+                const owned = isPlayerOnTeam(player.id);
                 return (
-                <PlayerCardDetailed
-                  key={player.id}
-                  player={player}
-                  isOwned={isPlayerOnTeam(player.id)}
-                  onAdd={() => handleDraftPlayer(player.id, player.name)}
-                  onRemove={() => handleUndraftPlayer(player.id, player.name)}
-                  isLocked={isLocked}
-                  disabled={
-                    !selectedTeamId ||
-                    player.price > getRemainingBudget(selectedTeamId) ||
-                    getRemainingSlots(selectedTeamId) <= 0
-                  }
-                />
-              );
-            })}
+                  <PlayerCardDetailed
+                    key={player.id}
+                    player={player}
+                    isOwned={owned}
+                    onAdd={() => handleDraftPlayer(player.id, player.name)}
+                    onRemove={() => handleUndraftPlayer(player.id, player.name)}
+                    isLocked={isLocked}
+                    disabled={
+                      !selectedTeamId ||
+                      (player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId) ||
+                      getRemainingSlots(selectedTeamId) <= 0
+                    }
+                  />
+                );
+              })}
             </div>
-
-            {filteredPlayers.length === 0 && (
+            {displayPlayers.length === 0 && viewMode === 'all' && (
               <div className="text-center py-12 col-span-full">
                 <Search className="h-16 w-16 mx-auto text-primary-gray mb-4" />
                 <p className="text-primary-gray text-lg font-medium">No players found</p>
                 <p className="text-sm text-primary-gray font-medium mt-2">Try adjusting your search or filters</p>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {selectedTeamId && draftedPlayers[selectedTeamId]?.length > 0 ? (
-              <>
-                <p className="text-sm text-primary-gray mb-4">
-                  {draftedPlayers[selectedTeamId].length} players in {selectedTeam?.name || selectedTeamId}
-                </p>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {draftedPlayers[selectedTeamId].map((playerId: number) => {
-                    const player = players.find((p: Player) => p.id === playerId);
-                    const isLocked = lockToken === player?.tradeLockedWeek;
-                    if (!player) return null;
-                    return (
-                      <PlayerCardDetailed
-                        key={player.id}
-                        player={player}
-                        isOwned={true}
-                        onAdd={() => {}}
-                        onRemove={() => handleUndraftPlayer(player.id, player.name)}
-                        isLocked={isLocked}
-                      />
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <Trophy className="h-16 w-16 mx-auto text-primary-gray mb-4" />
-                <p className="text-primary-gray text-lg font-medium">
-                  {selectedTeamId ? 'No players added yet' : 'Select a team to view players'}
-                </p>
-                <p className="text-sm text-primary-gray font-medium mt-2">
-                  {selectedTeamId ? 'Start adding players from the "All Players" tab' : 'Choose a team from the dropdown above'}
-                </p>
               </div>
             )}
           </>

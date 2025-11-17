@@ -14,7 +14,7 @@ import Modal from "./Modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 import { Team } from "@/types";
-import { removeLeagueId, updateTeam } from "@/services/teamsService";
+import { updateTeam } from "@/services/teamsService";
 
 interface SelectTeamModalProps {
     leagueId: string | null;
@@ -43,7 +43,7 @@ const SelectTeamModal = ({ leagueId, selectedTeam, teams }: SelectTeamModalProps
         try {
             // If changing teams, remove previous team from league
             if (selectedTeam?.id && selectedTeam?.id !== selectedTeamId) {
-                await removeLeagueId(selectedTeam.id, api);
+                 await updateTeam(selectedTeam.id, { leagueId: null }, api);
             }
             await updateTeam(selectedTeamId, { leagueId }, api);
             toast.success("Team updated successfully!");

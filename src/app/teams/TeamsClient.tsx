@@ -76,7 +76,7 @@ const TeamsClient = ({ teams }: TeamsClientProps) => {
 
         <StatsCard 
           title="Total Value" 
-          value={`$${(teams.reduce((sum, team) => sum + team.roster.reduce((playerSum, player) => playerSum + player.price, 0), 0) / 1_000_000).toFixed(1)}M`} 
+          value={`$${(teams.reduce((sum, team) => sum + team.roster.reduce((playerSum, player) => playerSum + player.price + player.weekPriceChange, 0), 0) / 1_000_000).toFixed(1)}M`} 
           valueColor="text-primary-yellow" 
           description="combined value" 
           icon={Trophy} 

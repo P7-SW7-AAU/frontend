@@ -1,11 +1,12 @@
 "use client";
 
-import React from 'react';
+import { usePathname } from 'next/navigation';
 import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
- import { usePlayerDelta } from '@/hooks/usePlayerDelta';
+
+import { usePlayerDelta } from '@/hooks/usePlayerDelta';
 
 import { Player } from '@/types';
 
@@ -42,11 +43,18 @@ const PlayerCardDetailed = ({
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
-   //sport-aware
-   const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba', player.id);
-
-   const changeColor =
-    delta?.liveDelta == null ? 'text-primary-gray' : delta.liveDelta >= 0 ? 'text-green-400' : 'text-red-400';
+  const pathname = usePathname();
+  // Always call the hook, but only use its value when needed
+  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba' | 'f1', player.id);
+  let newWeekPriceChange: number;
+  let newPrice: number;
+  if (pathname.includes('/teams')) {
+    newWeekPriceChange = player.weekPriceChange;
+    newPrice = player.price + newWeekPriceChange;
+  } else {
+    newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
+    newPrice = player.price + newWeekPriceChange;
+  }
 
   const getTrendIcon = (weeklyPriceChange: number) => {
     if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
@@ -84,7 +92,7 @@ const PlayerCardDetailed = ({
           )}
 
           <div className="flex flex-col items-end gap-1">
-            {getTrendIcon(player.weekPriceChange)}
+            {getTrendIcon(newWeekPriceChange)}
           </div>
         </div>
 
@@ -96,37 +104,21 @@ const PlayerCardDetailed = ({
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Value</span>
-            <span className="font-bold text-primary-yellow">{fmtMoney(player.price / 1000000, 6).replace(/\.00$/, '')}M</span>
+            <span className="font-bold text-primary-yellow">{fmtMoney(newPrice / 1000000, 6).replace(/\.00$/, '')}M</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Weekly Price Change</span>
-            <span className={`font-bold ${player.weekPriceChange > 0 ? 'text-primary-green' : player.weekPriceChange < 0 ? 'text-primary-red' : 'text-primary-gray'}`}> 
+            <span className={`font-bold ${newWeekPriceChange > 0 ? 'text-primary-green' : newWeekPriceChange < 0 ? 'text-primary-red' : 'text-primary-gray'}`}> 
               {(() => {
-                if (player.weekPriceChange === 0) return '—';
-                const value = player.weekPriceChange / 1000;
+                if (newWeekPriceChange === 0) return '—';
+                const value = newWeekPriceChange / 1000;
                 // Show three decimals for k-suffix
-                const sign = player.weekPriceChange > 0 ? '+' : '';
+                const sign = newWeekPriceChange > 0 ? '+' : '';
                 return `${sign}${fmtMoney(value, 3)}K`;
               })()}
             </span>
           </div>
-
-          {/* Live change (from WS) */}
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-primary-gray font-medium">Live change</span>
-            <span className={`font-bold ${changeColor}`}>
-              {delta?.liveDelta == null ? '—' : `${delta.liveDelta >= 0 ? '+' : ''}${fmtMoney(delta.liveDelta)}`}
-            </span>
-          </div> 
-
-          {/* show preview price if present */}
-           {delta?.previewPrice != null && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-primary-gray font-medium">Preview price</span>
-              <span className="font-bold text-white">{fmtMoney(delta.previewPrice)}</span>
-            </div>
-          )} 
         </div>
 
         {isOwned ? (
