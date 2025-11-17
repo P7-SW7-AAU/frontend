@@ -1,8 +1,14 @@
+import { Player } from "@/types";
 import PlayersClient from "./PlayersClient";
 
-const PlayersPage = () => {
+import { getPlayers } from "@/services/playersService";
+
+const PlayersPage = async () => {
+    const players = await getPlayers();
+    const sortedPlayers = players.sort((a: Player, b: Player) => a.name.localeCompare(b.name));
+
     return (
-        <PlayersClient />
+        <PlayersClient players={sortedPlayers} />
     );
 }
 
