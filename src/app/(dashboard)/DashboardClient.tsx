@@ -73,14 +73,18 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
                     <Badge variant="secondary" className="px-3 py-1">This Week</Badge>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {players.slice(0, 3).map((player) => (
-                        <PlayerCardDetailed 
-                            key={player.id}
-                            player={player}
-                            isOwned={false}
-                            onAdd={() => router.push('/teams/lineup')}
-                            onRemove={() => {}}
-                        />
+                    {players
+                        .slice()
+                        .sort((a, b) => (b.price + b.weekPriceChange) - (a.price + a.weekPriceChange))
+                        .slice(0, 3)
+                        .map((player) => (
+                            <PlayerCardDetailed 
+                                key={player.id}
+                                player={player}
+                                isOwned={false}
+                                onAdd={() => router.push('/teams/lineup')}
+                                onRemove={() => {}}
+                            />
                     ))}
                 </div>
             </div>
