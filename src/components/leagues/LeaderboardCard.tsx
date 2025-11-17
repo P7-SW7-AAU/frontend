@@ -15,7 +15,7 @@ interface LeaderboardCardProps {
 
 const LeaderboardCard = ({ team, index, adminId, myTeam }: LeaderboardCardProps) => {
   const isMyTeam = myTeam && team.id === myTeam.id;
-  const { totalValue, weeklyChange } = useTeamValueFormat(team);
+  const { combinedValue, weeklyChange } = useTeamValueFormat(team);
   
   return (
     <Card className={isMyTeam ? "border-yellow-500/40 shadow-[0_0_24px_rgba(255,215,0,0.35)]" : undefined}>
@@ -42,7 +42,7 @@ const LeaderboardCard = ({ team, index, adminId, myTeam }: LeaderboardCardProps)
           <div className="flex flex-row sm:flex-col items-center sm:items-end gap-4 sm:gap-2 text-right">
             <div>
               <div className="text-2xl sm:text-3xl font-extrabold text-primary-yellow">
-                {totalValue()}
+                {combinedValue()}
               </div>
               <div className="text-xs sm:text-sm font-semibold text-primary-gray">Total Value</div>
             </div>
