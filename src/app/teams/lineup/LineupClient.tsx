@@ -30,7 +30,7 @@ const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
 const BATCH_SIZE = 10; // Number of DraftedPlayerDelta components to render per batch
-const BATCH_DELAY = 400;
+const BATCH_DELAY = 700;
 
 const LineupClient = ({ players, teams }: LineupClientProps) => {
   const { api } = useApi();
