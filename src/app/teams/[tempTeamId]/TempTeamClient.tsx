@@ -42,7 +42,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   type DraftedPlayerKey = { id: number, sport: string };
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, DraftedPlayerKey[]>>({}); // draftedPlayers is a map from teamId -> array of {id, sport}
   const [playersState, setPlayersState] = useState<Player[]>(players);
-  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({}); // State to track liveDelta for each drafted player 
+  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<string, number | undefined>>({}); // State to track liveDelta for each drafted player 
 
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const selectedTeamId = tempTeamId;
@@ -109,20 +109,22 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   }, [players]);
 
   // Callback for DraftedPlayerDelta to report liveDelta 
-  const handlePlayerDelta = (playerId: number, liveDelta: number | undefined) => { 
+  const handlePlayerDelta = (playerId: number, playerSport: string, liveDelta: number | undefined) => { 
+    const key = `${playerId}-${playerSport}`;
     setPlayerLiveDeltas(prev => {
-      if (prev[playerId] === liveDelta) return prev; 
-      return { ...prev, [playerId]: liveDelta }; 
+      if (prev[key] === liveDelta) return prev; 
+      return { ...prev, [key]: liveDelta }; 
     }); 
   }
   
   const getBudgetSpent = (teamId: string) => { 
-    const drafted = draftedPlayers[teamId] || []; 
-    return drafted.reduce((sum, { id, sport }) => { 
-      const player = players.find(p => p.id === id && p.sport === sport); 
-      const liveDelta = player ? playerLiveDeltas[player.id] : undefined; 
-      return sum + ((player?.price || 0) + (liveDelta ?? player?.weekPriceChange ?? 0)); 
-    }, 0); 
+    const drafted = draftedPlayers[teamId] || [];
+    return drafted.reduce((sum, { id, sport }) => {
+      const player = players.find(p => p.id === id && p.sport === sport);
+      const key = `${id}-${sport}`;
+      const liveDelta = player ? playerLiveDeltas[key] : undefined;
+      return sum + ((player?.price || 0) + (liveDelta ?? player?.weekPriceChange ?? 0));
+    }, 0);
   }
   
   const getRemainingBudget = (teamId: string) => {
@@ -197,7 +199,8 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   useEffect(() => {
     setPlayersState(prevPlayers =>
       prevPlayers.map(player => {
-        const liveDelta = playerLiveDeltas[player.id];
+        const key = `${player.id}-${player.sport}`;
+        const liveDelta = playerLiveDeltas[key];
         if (liveDelta !== undefined) {
           return { ...player, weekPriceChange: liveDelta };
         }

@@ -5,11 +5,17 @@ import { usePlayerDelta } from "@/hooks/usePlayerDelta";
 
 import { Player } from "@/types";
 
-function DraftedPlayerDelta({ player, onDelta }: { player: Player, onDelta: (playerId: number, liveDelta: number | undefined) => void }) {
+function DraftedPlayerDelta({
+  player,
+  onDelta,
+}: {
+  player: Player,
+  onDelta: (playerId: number, playerSport: string, liveDelta: number | undefined) => void
+}) {
   const delta = usePlayerDelta(player.sport.toLowerCase() as 'football' | 'nba' | 'f1', player.id);
   useEffect(() => {
-    onDelta(player.id, delta?.liveDelta);
-  }, [delta?.liveDelta]);
+    onDelta(player.id, player.sport, delta?.liveDelta);
+  }, [delta?.liveDelta, player.id, player.sport]);
   return null;
 }
 

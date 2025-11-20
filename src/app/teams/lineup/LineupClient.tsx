@@ -45,7 +45,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState(initialTeamId);
   const [playersState, setPlayersState] = useState<Player[]>(players);
-  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({}); // State to track liveDelta for each drafted player 
+  const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<string, number | undefined>>({}); // State to track liveDelta for each drafted player 
 
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -130,10 +130,11 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   }, [players]);
 
   // Callback for DraftedPlayerDelta to report liveDelta 
-  const handlePlayerDelta = (playerId: number, liveDelta: number | undefined) => { 
+  const handlePlayerDelta = (playerId: number, playerSport: string, liveDelta: number | undefined) => { 
+    const key = `${playerId}-${playerSport}`;
     setPlayerLiveDeltas(prev => {
-      if (prev[playerId] === liveDelta) return prev; 
-      return { ...prev, [playerId]: liveDelta }; 
+      if (prev[key] === liveDelta) return prev; 
+      return { ...prev, [key]: liveDelta }; 
     }); 
   }
 
@@ -230,7 +231,8 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   useEffect(() => {
     setPlayersState(prevPlayers =>
       prevPlayers.map(player => {
-        const liveDelta = playerLiveDeltas[player.id];
+        const key = `${player.id}-${player.sport}`;
+        const liveDelta = playerLiveDeltas[key];
         if (liveDelta !== undefined) {
           return { ...player, weekPriceChange: liveDelta };
         }
