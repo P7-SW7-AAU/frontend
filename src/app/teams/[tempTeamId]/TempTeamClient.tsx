@@ -39,7 +39,8 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [deltaBatchCount, setDeltaBatchCount] = useState(BATCH_SIZE);
-  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>({}); // draftedPlayers is a map from teamId -> array of player IDs
+  type DraftedPlayerKey = { id: number, sport: string };
+  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, DraftedPlayerKey[]>>({}); // draftedPlayers is a map from teamId -> array of {id, sport}
   const [playersState, setPlayersState] = useState<Player[]>(players);
   const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<number, number | undefined>>({}); // State to track liveDelta for each drafted player 
 
@@ -60,8 +61,8 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
 
     // Transform draftedPlayers to [{ sport, externalId }]
     const draftedPlayerObjects =
-      (draftedPlayers[selectedTeamId] || []).map((playerId) => {
-        const player = players.find((p) => p.id === playerId);
+      (draftedPlayers[selectedTeamId] || []).map(({ id, sport }) => {
+        const player = players.find((p) => p.id === id && p.sport === sport);
         return player
           ? { sport: player.sport, externalId: player.id }
           : null;
@@ -117,9 +118,9 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   
   const getBudgetSpent = (teamId: string) => { 
     const drafted = draftedPlayers[teamId] || []; 
-    return drafted.reduce((sum, playerId) => { 
-      const player = players.find(p => p.id === playerId); 
-      const liveDelta = playerLiveDeltas[playerId]; 
+    return drafted.reduce((sum, { id, sport }) => { 
+      const player = players.find(p => p.id === id && p.sport === sport); 
+      const liveDelta = player ? playerLiveDeltas[player.id] : undefined; 
       return sum + ((player?.price || 0) + (liveDelta ?? player?.weekPriceChange ?? 0)); 
     }, 0); 
   }
@@ -138,13 +139,13 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
     return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
   }
 
-  const handleDraftPlayer = (playerId: number, playerName: string) => {
+  const handleDraftPlayer = (playerId: number, playerName: string, playerSport?: string) => {
     if (!selectedTeamId) {
       toast.message("No team selected");
       return;
     }
     
-    const player = players.find(p => p.id === playerId);
+    const player = players.find(p => p.id === playerId && (!playerSport || p.sport === playerSport));
     if (!player) return;
     
     if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
@@ -161,16 +162,16 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       const teamDrafts = prev[selectedTeamId] || [];
       return {
         ...prev,
-        [selectedTeamId]: [...teamDrafts, playerId],
+        [selectedTeamId]: [...teamDrafts, { id: playerId, sport: player.sport }],
       };
     });
 
     toast.message(`${playerName} joined the team! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
   }
 
-  const handleUndraftPlayer = (playerId: number, playerName: string) => {
+  const handleUndraftPlayer = (playerId: number, playerName: string, playerSport?: string) => {
     setDraftedPlayers(prev => {
-      const teamDrafts = (prev[selectedTeamId] || []).filter(id => id !== playerId);
+      const teamDrafts = (prev[selectedTeamId] || []).filter(p => !(p.id === playerId && (!playerSport || p.sport === playerSport)));
       return {
         ...prev,
         [selectedTeamId]: teamDrafts,
@@ -233,7 +234,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       </div>
 
       {players.slice(0, deltaBatchCount).map(player => (
-        <DraftedPlayerDelta key={player.id} player={player} onDelta={handlePlayerDelta} />
+        <DraftedPlayerDelta key={player.id + '-' + player.sport} player={player} onDelta={handlePlayerDelta} />
       ))}
 
       <PlayersManagementCard

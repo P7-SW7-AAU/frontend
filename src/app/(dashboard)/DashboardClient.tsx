@@ -79,7 +79,7 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
                         .slice(0, 3)
                         .map((player) => (
                             <PlayerCardDetailed 
-                                key={player.id}
+                                key={player.id + '-' + player.sport}
                                 player={player}
                                 isOwned={false}
                                 onAdd={() => router.push('/teams/lineup')}
@@ -103,7 +103,7 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {players.slice(3, 6).map((player) => (
                         <PlayerCardDetailed 
-                            key={player.id}
+                            key={player.id + '-' + player.sport}
                             player={player}
                             isOwned={false}
                             onAdd={() => router.push('/teams/lineup')}

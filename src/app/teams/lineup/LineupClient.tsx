@@ -54,18 +54,19 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
     const team = teams.find(t => t.id === teamId);
     if (!team) return TEAM_BUDGET;
     // Always use the sum of the original 10-player roster or TEAM_BUDGET, whichever is higher
-    const originalRoster = team.roster?.map((p: Player) => p.externalId) || [];
-    const originalSum = originalRoster.reduce((sum, playerId) => {
-      const player = playersState.find(p => p.id === playerId);
+    const originalRoster = team.roster || [];
+    const originalSum = originalRoster.reduce((sum, rosterPlayer) => {
+      const player = playersState.find(p => p.id === rosterPlayer.externalId && p.sport === rosterPlayer.sport);
       return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
     return Math.max(TEAM_BUDGET, originalSum);
   }
 
-  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, number[]>>(() => {
-    const initialDrafts: Record<string, number[]> = {};
+  type DraftedPlayerKey = { id: number, sport: string };
+  const [draftedPlayers, setDraftedPlayers] = useState<Record<string, DraftedPlayerKey[]>>(() => {
+    const initialDrafts: Record<string, DraftedPlayerKey[]> = {};
     teams.forEach((team) => {
-      initialDrafts[team.id] = team.roster?.map((p: Player) => p.externalId) || [];
+      initialDrafts[team.id] = team.roster?.map((p: Player) => ({ id: p.externalId, sport: p.sport })) || [];
     });
     return initialDrafts;
   });
@@ -80,8 +81,8 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
 
     // Backend currently receives the entire player array in payload instead of updating the swapped players only. Minimal performance impact for 10 players though. Adjust to fit future backend changes if needed.
     const draftedPlayerObjects =
-      (draftedPlayers[selectedTeamId] || []).map((playerId) => {
-        const player = players.find((p) => p.id === playerId);
+      (draftedPlayers[selectedTeamId] || []).map(({ id, sport }) => {
+        const player = players.find((p) => p.id === id && p.sport === sport);
         return player
           ? { sport: player.sport, externalId: player.id }
           : null;
@@ -141,8 +142,8 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
   // Use real-time player prices (with deltas) for budget spent
   const getBudgetSpent = (teamId: string) => {
     const drafted = draftedPlayers[teamId] || [];
-    return drafted.reduce((sum, playerId) => {
-      const player = playersState.find(p => p.id === playerId);
+    return drafted.reduce((sum, { id, sport }) => {
+      const player = playersState.find(p => p.id === id && p.sport === sport);
       return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
   }
@@ -163,14 +164,14 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
     return MAX_PLAYERS_PER_TEAM - currentPlayers - draftedCount;
   }
   
-  const handleDraftPlayer = (playerId: number, playerName: string) => {
+  const handleDraftPlayer = (playerId: number, playerName: string, playerSport?: string) => {
     if (!selectedTeamId) {
       toast.message("No team selected");
       return;
     }
 
     // Use real-time player prices for draft checks
-    const player = playersState.find(p => p.id === playerId);
+    const player = playersState.find(p => p.id === playerId && (!playerSport || p.sport === playerSport));
     if (!player) return;
 
     if ((player.price + player.weekPriceChange) > getRemainingBudget(selectedTeamId)) {
@@ -187,16 +188,16 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       const teamDrafts = prev[selectedTeamId] || [];
       return {
         ...prev,
-        [selectedTeamId]: [...teamDrafts, playerId],
+        [selectedTeamId]: [...teamDrafts, { id: playerId, sport: player.sport }],
       };
     });
 
     toast.message(`${playerName} joined the team! ${getRemainingSlots(selectedTeamId) - 1} slots left.`);
   }
   
-  const handleUndraftPlayer = (playerId: number, playerName: string) => {
+  const handleUndraftPlayer = (playerId: number, playerName: string, playerSport?: string) => {
     setDraftedPlayers(prev => {
-      const teamDrafts = (prev[selectedTeamId] || []).filter(id => id !== playerId);
+      const teamDrafts = (prev[selectedTeamId] || []).filter(p => !(p.id === playerId && (!playerSport || p.sport === playerSport)));
       return {
         ...prev,
         [selectedTeamId]: teamDrafts,
@@ -272,7 +273,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       </div>
 
       {players.slice(0, deltaBatchCount).map(player => (
-        <DraftedPlayerDelta key={player.id} player={player} onDelta={handlePlayerDelta} />
+        <DraftedPlayerDelta key={player.id + '-' + player.sport} player={player} onDelta={handlePlayerDelta} />
       ))}
 
       <PlayersManagementCard

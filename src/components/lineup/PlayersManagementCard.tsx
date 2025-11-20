@@ -11,13 +11,14 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 import { Player, Team } from '@/types';
 
+type DraftedPlayerKey = { id: number, sport: string };
 interface Props {
   players: Player[];
-  draftedPlayers: Record<string, number[]>;
+  draftedPlayers: Record<string, DraftedPlayerKey[]>;
   selectedTeamId: string;
   selectedTeam?: Team;
-  handleDraftPlayer: (id: number, name: string) => void;
-  handleUndraftPlayer: (id: number, name: string) => void;
+  handleDraftPlayer: (id: number, name: string, sport: string) => void;
+  handleUndraftPlayer: (id: number, name: string, sport: string) => void;
   getRemainingBudget: (teamId: string) => number;
   getRemainingSlots: (teamId: string) => number;
   lockToken?: string;
@@ -44,15 +45,14 @@ const PlayersManagementCard = ({
     { id: 'NBA', name: 'NBA' },
   ]
 
-  const isPlayerOnTeam = (playerId: number) => {
-    return draftedPlayers[selectedTeamId]?.includes(playerId) || false;
+  const isPlayerOnTeam = (playerId: number, playerSport: string) => {
+    return draftedPlayers[selectedTeamId]?.some(p => p.id === playerId && p.sport === playerSport) || false;
   }
 
   const filteredPlayers = useMemo(() => {
     return players.filter((player) => {
-      if (selectedSport !== 'all') {
-        const sportPlayers = players.filter((p) => p.sport === selectedSport);
-        if (!sportPlayers.some((sp) => sp.id === player.id)) return false;
+      if (selectedSport !== 'all' && player.sport !== selectedSport) {
+        return false;
       }
 
       if (searchQuery) {
@@ -75,7 +75,7 @@ const PlayersManagementCard = ({
     } else if (selectedTeamId && draftedPlayers[selectedTeamId]?.length > 0) {
       // Only show drafted players for "my" tab
       return draftedPlayers[selectedTeamId]
-        .map((playerId: number) => players.find((p: Player) => p.id === playerId))
+        .map(({ id, sport }) => players.find((p: Player) => p.id === id && p.sport === sport))
         .filter(Boolean) as Player[];
     }
     return [];
@@ -162,14 +162,14 @@ const PlayersManagementCard = ({
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {displayPlayers.map((player: Player) => {
                 const isLocked = lockToken === player?.tradeLockedWeek;
-                const owned = isPlayerOnTeam(player.id);
+                const owned = isPlayerOnTeam(player.id, player.sport);
                 return (
                   <PlayerCardDetailed
-                    key={player.id}
+                    key={player.id + '-' + player.sport}
                     player={player}
                     isOwned={owned}
-                    onAdd={() => handleDraftPlayer(player.id, player.name)}
-                    onRemove={() => handleUndraftPlayer(player.id, player.name)}
+                    onAdd={() => handleDraftPlayer(player.id, player.name, player.sport)}
+                    onRemove={() => handleUndraftPlayer(player.id, player.name, player.sport)}
                     isLocked={isLocked}
                     disabled={
                       !selectedTeamId ||
