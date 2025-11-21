@@ -29,7 +29,7 @@ function eventFor(sport: Sport) {
   return 'driverRaceDelta';
 }
 
-// One Manager per baseUrl
+// Manager cache
 const managerCache = new Map<string, Manager>();
 
 function getManager(baseUrl: string): Manager {
@@ -49,7 +49,7 @@ function getManager(baseUrl: string): Manager {
   return m;
 }
 
-// One socket per (baseUrl + namespace)
+// Socket cache
 const socketCache = new Map<string, Socket>();
 
 function getSocket(baseUrl: string, namespace: string): Socket {
@@ -77,22 +77,24 @@ export function usePlayerDelta(sport: Sport, entityId: number) {
     const socket = getSocket(base, namespace);
     sockRef.current = socket;
 
-    const onConnect = () => {
-      console.debug('[WS] connect', { ns: namespace, id: socket.id });
-
+    const doSubscribe = () => {
       if (sport === 'f1') {
         socket.emit('subscribe', { type: 'driver', driverId: entityId });
       } else {
         socket.emit('subscribe', { type: 'player', playerId: entityId });
       }
-
       console.debug('[WS] subscribe sent', { ns: namespace, entityId, sport });
     };
 
+    const onConnect = () => {
+      console.debug('[WS] connect', { ns: namespace, id: socket.id });
+      doSubscribe();
+    };
+
     const onMsg = (msg: RawDeltaMsg) => {
-      console.debug('[WS] message', { ns: namespace, evt, msg });
       const id = msg.playerId ?? msg.driverId;
       if (id === entityId) {
+        console.debug('[WS] delta msg', msg);
         setDelta({
           id,
           liveDelta: msg.liveDelta,
@@ -101,29 +103,35 @@ export function usePlayerDelta(sport: Sport, entityId: number) {
       }
     };
 
-    // Use unknown instead of any
-    const onAny = (event: string, ...args: unknown[]) => {
-      console.debug('[WS] onAny', { ns: namespace, event, args });
-    };
-
     const onConnectError = (e: Error) => {
-      console.error('[WS] connect_error', { ns: namespace, error: e.message });
+      console.error('[WS] connect_error', e);
     };
 
     const onError = (e: Error) => {
-      console.error('[WS] error', { ns: namespace, error: e.message });
+      console.error('[WS] error', e);
     };
 
     socket.on('connect', onConnect);
     socket.on(evt, onMsg);
-    socket.onAny(onAny);
     socket.on('connect_error', onConnectError);
     socket.on('error', onError);
 
+    if (socket.connected) {
+      doSubscribe();
+    }
+
     return () => {
+      if (sockRef.current) {
+        if (sport === 'f1') {
+          sockRef.current.emit('unsubscribe', { type: 'driver', driverId: entityId });
+        } else {
+          sockRef.current.emit('unsubscribe', { type: 'player', playerId: entityId });
+        }
+        console.debug('[WS] unsubscribe sent', { ns: namespace, entityId, sport });
+      }
+
       socket.off('connect', onConnect);
       socket.off(evt, onMsg);
-      socket.offAny(onAny);
       socket.off('connect_error', onConnectError);
       socket.off('error', onError);
 
