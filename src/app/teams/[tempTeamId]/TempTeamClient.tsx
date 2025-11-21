@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner'
 import { ArrowUp, Trophy, Plus } from 'lucide-react';
@@ -28,9 +28,6 @@ interface TempTeamClientProps {
 const TEAM_BUDGET = 50000000;
 const MAX_PLAYERS_PER_TEAM = 10;
 
-const BATCH_SIZE = 10; // Number of DraftedPlayerDelta components to render per batch
-const BATCH_DELAY = 400;
-
 const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
   const { api } = useApi();
   const router = useRouter();
@@ -38,13 +35,10 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [deltaBatchCount, setDeltaBatchCount] = useState(BATCH_SIZE);
   type DraftedPlayerKey = { id: number, sport: string };
   const [draftedPlayers, setDraftedPlayers] = useState<Record<string, DraftedPlayerKey[]>>({}); // draftedPlayers is a map from teamId -> array of {id, sport}
   const [playersState, setPlayersState] = useState<Player[]>(players);
   const [playerLiveDeltas, setPlayerLiveDeltas] = useState<Record<string, number | undefined>>({}); // State to track liveDelta for each drafted player 
-
-  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const selectedTeamId = tempTeamId;
 
   const onSubmit = () => {
@@ -83,30 +77,6 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         setIsLoading(false);
       });
   }
-
-  useEffect(() => {
-    // Reset batching if players change
-    setDeltaBatchCount(BATCH_SIZE);
-    if (batchTimeoutRef.current) {
-      clearTimeout(batchTimeoutRef.current);
-    }
-    // Progressive batching
-    if (players.length > BATCH_SIZE) {
-      let current = BATCH_SIZE;
-      function loadNextBatch() {
-        if (current >= players.length) return;
-        batchTimeoutRef.current = setTimeout(() => {
-          current = Math.min(current + BATCH_SIZE, players.length);
-          setDeltaBatchCount(current);
-          loadNextBatch();
-        }, BATCH_DELAY);
-      }
-      loadNextBatch();
-    }
-    return () => {
-      if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current);
-    };
-  }, [players]);
 
   // Callback for DraftedPlayerDelta to report liveDelta 
   const handlePlayerDelta = (playerId: number, playerSport: string, liveDelta: number | undefined) => { 
@@ -236,7 +206,7 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
         )}
       </div>
 
-      {players.slice(0, deltaBatchCount).map(player => (
+      {players.map(player => (
         <DraftedPlayerDelta key={player.id + '-' + player.sport} player={player} onDelta={handlePlayerDelta} />
       ))}
 
