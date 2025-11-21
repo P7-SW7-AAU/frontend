@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from 'next/navigation';
 import { Lock, UserPlus, UserMinus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -20,17 +19,17 @@ interface PlayerCardDetailedProps {
 }
 
 const fmtMoney = (n: number, decimals = 0) => {
-  // Always show all decimals, but omit trailing zeros
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   }).format(n);
+
   if (decimals > 0) {
-    // Remove trailing zeros after decimal, but keep at least one decimal if present
-    // $1.2300 -> $1.23, $1.200 -> $1.2, $1.000 -> $1
-    return formatted.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'');
+    return formatted
+      .replace(/(\.\d*?[1-9])0+$/, '$1')
+      .replace(/\.0+$/, '');
   }
   return formatted;
 };
@@ -43,25 +42,29 @@ const PlayerCardDetailed = ({
   disabled,
   isLocked,
 }: PlayerCardDetailedProps) => {
-  const pathname = usePathname();
-  // Always call the hook, but only use its value when needed
-  const delta = usePlayerDelta((player.sport || '').toLowerCase() as 'football' | 'nba' | 'f1', player.id);
-  console.debug('[UI] delta', { name: player.name, sport: player.sport, id: player.id, delta });
-  let newWeekPriceChange: number;
-  let newPrice: number;
-  if (pathname.includes('/teams')) {
-    newWeekPriceChange = player.weekPriceChange;
-    newPrice = player.price + newWeekPriceChange;
-  } else {
-    newWeekPriceChange = delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
-    newPrice = player.price + newWeekPriceChange;
-  }
+  // Normalize sport to our hook union type
+  const sport = (player.sport || '').toLowerCase() as 'football' | 'nba' | 'f1';
+
+  // Live delta from websocket (if any)
+  const delta = usePlayerDelta(sport, player.id);
+
+  // 1) Weekly price change: prefer live delta, fallback to DB value
+  const newWeekPriceChange =
+    delta?.liveDelta != null ? delta.liveDelta : player.weekPriceChange;
+
+  // 2) Player value:
+  //    - If backend gives us previewPrice, trust that.
+  //    - Otherwise compute from DB price + current week change.
+  const newPrice =
+    delta?.previewPrice != null
+      ? delta.previewPrice
+      : player.price + newWeekPriceChange;
 
   const getTrendIcon = (weeklyPriceChange: number) => {
     if (weeklyPriceChange > 0) return <TrendingUp className="h-3 w-3 text-primary-green" />;
     if (weeklyPriceChange < 0) return <TrendingDown className="h-3 w-3 text-destructive" />;
     return <Minus className="h-3 w-3 text-primary-gray" />;
-  }
+  };
 
   return (
     <div className="border-2 border-[#1E2938] hover:border-[#16A149] transition-all hover:-translate-y-1 group rounded-2xl bg-card">
@@ -70,17 +73,25 @@ const PlayerCardDetailed = ({
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12 group-hover:scale-110 transition-transform">
               {player.logo ? (
-                <img src={player.logo} alt={`${player.teamName} logo`} className="h-full w-full object-contain" />
+                <img
+                  src={player.logo}
+                  alt={`${player.teamName} logo`}
+                  className="h-full w-full object-contain"
+                />
               ) : (
                 <AvatarFallback className="bg-gradient-to-r from-green-600 to-green-700 text-white font-bold">
-                  {player.name.split(' ').map(n => n[0]).join('')}
+                  {player.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
                 </AvatarFallback>
               )}
             </Avatar>
             <div>
               <h3 className="font-semibold text-white">{player.name}</h3>
               <p className="text-sm text-primary-gray font-medium">
-                {player.sport.charAt(0).toUpperCase() + player.sport.slice(1).toLowerCase()}
+                {player.sport.charAt(0).toUpperCase() +
+                  player.sport.slice(1).toLowerCase()}
               </p>
             </div>
           </div>
@@ -100,21 +111,34 @@ const PlayerCardDetailed = ({
         <div className="space-y-2 mb-4 bg-[#131C25] rounded-lg p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Team</span>
-            <span className="font-bold text-white text-xs">{player.teamName || "No Team"}</span>
+            <span className="font-bold text-white text-xs">
+              {player.teamName || 'No Team'}
+            </span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-primary-gray font-medium">Value</span>
-            <span className="font-bold text-primary-yellow">{fmtMoney(newPrice / 1000000, 6).replace(/\.00$/, '')}M</span>
+            <span className="font-bold text-primary-yellow">
+              {fmtMoney(newPrice / 1_000_000, 6).replace(/\.00$/, '')}M
+            </span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-primary-gray font-medium">Weekly Price Change</span>
-            <span className={`font-bold ${newWeekPriceChange > 0 ? 'text-primary-green' : newWeekPriceChange < 0 ? 'text-primary-red' : 'text-primary-gray'}`}> 
+            <span className="text-primary-gray font-medium">
+              Weekly Price Change
+            </span>
+            <span
+              className={`font-bold ${
+                newWeekPriceChange > 0
+                  ? 'text-primary-green'
+                  : newWeekPriceChange < 0
+                  ? 'text-primary-red'
+                  : 'text-primary-gray'
+              }`}
+            >
               {(() => {
                 if (newWeekPriceChange === 0) return '—';
                 const value = newWeekPriceChange / 1000;
-                // Show three decimals for k-suffix
                 const sign = newWeekPriceChange > 0 ? '+' : '';
                 return `${sign}${fmtMoney(value, 3)}K`;
               })()}
@@ -123,12 +147,24 @@ const PlayerCardDetailed = ({
         </div>
 
         {isOwned ? (
-          <Button className="w-full hover:scale-105 transition-transform" size="sm" variant="destructive" onClick={onRemove} disabled={isLocked}>
+          <Button
+            className="w-full hover:scale-105 transition-transform"
+            size="sm"
+            variant="destructive"
+            onClick={onRemove}
+            disabled={isLocked}
+          >
             <UserMinus className="h-4 w-4 mr-2" />
             Remove from Team
           </Button>
         ) : (
-          <Button className="w-full hover:scale-105 transition-transform" size="sm" variant="hero" onClick={onAdd} disabled={disabled || isLocked}>
+          <Button
+            className="w-full hover:scale-105 transition-transform"
+            size="sm"
+            variant="hero"
+            onClick={onAdd}
+            disabled={disabled || isLocked}
+          >
             <UserPlus className="h-4 w-4 mr-2" />
             {disabled ? 'Unavailable' : 'Add Player'}
           </Button>
@@ -136,6 +172,6 @@ const PlayerCardDetailed = ({
       </div>
     </div>
   );
-}
+};
 
 export default PlayerCardDetailed;
