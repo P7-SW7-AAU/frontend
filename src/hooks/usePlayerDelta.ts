@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { io, Manager, Socket } from 'socket.io-client';
+import { Manager, Socket } from 'socket.io-client';
 
 type Sport = 'football' | 'nba' | 'f1';
 
-// Raw messages from servers (football/nba use playerId; f1 uses driverId)
-type RawDeltaMsg = { playerId?: number; driverId?: number; liveDelta: number; previewPrice: number };
+type RawDeltaMsg = {
+  playerId?: number;
+  driverId?: number;
+  liveDelta: number;
+  previewPrice: number;
+};
 
-// Normalized shape your UI can use regardless of sport
 type DeltaMsg = { id: number; liveDelta: number; previewPrice: number };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -19,16 +22,18 @@ function nsFor(sport: Sport) {
   if (sport === 'nba') return '/ws/nba';
   return '/ws/f1';
 }
+
 function eventFor(sport: Sport) {
   if (sport === 'football') return 'playerWeekDelta';
   if (sport === 'nba') return 'playerGameDelta';
   return 'driverRaceDelta';
 }
 
+// One Manager per baseUrl
 const managerCache = new Map<string, Manager>();
-function getManager(baseUrl: string) {
-  const key = `${baseUrl}|${SOCKET_PATH}`;
-  let m = managerCache.get(key);
+
+function getManager(baseUrl: string): Manager {
+  let m = managerCache.get(baseUrl);
   if (!m) {
     m = new Manager(baseUrl, {
       path: SOCKET_PATH,
@@ -39,17 +44,25 @@ function getManager(baseUrl: string) {
       reconnectionDelay: 800,
       autoConnect: true,
     });
-    managerCache.set(key, m);
+    managerCache.set(baseUrl, m);
   }
   return m;
 }
 
-/**
- * Subscribe to live price deltas for a single entity:
- * - football: playerId
- * - nba:      playerId
- * - f1:       driverId
- */
+// One socket per (baseUrl + namespace)
+const socketCache = new Map<string, Socket>();
+
+function getSocket(baseUrl: string, namespace: string): Socket {
+  const key = `${baseUrl}${namespace}`;
+  let sock = socketCache.get(key);
+  if (!sock) {
+    const manager = getManager(baseUrl);
+    sock = manager.socket(namespace);
+    socketCache.set(key, sock);
+  }
+  return sock;
+}
+
 export function usePlayerDelta(sport: Sport, entityId: number) {
   const [delta, setDelta] = useState<DeltaMsg | null>(null);
   const sockRef = useRef<Socket | null>(null);
@@ -61,22 +74,12 @@ export function usePlayerDelta(sport: Sport, entityId: number) {
     const evt = eventFor(sport);
     const base = API_BASE || window.location.origin;
 
-    // Cross-origin? prefer full URL sockets (forceNew). Same-origin? use Manager.
-    const socket: Socket = API_BASE
-      ? io(`${API_BASE}${namespace}`, {
-          path: SOCKET_PATH,
-          transports: ['websocket'],
-          withCredentials: true,
-          forceNew: true,
-        })
-      : getManager(base).socket(namespace);
-
+    const socket = getSocket(base, namespace);
     sockRef.current = socket;
 
     const onConnect = () => {
       console.debug('[WS] connect', { ns: namespace, id: socket.id });
 
-      // Subscribe payload differs for F1 vs others
       if (sport === 'f1') {
         socket.emit('subscribe', { type: 'driver', driverId: entityId });
       } else {
@@ -90,33 +93,40 @@ export function usePlayerDelta(sport: Sport, entityId: number) {
       console.debug('[WS] message', { ns: namespace, evt, msg });
       const id = msg.playerId ?? msg.driverId;
       if (id === entityId) {
-        setDelta({ id, liveDelta: msg.liveDelta, previewPrice: msg.previewPrice });
+        setDelta({
+          id,
+          liveDelta: msg.liveDelta,
+          previewPrice: msg.previewPrice,
+        });
       }
     };
 
-    // log everything (handy while integrating)
+    // Use unknown instead of any
     const onAny = (event: string, ...args: unknown[]) => {
       console.debug('[WS] onAny', { ns: namespace, event, args });
+    };
+
+    const onConnectError = (e: Error) => {
+      console.error('[WS] connect_error', { ns: namespace, error: e.message });
+    };
+
+    const onError = (e: Error) => {
+      console.error('[WS] error', { ns: namespace, error: e.message });
     };
 
     socket.on('connect', onConnect);
     socket.on(evt, onMsg);
     socket.onAny(onAny);
-    socket.on('connect_error', (e) =>
-      console.error('[WS] connect_error', { ns: namespace, error: e?.message ?? e })
-    );
-    socket.on('error', (e) => console.error('[WS] error', { ns: namespace, error: e }));
-
-    if (!API_BASE) socket.connect();
+    socket.on('connect_error', onConnectError);
+    socket.on('error', onError);
 
     return () => {
       socket.off('connect', onConnect);
       socket.off(evt, onMsg);
       socket.offAny(onAny);
-      socket.off('connect_error');
-      socket.off('error');
-      socket.disconnect();
-      console.debug('[WS] cleanup', { ns: namespace });
+      socket.off('connect_error', onConnectError);
+      socket.off('error', onError);
+
       sockRef.current = null;
     };
   }, [sport, entityId]);
