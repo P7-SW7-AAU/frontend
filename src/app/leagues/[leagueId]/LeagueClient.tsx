@@ -23,13 +23,13 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
     const myTeam = league.teams.find(team => team.ownerId === currentUser.id) || null;
     const adminId = league.members.find(member => member.userId === league.commissionerId)?.userId;
 
-    const teamPrices = league.teams.map(team =>
-        team.roster.reduce((sum, player) => sum + player.price, 0)
+    const teamValues = league.teams.map(team =>
+        team.roster.reduce((sum, player) => sum + player.price + (typeof player.weekPriceChange === 'number' ? player.weekPriceChange : 0), 0)
     );
 
     const sortedTeams = [...league.teams]
-        .map((team, idx) => ({ team, price: teamPrices[idx] }))
-        .sort((a, b) => b.price - a.price)
+        .map((team, idx) => ({ team, value: teamValues[idx] }))
+        .sort((a, b) => b.value - a.value)
         .map(({ team }) => team);
 
     let week = 1;
