@@ -11,8 +11,8 @@ import PlayerCardDetailed from '@/components/PlayerCardDetailed';
 
 import { Player } from '@/types';
 
-import { useUser } from '@stackframe/stack';
-import { useEffect } from 'react';
+// import { useUser } from '@stackframe/stack';
+// import { useEffect } from 'react';
 
 interface DashboardClientProps {
     players: Player[];
@@ -22,14 +22,14 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
     const router = useRouter();
 
     // -- ONLY FOR GETTING TOKEN FOR TESTING ENDPOINTS! REMOVE LATER AS WE USE A BETTER APPROACH GETTING TOKEN --
-    const user = useUser();
-    useEffect(() => {
-        (async () => {
-            if (!user) return;
-            const { accessToken } = await user.getAuthJson(); // ← correct API
-            console.log('Access token:', accessToken);
-        })();
-    }, [user]);
+    // const user = useUser();
+    // useEffect(() => {
+    //     (async () => {
+    //         if (!user) return;
+    //         const { accessToken } = await user.getAuthJson(); // ← correct API
+    //         console.log('Access token:', accessToken);
+    //     })();
+    // }, [user]);
     // -- REMOVE ABOVE --
 
     return (
@@ -38,7 +38,7 @@ const DashboardClient = ({ players }: DashboardClientProps) => {
 
             <Banner
                 title="Fantasy Arena"
-                description="Build teams with players from basketball, soccer and F1. Dominate across all sports!"
+                description="Build teams with players from basketball, football and F1. Dominate across all sports!"
                 onClick={() => router.push('/teams')}
                 onSecondaryClick={() => router.push('/players')}
             />
