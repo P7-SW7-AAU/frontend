@@ -63,7 +63,10 @@ const TempTeamClient = ({ tempTeamId, players }: TempTeamClientProps) => {
       }).filter(Boolean);
 
     createTeam(
-      { name: tempTeamId, players: draftedPlayerObjects },
+      { name: tempTeamId, 
+        bank: getRemainingBudget(selectedTeamId),
+        players: draftedPlayerObjects 
+      },
       api
     )
       .then(() => {

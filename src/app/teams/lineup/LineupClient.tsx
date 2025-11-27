@@ -53,7 +53,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
       const player = playersState.find(p => p.id === rosterPlayer.externalId && p.sport === rosterPlayer.sport);
       return sum + ((player?.price || 0) + (player?.weekPriceChange || 0));
     }, 0);
-    return Math.max(TEAM_BUDGET, originalSum);
+    return Math.max(TEAM_BUDGET, originalSum + Number(team.bank));
   }
 
   type DraftedPlayerKey = { id: number, sport: string };
@@ -84,7 +84,7 @@ const LineupClient = ({ players, teams }: LineupClientProps) => {
 
     updateTeam(
       selectedTeamId,
-      { players: draftedPlayerObjects },
+      { bank: getRemainingBudget(selectedTeamId), players: draftedPlayerObjects },
       api
     )
       .then(() => {
