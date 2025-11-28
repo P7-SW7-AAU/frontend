@@ -44,6 +44,9 @@ const LeagueCard = ({ league, teams, currentUser, onEdit, onDelete, onViewLeague
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="secondary" className="px-2 py-1">
+                {league.counts.members}/{league.maxTeams} Members
+              </Badge>
+              <Badge variant="secondary" className="px-2 py-1">
                 {league.counts.teams}/{league.maxTeams} Teams
               </Badge>
             </div>
