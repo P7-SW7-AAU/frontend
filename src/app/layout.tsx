@@ -50,7 +50,7 @@ export default function RootLayout({
             <DeleteLeagueModal leagueId={null} />
             <EditLeagueModal leagueId={null} />
             <JoinLeagueModal />
-            <LeaveLeagueModal leagueId={null} teamId={null} userId={null} />
+            <LeaveLeagueModal leagueId={null} teamId={null} />
             <SelectTeamModal leagueId={null} teams={[]} />
             {children}
           </StackTheme>
