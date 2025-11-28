@@ -39,6 +39,7 @@ const LeaveLeagueModal = ({ leagueId, teamId }: LeaveLeagueModalProps) => {
             toast.success("Left league successfully!");
             leaveLeagueModal.onClose();
             router.push("/leagues");
+            router.refresh();
         } catch (error: unknown) {
             let message = "";
             if (error instanceof Error) {

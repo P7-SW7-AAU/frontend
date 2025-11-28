@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import { AxiosInstance } from "axios";
 
 export const deleteLeagueMember = async (leagueId: string, api: AxiosInstance) => {
     try {
