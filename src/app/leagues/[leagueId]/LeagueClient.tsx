@@ -48,7 +48,7 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
 
     return (
         <Container>
-            <LeaveLeagueModal leagueId={league.id} teamId={myTeam?.id || null} userId={currentUser.id} />
+            <LeaveLeagueModal leagueId={league.id} teamId={myTeam?.id || null} />
             
             <Header
                 title={league.name}

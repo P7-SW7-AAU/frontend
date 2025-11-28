@@ -15,10 +15,9 @@ import { updateTeam } from "@/services/teamsService";
 interface LeaveLeagueModalProps {
     leagueId: string | null;
     teamId: string | null;
-    userId: string | null;
 }
 
-const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) => {
+const LeaveLeagueModal = ({ leagueId, teamId }: LeaveLeagueModalProps) => {
     const { api } = useApi();
     const router = useRouter();
     const leaveLeagueModal = useLeaveLeagueModal();
@@ -36,7 +35,7 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
             if (teamId) {
                 await updateTeam(teamId, { leagueId: null }, api);
             }
-            await deleteLeagueMember(leagueId, userId || "");
+            await deleteLeagueMember(leagueId, api);
             toast.success("Left league successfully!");
             leaveLeagueModal.onClose();
             router.push("/leagues");
@@ -53,7 +52,7 @@ const LeaveLeagueModal = ({ leagueId, teamId, userId }: LeaveLeagueModalProps) =
         } finally {
             setIsLoading(false);
         }
-    }, [leagueId, userId, teamId, api, router, leaveLeagueModal]);
+    }, [leagueId, teamId, api, router, leaveLeagueModal]);
 
     const bodyContent = (
         <div className="flex flex-col gap-4">
