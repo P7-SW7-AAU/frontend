@@ -43,7 +43,7 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
 
     const handleCopyJoinCode = () => {
         navigator.clipboard.writeText(league.joinCode);
-        toast.success("Code copied to clipboard!");
+        toast.success(`Code ${league.joinCode} copied to clipboard!`);
     }
 
     return (
