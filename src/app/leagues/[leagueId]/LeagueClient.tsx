@@ -21,7 +21,6 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
     const leaveLeagueModal = useLeaveLeagueModal();
 
     const myTeam = league.teams.find(team => team.ownerId === currentUser.id) || null;
-    const adminId = league.members.find(member => member.userId === league.commissionerId)?.userId;
 
     const teamValues = league.teams.map(team =>
         team.roster.reduce((sum, player) => sum + player.price + (typeof player.weekPriceChange === 'number' ? player.weekPriceChange : 0), 0)
@@ -56,7 +55,7 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
                 buttonText="Leave League"
                 buttonIcon={DoorOpen}
                 buttonIconSize="4"
-                {...(adminId !== currentUser.id && { onClick: leaveLeagueModal.onOpen })}
+                {...(league.commissionerId !== currentUser.id && { onClick: leaveLeagueModal.onOpen })}
                 secondaryButtonText="View Code"
                 secondaryButtonIcon={Eye}
                 secondaryButtonIconSize="4"
@@ -115,7 +114,7 @@ const LeagueClient = ({ league, currentUser }: LeagueClientProps) => {
                                 key={team.id}
                                 team={team}
                                 index={index}
-                                adminId={adminId}
+                                adminId={league.commissionerId}
                                 myTeam={myTeam ?? null}
                             />
                         ))}
